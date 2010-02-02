@@ -61,16 +61,16 @@ public:
 
   /**
    * Write a pcap header in the output file which specifies
-   * that the content of the file will be IPv4 Packets. This 
-   * method should be invoked before ns3::PcapWriter::WritePacket 
+   * that the content of the file will be IPv4 Packets. This
+   * method should be invoked before ns3::PcapWriter::WritePacket
    * and after ns3::PcapWriter::Open.
    */
   void WriteIpHeader (void);
 
   /**
    * Write a pcap header in the output file which specifies
-   * that the content of the file will be 802.11 Packets. This 
-   * method should be invoked before ns3::PcapWriter::WritePacket 
+   * that the content of the file will be 802.11 Packets. This
+   * method should be invoked before ns3::PcapWriter::WritePacket
    * and after ns3::PcapWriter::Open.
    */
   void WriteWifiHeader (void);
@@ -80,7 +80,7 @@ public:
    * that the content of the file will be 802.11 Packets preceded by a
    * radiotap header providing PHY layer info. This method should be
    * invoked before ns3::PcapWriter::WritePacket and after
-   * ns3::PcapWriter::Open. 
+   * ns3::PcapWriter::Open.
    */
   void WriteWifiRadiotapHeader (void);
 
@@ -89,24 +89,32 @@ public:
    * that the content of the file will be 802.11 Packets preceded by a
    * prism header providing PHY layer info. This method should be
    * invoked before ns3::PcapWriter::WritePacket and after
-   * ns3::PcapWriter::Open. 
+   * ns3::PcapWriter::Open.
    */
   void WriteWifiPrismHeader (void);
 
   /**
    * Write a pcap header in the output file which specifies
-   * that the content of the file will be ppp Packets. This 
-   * method should be invoked before ns3::PcapWriter::WritePacket 
+   * that the content of the file will be ppp Packets. This
+   * method should be invoked before ns3::PcapWriter::WritePacket
    * and after ns3::PcapWriter::Open.
    */
   void WritePppHeader (void);
+
+  /**
+       * Write a pcap header in the output file which specifies
+       * that the content of the file will be 802.16 Packets. This
+       * method should be invoked before ns3::PcapWriter::WritePacket
+       * and after ns3::PcapWriter::Open.
+       */
+  void WriteWimaxM2MHeader (void);
 
   /**
    * \param packet packet to write to output file
    */
   void WritePacket (Ptr<const Packet> packet);
 
-  /** 
+  /**
    * Write a Packet, possibly adding wifi PHY layer information to it
    *
    * @param packet the packet being received
@@ -118,9 +126,9 @@ public:
    * tuned on a given channel and still to be able to receive packets
    * on a nearby channel.
    * @param channelNumber the channel number, as defined by the
-   * IEEE 802.11 standard. 
+   * IEEE 802.11 standard.
    * @param rate the PHY data rate in units of 500kbps (i.e., the same
-   * units used both for the radiotap and for the prism header) 
+   * units used both for the radiotap and for the prism header)
    * @param isShortPreamble true if short preamble is used, false otherwise
    * @param isTx true if packet is being transmitted, false when
    * packet is being received
@@ -128,14 +136,19 @@ public:
    * @param noiseDbm  noise power in dBm
    */
   void WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t channelFreqMhz,  uint16_t channelNumber,
-                              uint32_t rate, bool isShortPreamble, bool isTx, 
+                              uint32_t rate, bool isShortPreamble, bool isTx,
                               double signalDbm, double noiseDbm);
 
-  /** 
-   * Set the maximum number of bytes to be captured for each packet. 
-   * 
+  /**
+    * \param packet packet to write to output file
+    */
+   void WriteWimaxPacket (Ptr<const Packet> packet);
+
+  /**
+   * Set the maximum number of bytes to be captured for each packet.
+   *
    * @param size the maximum number of bytes to be captured. If zero
-   * (default), the whole packet will be captured. 
+   * (default), the whole packet will be captured.
    */
   void SetCaptureSize (uint32_t size);
 
@@ -151,7 +164,7 @@ private:
   std::ofstream *m_writer;
   uint32_t m_pcapMode;
   uint32_t m_captureSize;
-  
+
 };
 
 } // namespace ns3

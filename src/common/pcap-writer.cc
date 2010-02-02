@@ -48,7 +48,7 @@ enum {
   PCAP_80211_RADIOTAP  = 127,
 };
 
-TypeId 
+TypeId
 PcapWriter::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::PcapWriter")
@@ -114,14 +114,14 @@ PcapWriter::Open (std::string const &name)
   NS_LOG_LOGIC ("Writer opened successfully");
 }
 
-void 
+void
 PcapWriter::WriteEthernetHeader (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   WriteHeader (PCAP_ETHERNET);
 }
 
-void 
+void
 PcapWriter::WriteIpHeader (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
@@ -149,14 +149,20 @@ PcapWriter::WriteWifiPrismHeader (void)
   WriteHeader (PCAP_80211_PRISM);
 }
 
-void 
+void
 PcapWriter::WritePppHeader (void)
 {
   NS_LOG_FUNCTION_NOARGS ();
   WriteHeader (PCAP_PPP);
 }
 
-void 
+void
+PcapWriter::WriteWimaxM2MHeader (void)
+{
+  WriteHeader (PCAP_ETHERNET);
+}
+
+void
 PcapWriter::WriteHeader (uint32_t network)
 {
   NS_LOG_FUNCTION (this << network);
@@ -170,10 +176,10 @@ PcapWriter::WriteHeader (uint32_t network)
   m_pcapMode = network;
 }
 
-void 
+void
 PcapWriter::WritePacket (Ptr<const Packet> packet)
 {
-  if (m_writer != 0) 
+  if (m_writer != 0)
     {
       uint64_t current = Simulator::Now ().GetMicroSeconds ();
       uint64_t s = current / 1000000;
@@ -187,40 +193,40 @@ PcapWriter::WritePacket (Ptr<const Packet> packet)
         }
       else
         {
-          thisCaptureSize = std::min (m_captureSize, packet->GetSize ());         
-        }          
-      Write32 (thisCaptureSize); 
+          thisCaptureSize = std::min (m_captureSize, packet->GetSize ());
+        }
+      Write32 (thisCaptureSize);
       Write32 (packet->GetSize ()); // actual packet size
       packet->CopyData (m_writer, thisCaptureSize);
     }
 }
 
 
-void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t channelFreqMhz, uint16_t channelNumber,                                        
-                                        uint32_t rate, bool isShortPreamble, bool isTx, 
+void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t channelFreqMhz, uint16_t channelNumber,
+                                        uint32_t rate, bool isShortPreamble, bool isTx,
                                         double signalDbm, double noiseDbm)
-{  
+{
   NS_LOG_FUNCTION (this << packet->GetSize() << channelFreqMhz << rate << isShortPreamble << isTx << signalDbm << noiseDbm);
 
-  if (m_writer == 0) 
+  if (m_writer == 0)
     {
       return;
     }
 
   if (m_pcapMode == PCAP_80211)
     {
-      WritePacket (packet);    
+      WritePacket (packet);
       return;
     }
-  
+
   /* the following is common between PRISM and RADIOTAP */
-  
+
   uint64_t current = Simulator::Now ().GetMicroSeconds ();
   uint64_t s = current / 1000000;
   uint64_t us = current % 1000000;
   Write32 (s & 0xffffffff);
   Write32 (us & 0xffffffff);
-    
+
 
   // MAC timestamp. Actually according to radiotap specifications
   // (http://www.radiotap.org/defined-fields/TSFT) this should be
@@ -230,14 +236,14 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
   // real devices (e.g. madwifi) handle this case, especially for TX
   // packets (radiotap specs says TSFT is not used for TX packets,
   // but madwifi actually uses it).
-  uint64_t tsft = current;    
+  uint64_t tsft = current;
 
-  
-  uint32_t wifiMonitorHeaderSize;  
-    
+
+  uint32_t wifiMonitorHeaderSize;
+
   if (m_pcapMode == PCAP_80211_PRISM)
     {
-      
+
 #define PRISM_MSG_CODE		 0x00000044
 #define PRISM_MSG_LENGTH         144
 #define PRISM_DID_HOSTTIME	 0x00010044
@@ -263,37 +269,37 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
         }
       else
         {
-          uint32_t thisCaptureSize = std::min (m_captureSize, packet->GetSize () + wifiMonitorHeaderSize);         
-          Write32 (thisCaptureSize); 
+          uint32_t thisCaptureSize = std::min (m_captureSize, packet->GetSize () + wifiMonitorHeaderSize);
+          Write32 (thisCaptureSize);
         }
       Write32 (packet->GetSize () + wifiMonitorHeaderSize); // actual packet size
 
       Write32(PRISM_MSG_CODE);
       Write32(PRISM_MSG_LENGTH);
       WriteData((const uint8_t *)"unknown wifi device!!!!!!!!", 16);
-    
+
       Write32(PRISM_DID_HOSTTIME);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
-      // madwifi reports hosttime in jiffies. 
+      Write16(PRISM_ITEM_LENGTH);
+      // madwifi reports hosttime in jiffies.
       // We calculate jiffies assuming HZ = 10
-      Write32((uint32_t) (Now ().GetMilliSeconds () / 10 ) ); 
+      Write32((uint32_t) (Now ().GetMilliSeconds () / 10 ) );
 
       Write32(PRISM_DID_MACTIME);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
+      Write16(PRISM_ITEM_LENGTH);
       // This looses precision, which is a well-known issue of the prism
       // header format.
       Write32((uint32_t) tsft);
 
       Write32(PRISM_DID_CHANNEL);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH);             
+      Write16(PRISM_ITEM_LENGTH);
       Write32((uint32_t) channelNumber);
 
       Write32(PRISM_DID_RSSI);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
+      Write16(PRISM_ITEM_LENGTH);
       // madwifi here reports a value which is said to be "the value in
       // dBm above noise". Apart from the fact that this is incorrect
       // (if it is relative to a value in dBm, then it must be in dB,
@@ -306,45 +312,45 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
       // SQ field not used. I would expect a PRISM_STATUS_ABSENT to be
       // needed here, but if you look at the prism header that madwifi
       // produces you'll just see that the whole field structure is
-      // zeroed. 
+      // zeroed.
       Write32(0);
       Write16(0);
-      Write16(0); 
+      Write16(0);
       Write32(0);
 
       Write32(PRISM_DID_SIGNAL);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
+      Write16(PRISM_ITEM_LENGTH);
       Write32((uint32_t)round(signalDbm));
 
       Write32(PRISM_DID_NOISE);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
+      Write16(PRISM_ITEM_LENGTH);
       Write32((uint32_t)round(noiseDbm));
-            
-      Write32(PRISM_DID_RATE);    
+
+      Write32(PRISM_DID_RATE);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
+      Write16(PRISM_ITEM_LENGTH);
       Write32(rate);
- 
+
       Write32(PRISM_DID_ISTX);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
+      Write16(PRISM_ITEM_LENGTH);
       Write32(isTx ? 1 : 0);
 
       Write32(PRISM_DID_FRMLEN);
       Write16(PRISM_STATUS_PRESENT);
-      Write16(PRISM_ITEM_LENGTH); 
-      Write32(packet->GetSize ());    
-      
-    
+      Write16(PRISM_ITEM_LENGTH);
+      Write32(packet->GetSize ());
+
+
 
     } // PCAP_80211_PRISM
 
   else if (m_pcapMode == PCAP_80211_RADIOTAP)
-    {      
+    {
       NS_LOG_LOGIC("writing radiotap packet");
-      
+
 #define	RADIOTAP_TSFT               0x00000001
 #define	RADIOTAP_FLAGS              0x00000002
 #define	RADIOTAP_RATE               0x00000004
@@ -353,7 +359,7 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
 #define RADIOTAP_DBM_ANTSIGNAL      0x00000020
 #define RADIOTAP_DBM_ANTNOISE       0x00000040
 #define RADIOTAP_LOCK_QUALITY       0x00000080
-#define RADIOTAP_TX_ATTENUATION     0x00000100    
+#define RADIOTAP_TX_ATTENUATION     0x00000100
 #define RADIOTAP_DB_TX_ATTENUATION  0x00000200
 #define RADIOTAP_DBM_TX_POWER       0x00000200
 #define RADIOTAP_ANTENNA            0x00000400
@@ -361,14 +367,14 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
 #define RADIOTAP_DB_ANTNOISE        0x00001000
 #define RADIOTAP_EXT                0x10000000
 
-#define	RADIOTAP_FLAG_NONE	   0x00	
-#define	RADIOTAP_FLAG_CFP	   0x01	
-#define	RADIOTAP_FLAG_SHORTPRE	   0x02	
-#define	RADIOTAP_FLAG_WEP	   0x04	
-#define	RADIOTAP_FLAG_FRAG	   0x08	
-#define	RADIOTAP_FLAG_FCS	   0x10	
-#define	RADIOTAP_FLAG_DATAPAD	   0x20	
-#define	RADIOTAP_FLAG_BADFCS	   0x40	
+#define	RADIOTAP_FLAG_NONE	   0x00
+#define	RADIOTAP_FLAG_CFP	   0x01
+#define	RADIOTAP_FLAG_SHORTPRE	   0x02
+#define	RADIOTAP_FLAG_WEP	   0x04
+#define	RADIOTAP_FLAG_FRAG	   0x08
+#define	RADIOTAP_FLAG_FCS	   0x10
+#define	RADIOTAP_FLAG_DATAPAD	   0x20
+#define	RADIOTAP_FLAG_BADFCS	   0x40
 
 #define	RADIOTAP_CHANNEL_TURBO	         0x0010
 #define	RADIOTAP_CHANNEL_CCK	         0x0020
@@ -388,7 +394,7 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
 
 #define RADIOTAP_TX_PRESENT (RADIOTAP_TSFT | RADIOTAP_FLAGS  | RADIOTAP_RATE | RADIOTAP_CHANNEL)
 #define RADIOTAP_TX_LENGTH (8+8+1+1+2+2)
-      
+
       if (isTx)
         {
           wifiMonitorHeaderSize = RADIOTAP_TX_LENGTH;
@@ -396,7 +402,7 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
       else
         {
           wifiMonitorHeaderSize = RADIOTAP_RX_LENGTH;
-        }      
+        }
 
       if (m_captureSize == 0)
         {
@@ -404,8 +410,8 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
         }
       else
         {
-          uint32_t thisCaptureSize = std::min (m_captureSize, packet->GetSize () + wifiMonitorHeaderSize);         
-          Write32 (thisCaptureSize); 
+          uint32_t thisCaptureSize = std::min (m_captureSize, packet->GetSize () + wifiMonitorHeaderSize);
+          Write32 (thisCaptureSize);
         }
       Write32 (packet->GetSize () + wifiMonitorHeaderSize); // actual packet size
 
@@ -414,61 +420,61 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
 
       if (isTx)
         {
-          Write16(RADIOTAP_TX_LENGTH); 
-          Write32(RADIOTAP_TX_PRESENT); 
+          Write16(RADIOTAP_TX_LENGTH);
+          Write32(RADIOTAP_TX_PRESENT);
         }
       else
         {
-          Write16(RADIOTAP_RX_LENGTH); 
-          Write32(RADIOTAP_RX_PRESENT); 
+          Write16(RADIOTAP_RX_LENGTH);
+          Write32(RADIOTAP_RX_PRESENT);
         }
 
-      Write64(tsft); 
-      
+      Write64(tsft);
+
       uint8_t flags = RADIOTAP_FLAG_NONE;
       if (isShortPreamble)
         {
-          flags |= RADIOTAP_FLAG_SHORTPRE; 
+          flags |= RADIOTAP_FLAG_SHORTPRE;
         }
       Write8(flags);
-      
 
-      Write8(rate); 
 
-      Write16(channelFreqMhz); 
-      
+      Write8(rate);
+
+      Write16(channelFreqMhz);
+
       uint16_t channelFlags;
       if (channelFreqMhz < 2500)
         {
           // TODO: when 802.11g WifiModes will be implemented
           // we will need to check dinamically whether channelFlags
           // needs to be set to RADIOTAP_CHANNEL_CCK,
-          // RADIOTAP_CHANNEL_DYN or RADIOTAP_CHANNEL_OFDM.          
+          // RADIOTAP_CHANNEL_DYN or RADIOTAP_CHANNEL_OFDM.
           channelFlags = RADIOTAP_CHANNEL_2GHZ | RADIOTAP_CHANNEL_CCK;
         }
       else
         {
           // TODO: we should handle correctly the case of half rate
-          // (10 MHz channel) and quarter rate (5 Mhz channel). 
+          // (10 MHz channel) and quarter rate (5 Mhz channel).
           channelFlags = RADIOTAP_CHANNEL_5GHZ | RADIOTAP_CHANNEL_OFDM;
-        }                
-      Write16(channelFlags); 
-    
+        }
+      Write16(channelFlags);
+
       if (!isTx)
         {
-          
-          Write8 (RoundToInt8 (signalDbm)); 
-          Write8 (RoundToInt8 (noiseDbm)); 
+
+          Write8 (RoundToInt8 (signalDbm));
+          Write8 (RoundToInt8 (noiseDbm));
         }
 
     } // PCAP_80211_RADIOTAP
 
-    
+
   else
     {
-      NS_LOG_ERROR("unknown PCAP mode");      
+      NS_LOG_ERROR("unknown PCAP mode");
       return;
-    }    
+    }
 
   // finally, write rest of packet
   if (m_captureSize == 0)
@@ -477,19 +483,84 @@ void PcapWriter::WriteWifiMonitorPacket(Ptr<const Packet> packet, uint16_t chann
     }
   else
     {
-      packet->CopyData (m_writer, m_captureSize - wifiMonitorHeaderSize);      
+      packet->CopyData (m_writer, m_captureSize - wifiMonitorHeaderSize);
     }
 
 }
-    
-  
-void 
+
+void
+PcapWriter::WriteWimaxPacket (Ptr<const Packet> packet)
+{
+  if (m_writer == 0)
+    {
+      return;
+    }
+  uint64_t current = Simulator::Now ().GetMicroSeconds ();
+  uint64_t s = current / 1000000;
+  uint64_t us = current % 1000000;
+  Write32 (s & 0xffffffff);
+  Write32 (us & 0xffffffff);
+  uint32_t thisCaptureSize;
+  if (m_captureSize == 0)
+    {
+      thisCaptureSize = packet->GetSize () + 24;
+    }
+  else
+    {
+      thisCaptureSize = std::min (m_captureSize, packet->GetSize () + 24);
+    }
+  Write32 (thisCaptureSize);
+  Write32 (packet->GetSize () + 24); // actual packet size
+
+
+  // The following header encoding was reverse-engineered by looking
+  // at existing live pcap traces which could be opened with wireshark
+  // i.e., we have no idea where this is coming from.
+  //
+  // 6 zeros for mac destination
+  // 6 zeros for mac source
+  // 2 bytes for length/type: 0x08f0 (host order)
+  // 2 bytes for sequence number: 0x0001 (host order)
+  // 2 bytes for number of tlvs: 0x0001 (host order)
+  // 1 byte for type of first tlv: 0x09
+  // 1 byte to indicate the length of the length field of the tlv : 0x80 | 0x04
+  // 4 bytes to indicate the size of the packet (network order)
+  // n bytes for the packet data
+
+  uint8_t zero = 0;
+  WriteData (&zero, 6); // mac eth destination
+  WriteData (&zero, 6); // mac eth source
+  Write8 (0xf0); // eth length/type low order byte
+  Write8 (0x08); // eth length/type high order byte
+  Write8 (0x01); // sequence number low order byte
+  Write8 (0x00); // sequence number high order byte
+  Write8 (0x01); // number of tlvs low order byte
+  Write8 (0x00); // number of tlvs high order byte
+  Write8 (0x09); // type of first tlv
+  Write8 (0x80 | 0x04); // the length field is encoded on 4 bytes
+  uint32_t len = packet->GetSize ();
+  while (len > 0xff)
+    {
+      Write8 (len & 0xff);
+      len >>= 8;
+    }
+  if (m_captureSize == 0)
+    {
+      packet->CopyData (m_writer, packet->GetSize ());
+    }
+  else
+    {
+      packet->CopyData (m_writer, m_captureSize - 24);
+    }
+}
+
+void
 PcapWriter::SetCaptureSize (uint32_t size)
 {
   m_captureSize = size;
 }
 
-int8_t 
+int8_t
 PcapWriter::RoundToInt8 (double value)
 {
   if (value < -128)
