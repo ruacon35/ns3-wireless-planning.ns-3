@@ -88,8 +88,8 @@ public:
   void SetBlockParameters (uint32_t burstSize, WimaxPhy::ModulationType modulationType);
   uint16_t GetNrBlocks (uint32_t burstSize, WimaxPhy::ModulationType modulationType) const;
 
-  double GetBandwidth (void) const;
-  void SetBandwidth (double BW);
+  uint32_t GetBandwidth (void) const;
+  void SetBandwidth (uint32_t BW);
 
   double GetTxPower (void) const;
   void SetTxPower (double txPower);

@@ -183,14 +183,14 @@ SimpleOfdmWimaxPhy::SetSNRToBlockErrorRateTracesPath (char * tracesPath)
   m_snrToBlockErrorRateManager->ReLoadTraces ();
 }
 
-double
+uint32_t
 SimpleOfdmWimaxPhy::GetBandwidth (void) const
 {
   return WimaxPhy::GetChannelBandwidth ();
 }
 
 void
-SimpleOfdmWimaxPhy::SetBandwidth (double BW)
+SimpleOfdmWimaxPhy::SetBandwidth (uint32_t BW)
 {
   WimaxPhy::SetChannelBandwidth (BW);
 }
