@@ -38,6 +38,7 @@ SNRToBlockErrorRateManager::SNRToBlockErrorRateManager (void)
       m_recordModulation[i] = new std::vector<SNRToBlockErrorRateRecord*> ();
     }
   m_activateLoss = false;
+  strcpy(m_traceFilePath,"DefaultTraces");
 }
 
 SNRToBlockErrorRateManager::~SNRToBlockErrorRateManager (void)
