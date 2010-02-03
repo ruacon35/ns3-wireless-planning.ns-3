@@ -46,7 +46,7 @@ NS_LOG_COMPONENT_DEFINE ("SubscriberStationNetDevice");
 
 namespace ns3 {
 
-NS_OBJECT_ENSURE_REGISTERED ( SubscriberStationNetDevice);
+NS_OBJECT_ENSURE_REGISTERED (SubscriberStationNetDevice);
 
 Time SubscriberStationNetDevice::GetDefaultLostDlMapInterval ()
 {
@@ -58,7 +58,7 @@ SubscriberStationNetDevice::GetTypeId (void)
 {
   static TypeId
   tid =
-    TypeId ("ns3::SubscriberStationNetDevice.")
+    TypeId ("ns3::SubscriberStationNetDevice")
 
     .SetParent<WimaxNetDevice> ()
 
@@ -71,7 +71,7 @@ SubscriberStationNetDevice::GetTypeId (void)
                    MakePointerChecker<WimaxConnection> ())
 
     .AddAttribute ("PrimaryConnection",
-                   "Primary connection.",
+                   "Primary connection",
                    PointerValue (),
                    MakePointerAccessor (&SubscriberStationNetDevice::m_primaryConnection),
                    MakePointerChecker<WimaxConnection> ())
