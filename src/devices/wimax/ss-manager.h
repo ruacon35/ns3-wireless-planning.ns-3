@@ -46,7 +46,6 @@ public:
    */
   SSRecord* GetSSRecord (Cid cid) const;
   std::vector<SSRecord*>* GetSSRecords (void) const;
-  SSRecord* CreateMulticastSSRecord (const Mac48Address &macAddress);
   bool IsInRecord (const Mac48Address &macAddress) const;
   bool IsRegistered (const Mac48Address &macAddress) const;
   void DeleteSSRecord (Cid cid);

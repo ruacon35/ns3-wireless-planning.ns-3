@@ -54,15 +54,6 @@ SSManager::CreateSSRecord (const Mac48Address &macAddress)
 }
 
 SSRecord*
-SSManager::CreateMulticastSSRecord (const Mac48Address &macAddress)
-{
-  SSRecord *ssRecord = new SSRecord (macAddress);
-  ssRecord->SetIsBroadcastSS (true);
-  m_ssRecords->push_back (ssRecord);
-  return ssRecord;
-}
-
-SSRecord*
 SSManager::GetSSRecord (const Mac48Address &macAddress) const
 {
   for (std::vector<SSRecord*>::iterator iter = m_ssRecords->begin (); iter != m_ssRecords->end (); ++iter)

@@ -116,10 +116,6 @@ PacketBurst::End (void) const
   return m_packets.end ();
 }
 
-void
-PacketBurst::Print (void) const
-{
-}
 
 } // namespace ns3
 

@@ -44,8 +44,6 @@ public:
 
   std::list<Ptr<Packet> >::const_iterator Begin (void) const;
   std::list<Ptr<Packet> >::const_iterator End (void) const;
-
-  void Print (void) const;
 private:
   void DoDispose (void);
   friend bool operator == (const PacketBurst &a, const PacketBurst &b);

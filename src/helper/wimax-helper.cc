@@ -399,23 +399,6 @@ Ptr<WimaxNetDevice> WimaxHelper::Install (Ptr<Node> node,
   return device;
 }
 
-/*
- void WimaxHelper::BsSetupMulticastConnection (Ptr<BaseStationNetDevice> bs,
- Ipv4Address multicastSource,
- Ipv4Address multicastGroupe,
- uint16_t srcPort,
- uint16_t dstPort,
- uint16_t protocol,
- QoSParameterSet *parameterSet,
- WimaxPhy::ModulationType modType)
- {
-
- Mac48Address dstMacAddress = Mac48Address::GetMulticast (multicastGroupe);
- SSRecord *ss = bs->GetSSManager ()->CreateMulticastSSRecord (dstMacAddress);
- ss->SetModulationType (modType);
- bs->GetServiceFlowManager ()->CreateMulticastServiceFlow (dstMacAddress, parameterSet);
- }
- */
 void WimaxHelper::AsciiEnqueueEvent (std::ostream *os, std::string path, Ptr<const Packet> packet)
 {
   *os << "+ " << Simulator::Now ().GetSeconds () << " ";
