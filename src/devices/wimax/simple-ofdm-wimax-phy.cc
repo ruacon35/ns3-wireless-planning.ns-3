@@ -449,7 +449,7 @@ SimpleOfdmWimaxPhy::EndReceiveFecBlock (bvec fecBlock,
           Simulator::Schedule (Seconds (0),
                                &SimpleOfdmWimaxPhy::EndReceive,
                                this,
-                               ConvertBitsToBurst (RecreateBuffer()));
+                               ConvertBitsToBurst (RecreateBuffer ()));
         }
       else
         {
@@ -550,7 +550,7 @@ SimpleOfdmWimaxPhy::ConvertBitsToBurst (bvec buffer)
           packetSize = (uint16_t)((uint16_t)(Len_MSB << 8) | (uint16_t)(pstart[pos + 2]));
           if (packetSize == 0)
             {
-              break;//padding
+              break; // padding
             }
         }
 
