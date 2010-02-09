@@ -78,7 +78,6 @@ void
 WimaxConnection::DoDispose (void)
 {
   m_queue = 0;
-  // m_serviceFlow = 0;
 }
 
 Cid

@@ -81,8 +81,7 @@ public:
   bvec ConvertBurstToBits (Ptr<const PacketBurst> burst);
   Ptr<PacketBurst> ConvertBitsToBurst (bvec buffer);
   void CreateFecBlocks (const bvec &buffer, WimaxPhy::ModulationType modulationType);
-  bvec RecreateBuffer (WimaxPhy::ModulationType modulationType);
-  bvec RecreateBuffer (WimaxPhy::ModulationType modulationType, uint32_t burst);
+  bvec RecreateBuffer ();
   uint32_t GetFecBlockSize (WimaxPhy::ModulationType type) const;
   uint32_t GetCodedFecBlockSize (WimaxPhy::ModulationType modulationType) const;
   void SetBlockParameters (uint32_t burstSize, WimaxPhy::ModulationType modulationType);
@@ -132,13 +131,6 @@ public:
    * purposes.
    */
   void NotifyRxDrop (bvec packet);
-
-  /*the following two fields have been defined as static so that receiver PHY has access to them. it is also useful (the second one) for catching
-   potential bugs, i.e., when stations's transmissions overlap, e.g. when a station tries to tranmsit before the transmission of another station was
-   completed. since it is a TDMA mechanism, each station is supposed to transmit in its allocated time-slot and no  overlapping shall happen. one
-   exception is the contention initial  ranging where multiple stations can transmit in same TO causing a collision.*/
-  Ptr<PacketBurst> m_burstCopy; // copy of burst before it is splitted into blocks, used at the receiving side to get packet metadata and tags
-  bvec bufferCopy; // temp just to compare
 private:
   void DoDispose (void);
   void EndSend (void);
@@ -178,11 +170,13 @@ private:
   void SetTraceFilePath (std::string path);
 
   uint16_t m_fecBlockSize; // in bits, size of FEC block transmitted after PHY operations
+  uint32_t m_currentBurstSize;
 
   std::list<bvec> *m_receivedFecBlocks; // a list of received FEC blocks until they are combined to recreate the full burst buffer
   uint32_t m_nrFecBlocksSent; // counting the number of FEC blocks sent (within a burst)
   std::list<bvec> *m_fecBlocks;
   Time m_blockTime;
+
   TracedCallback<Ptr<const PacketBurst> > m_traceRx;
   TracedCallback<Ptr<const PacketBurst>, WimaxPhy::ModulationType, uint16_t, uint16_t> m_traceTx;
 

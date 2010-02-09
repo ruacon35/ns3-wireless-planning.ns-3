@@ -61,10 +61,6 @@ public:
 
   void AllocateServiceFlows (const DsaReq &dsaReq, Cid cid);
   DsaRsp CreateDsaRsp (const ServiceFlow *serviceFlow, uint16_t transactionId);
-
-  // ServiceFlow* CreateMulticastServiceFlow (const Mac48Address &macAddress,
-  //                                         QoSParameterSet *parameterSet);
-
   void AddMulticastServiceFlow (ServiceFlow sf, enum WimaxPhy::ModulationType modulation);
   void ScheduleDsaRsp (ServiceFlow *serviceFlow, Cid cid);
   void ProcessDsaAck (const DsaAck &dsaAck, Cid cid);

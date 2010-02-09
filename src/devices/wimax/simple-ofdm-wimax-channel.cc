@@ -165,7 +165,6 @@ SimpleOfdmWimaxChannel::Send (Time BlockTime,
               delay = (senderMobility->GetDistanceFrom (receiverMobility)) / 300000000LL;
               rxPowerDbm = m_loss->CalcRxPower (rxPowerDbm, senderMobility, receiverMobility);
             }
-          // delay=0;
           simpleOfdmSendParam * param = new simpleOfdmSendParam (fecBlock,
                                                                  burstSize,
                                                                  isFirstBlock,

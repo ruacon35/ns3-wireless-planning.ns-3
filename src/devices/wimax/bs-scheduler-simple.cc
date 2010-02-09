@@ -57,8 +57,10 @@ BSSchedulerSimple::BSSchedulerSimple ()
 BSSchedulerSimple::BSSchedulerSimple (Ptr<BaseStationNetDevice> bs)
   : m_downlinkBursts (new std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > ())
 {
-  // m_downlinkBursts is filled by AddDownlinkBurst and emptied by
-  // wimax-bs-net-device::sendBurst and wimax-ss-net-device::sendBurst
+  /*
+   * m_downlinkBursts is filled by AddDownlinkBurst and emptied by
+   * wimax-bs-net-device::sendBurst and wimax-ss-net-device::sendBurst
+   */
   SetBs (bs);
 }
 

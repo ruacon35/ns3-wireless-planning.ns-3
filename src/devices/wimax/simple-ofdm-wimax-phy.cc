@@ -143,7 +143,7 @@ SimpleOfdmWimaxPhy::InitSimpleOfdmWimaxPhy (void)
   SetNrCarriers (192);
   m_fecBlocks = new std::list<bvec>;
   m_receivedFecBlocks = new std::list<bvec>;
-  m_burstCopy = 0;
+  m_currentBurstSize = 0;
   m_noiseFigure = 5; // dB
   m_txPower = 30; // dBm
   SetBandwidth (10000000); // 10Mhz
@@ -256,7 +256,7 @@ SimpleOfdmWimaxPhy::Send (Ptr<PacketBurst> burst,
                           uint8_t direction,
                           uint32_t symbolIndex)
 {
-  m_burstCopy = burst->Copy ();
+  m_currentBurstSize = burst->GetSize ();
   m_nrFecBlocksSent = 0;
 
   bvec buffer = ConvertBurstToBits (burst);
@@ -289,7 +289,7 @@ SimpleOfdmWimaxPhy::StartSendFecBlock (bool isFirstBlock,
   NotifyTxBegin (fecBlock);
   channel->Send (m_blockTime,
                  fecBlock,
-                 m_burstCopy->GetSize (),
+                 m_currentBurstSize,
                  this,
                  isFirstBlock,
                  GetTxFrequency (),
@@ -307,7 +307,7 @@ SimpleOfdmWimaxPhy::EndSendFecBlock (WimaxPhy::ModulationType modulationType,
   m_nrFecBlocksSent++;
   SetState (PHY_STATE_IDLE);
   // this is the last FEC block of the burst
-  if (m_nrFecBlocksSent * m_blockSize == m_burstCopy->GetSize () * 8 + m_paddingBits)
+  if (m_nrFecBlocksSent * m_blockSize == m_currentBurstSize * 8 + m_paddingBits)
     {
       NS_ASSERT_MSG (m_fecBlocks->size () == 0, "Error while sending a fec block: size of the fec bloc !=0");
     }
@@ -380,9 +380,6 @@ SimpleOfdmWimaxPhy::StartReceive (const bvec &fecBlock,
     case PHY_STATE_SCANNING:
       if (frequency == GetScanningFrequency ())
         {
-          // PHY frame detected (see Figure 56)
-          // will start synchronization next
-
           Simulator::Cancel (GetChnlSrchTimeoutEvent ());
           SetScanningCallback ();
           SetSimplex (frequency);
@@ -431,8 +428,9 @@ SimpleOfdmWimaxPhy::EndReceiveFecBlock (bvec fecBlock,
                                         uint8_t drop)
 {
   NS_ASSERT_MSG ((uint32_t) fecBlock.size () == GetFecBlockSize (modulationType),
-                 "Error while receiving FEC block: The FEC bloc size is not correct received: " << fecBlock.size ()
-                                                                                                << "Should be:" << GetFecBlockSize (modulationType));
+                 "Error while receiving FEC block: The FEC bloc size is not correctly received: " << fecBlock.size ()
+                                                                                                  << "Should be:"
+                                                                                                  << GetFecBlockSize (modulationType));
 
   SetState (PHY_STATE_IDLE);
   m_receivedFecBlocks->push_back (fecBlock);
@@ -451,7 +449,7 @@ SimpleOfdmWimaxPhy::EndReceiveFecBlock (bvec fecBlock,
           Simulator::Schedule (Seconds (0),
                                &SimpleOfdmWimaxPhy::EndReceive,
                                this,
-                               ConvertBitsToBurst (RecreateBuffer (modulationType, burstSize)));
+                               ConvertBitsToBurst (RecreateBuffer()));
         }
       else
         {
@@ -500,7 +498,6 @@ SimpleOfdmWimaxPhy::ConvertBurstToBits (Ptr<const PacketBurst> burst)
       free (pstart);
     }
 
-  bufferCopy = buffer; // saving a copy to compare later on
   return buffer;
 }
 
@@ -551,6 +548,10 @@ SimpleOfdmWimaxPhy::ConvertBitsToBurst (bvec buffer)
           // Read the size
           uint8_t Len_MSB = pstart[pos + 1] & 0x07;
           packetSize = (uint16_t)((uint16_t)(Len_MSB << 8) | (uint16_t)(pstart[pos + 2]));
+          if (packetSize == 0)
+            {
+              break;//padding
+            }
         }
 
       Ptr<Packet> p = Create<Packet> (&(pstart[pos]), packetSize);
@@ -582,13 +583,8 @@ SimpleOfdmWimaxPhy::CreateFecBlocks (const bvec &buffer, WimaxPhy::ModulationTyp
     }
 }
 
-/*
- Modulation type shall actually be determined from the current burst profile as indicated in DL-MAP/UL-MAP.
- The recreated buffer contains padding bits or not is determined using the copy of original burst stored. Shall
- actually be determined using the burst size information from DL-MAP/UL-MAP.
- */
 bvec
-SimpleOfdmWimaxPhy::RecreateBuffer (WimaxPhy::ModulationType modulationType)
+SimpleOfdmWimaxPhy::RecreateBuffer ()
 {
 
   bvec buffer (m_blockSize * m_nrBlocks);
@@ -601,37 +597,6 @@ SimpleOfdmWimaxPhy::RecreateBuffer (WimaxPhy::ModulationType modulationType)
       m_receivedFecBlocks->pop_front ();
       i += m_blockSize;
     }
-
-  // removing the padding
-  if ((uint32_t) buffer.size () > m_burstCopy->GetSize () * 8)
-    {
-      buffer.resize (m_burstCopy->GetSize () * 8);
-    }
-
-  return buffer;
-}
-
-bvec
-SimpleOfdmWimaxPhy::RecreateBuffer (WimaxPhy::ModulationType modulationType, uint32_t burstSize)
-{
-
-  bvec buffer (m_blockSize * m_nrBlocks);
-  bvec block (m_blockSize);
-  uint32_t i = 0;
-  for (uint32_t j = 0; j < m_nrBlocks; j++)
-    {
-      bvec tmpRecFecBloc = m_receivedFecBlocks->front ();
-      buffer.insert (buffer.begin () + i, tmpRecFecBloc.begin (), tmpRecFecBloc.end ());
-      m_receivedFecBlocks->pop_front ();
-      i += m_blockSize;
-    }
-
-  // removing the padding
-  if ((uint32_t) buffer.size () > burstSize * 8)
-    {
-      buffer.resize (burstSize * 8);
-    }
-
   return buffer;
 }
 
