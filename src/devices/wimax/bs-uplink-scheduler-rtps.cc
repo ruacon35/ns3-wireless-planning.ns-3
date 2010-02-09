@@ -82,7 +82,7 @@ UplinkSchedulerRtps::GetUplinkAllocations (void) const
 void
 UplinkSchedulerRtps::GetChannelDescriptorsToUpdate (bool &updateDcd, bool &updateUcd, bool &sendDcd, bool &sendUcd)
 {
-  /*XXX, DCD and UCD shall actually be updated when channel or burst profile definitions
+  /*DCD and UCD shall actually be updated when channel or burst profile definitions
    change. burst profiles are updated based on number of SSs, network conditions and etc.
    for now temporarily assuming DCD/UCD shall be updated everytime */
 
