@@ -509,8 +509,7 @@ BaseStationNetDevice::Start (void)
   GetPhy ()->SetSimplex (m_linkManager->SelectDlChannel ());
   Simulator::ScheduleNow (&BaseStationNetDevice::StartFrame, this);
 
-  /* shall actually be 2 symbols = 1 (preamble) + 1 (bandwidth request header)
-   if bandwidth request header is implemented exactly as in spec, see Question 66 */
+  /* shall actually be 2 symbols = 1 (preamble) + 1 (bandwidth request header)*/
   m_bwReqOppSize = 6;
   m_uplinkScheduler->InitOnce ();
 }
@@ -669,6 +668,8 @@ BaseStationNetDevice::DoReceive (Ptr<Packet> packet)
   Mac48Address source;
   LlcSnapHeader llc;
   Ptr<WimaxConnection> connection = 0;
+  FragmentationSubheader fragSubhdr;
+  bool fragmentation = false;  // it becames true when there is a fragmentation subheader
 
   packet->RemoveHeader (gnrcMacHdr);
   if (gnrcMacHdr.GetHt () == MacHeaderType::HEADER_TYPE_GENERIC)
@@ -692,7 +693,16 @@ BaseStationNetDevice::DoReceive (Ptr<Packet> packet)
             {
               packet->RemoveHeader (grantMgmntSubhdr);
             }
+          // Check if there is a fragmentation Subheader
+          uint8_t tmpType = type;
+          if (((tmpType >> 2) & 1) == 1)
+            {
+              // a TRANSPORT packet with fragmentation subheader has been received!
+              NS_LOG_INFO ("FRAG_DEBUG: DoReceive -> the packet is a fragment" << std::endl);
+              fragmentation = true;
+            }
         }
+
       if (cid.IsInitialRanging ()) // initial ranging connection
         {
           packet->RemoveHeader (msgType);
@@ -776,14 +786,57 @@ BaseStationNetDevice::DoReceive (Ptr<Packet> packet)
         }
       else // transport connection
         {
-
+          // If fragmentation is true, the packet is a fragment.
           Ptr<Packet> C_Packet = packet->Copy ();
-          C_Packet->RemoveHeader (llc);
+          if (!fragmentation)
+            {
+              C_Packet->RemoveHeader (llc);
+              source = m_ssManager->GetMacAddress (cid);
+              m_bsRxTrace (packet);
+              ForwardUp (packet->Copy (), source, Mac48Address ("ff:ff:ff:ff:ff:ff"));
+            }
+          else
+            {
+              NS_LOG_INFO ( "FRAG_DEBUG: BS DoReceive, the Packet is a fragment" << std::endl);
+              packet->RemoveHeader (fragSubhdr);
+              uint32_t fc = fragSubhdr.GetFc ();
+              NS_LOG_INFO ("\t fragment size = " << packet->GetSize () << std::endl);
+              if (fc == 2)
+                {
+                  // This is the latest fragment.
+                  // Take the fragment queue, defragment a packet and send it to the upper layer
+                  NS_LOG_INFO ("\t Received the latest fragment" << std::endl);
+                  GetConnectionManager ()->GetConnection (cid)
+                  ->FragmentEnqueue (packet);
+                  WimaxConnection::FragmentsQueue fragmentsQueue = GetConnectionManager ()->
+                    GetConnection (cid)->GetFragmentsQueue ();
+                  Ptr<Packet> fullPacket = Create<Packet> ();
 
-          source = m_ssManager->GetMacAddress (cid);
-          // m_traceBSRx (packet, source, &cid);
-          m_bsRxTrace (packet);
-          ForwardUp (packet->Copy (), source, Mac48Address ("ff:ff:ff:ff:ff:ff"));
+                  // DEFRAGMENTATION
+                  NS_LOG_INFO ("\t BS PACKET DEFRAGMENTATION" << std::endl);
+                  for (std::list<Ptr<const Packet> >::const_iterator iter = fragmentsQueue.begin ();
+                       iter != fragmentsQueue.end (); ++iter)
+                    {
+                      // Create the whole Packet
+                      fullPacket->AddAtEnd (*iter);
+                    }
+                  GetConnectionManager ()->GetConnection (cid)
+                  ->ClearFragmentsQueue ();
+
+                  NS_LOG_INFO ("\t fullPacket size = " << fullPacket->GetSize () << std::endl);
+                  source = m_ssManager->GetMacAddress (cid);
+                  m_bsRxTrace (fullPacket);
+                  ForwardUp (fullPacket->Copy (), source, Mac48Address ("ff:ff:ff:ff:ff:ff"));
+                }
+              else
+                {
+                  // This is the first or middle fragment.
+                  // Take the fragment queue, store the fragment into the queue
+                  NS_LOG_INFO ("\t Received the first or the middle fragment" << std::endl);
+                  GetConnectionManager ()->GetConnection (cid)
+                  ->FragmentEnqueue (packet);
+                }
+            }
         }
     }
   else
@@ -812,9 +865,6 @@ BaseStationNetDevice::CreateMapMessages (void)
 {
   Ptr<Packet> dlmap, ulmap;
   bool sendDcd = false, sendUcd = false, updateDcd = false, updateUcd = false;
-
-  /*not sure but there may be the situation when DCD/UCD is sent but not updated, e.g., previously
-   saved copy is sent again. however it is not clear and is under discussion. Question 85*/
 
   uint16_t currentNrSsRegistered = m_ssManager->GetNRegisteredSSs ();
 
@@ -947,7 +997,7 @@ BaseStationNetDevice::CreateDlMap (void)
        != downlinkBursts->end (); ++iter)
     {
       iter->first->SetPreamblePresent (0);
-      iter->first->SetStartTime (0); // note: StartTime field is not utilized, see Question 84
+      iter->first->SetStartTime (0);
       dlmap.AddDlMapElement (*(iter->first));
     }
 

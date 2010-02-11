@@ -270,7 +270,7 @@ UplinkSchedulerMBQoS::Schedule (void)
               && !ssRecord->GetAreServiceFlowsAllocated ())
             {
 
-              // allocating grant (with arbitrary size) to allow SS to send DSA messages DSA-REQ and DSA-ACK (See Question 145)
+              // allocating grant (with arbitrary size) to allow SS to send DSA messages DSA-REQ and DSA-ACK
               // only one DSA allocation per frame
               if (!allocationForDsa)
                 {

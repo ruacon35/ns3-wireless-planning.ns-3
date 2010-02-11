@@ -46,6 +46,8 @@ public:
                 const GenericMacHeader &hdr);
   Ptr<Packet> Dequeue (MacHeaderType::HeaderType packetType =
                          MacHeaderType::HEADER_TYPE_GENERIC);
+  Ptr<Packet> Dequeue (MacHeaderType::HeaderType packetType,
+                       uint32_t availableByte);
 
   /**
    * \brief Same as Dequeue but does not pop from queue
@@ -75,17 +77,47 @@ public:
 
   uint32_t GetSize (void) const;
   uint32_t GetNBytes (void) const;
+
+  /**
+   * \brief Fragmentation utilities
+   */
+  bool CheckForFragmentation (MacHeaderType::HeaderType packetType);
+  uint32_t GetFirstPacketHdrSize (MacHeaderType::HeaderType packetType);
+  uint32_t GetFirstPacketPayloadSize (MacHeaderType::HeaderType packetType);
+  uint32_t GetFirstPacketRequiredByte (MacHeaderType::HeaderType packetType);
+
+  uint32_t GetQueueLengthWithMACOverhead (void);
+
+  void SetFragmentation (MacHeaderType::HeaderType packetType);
+  void SetFragmentNumber (MacHeaderType::HeaderType packetType);
+  void SetFragmentOffset (MacHeaderType::HeaderType packetType, uint32_t offset);
 private:
   struct QueueElement
   {
     QueueElement (void);
-    QueueElement (Ptr<Packet> packet, const MacHeaderType &hdrType,
-                  const GenericMacHeader &hdr, Time timeStamp);
+    QueueElement (Ptr<Packet> packet, 
+                  const MacHeaderType &hdrType,
+                  const GenericMacHeader &hdr, 
+                  Time timeStamp);
     uint32_t GetSize (void) const;
     Ptr<Packet> m_packet;
     MacHeaderType m_hdrType;
     GenericMacHeader m_hdr;
     Time m_timeStamp;
+
+    /*
+     To menage fragmentation feature, each QueueElement have 3 new fields:
+     m_fragmentation that became true when the fragmentation starts;
+     m_fragmentNumber that are incremented when a new fragment is sent
+     m_fragmentOffset that describe the start of the next fragment into the packet
+     */
+    bool m_fragmentation;
+    uint32_t m_fragmentNumber;
+    uint32_t m_fragmentOffset;
+
+    void SetFragmentation (void);
+    void SetFragmentNumber (void);
+    void SetFragmentOffset (uint32_t offset);
   };
 
   /*
@@ -109,8 +141,7 @@ private:
   TracedCallback<Ptr<const Packet> > m_traceDequeue;
   TracedCallback<Ptr<const Packet> > m_traceDrop;
 public:
-  const WimaxMacQueue::PacketQueue &
-  GetPacketQueue (void) const;
+  const WimaxMacQueue::PacketQueue & GetPacketQueue (void) const;
 };
 
 } // namespace ns3

@@ -71,10 +71,6 @@ BSLinkManager::ProcessRangingRequest (Cid cid, RngReq rngreq)
 
   if (m_bs->GetUplinkScheduler ()->GetIsInvIrIntrvlAllocated ())
     {
-      /*assuming invited IR interval is composed of one ranging opportunity, see Question 94
-       temporarily assuming that invited IR interval is allocated just next to the regular IR interval
-       however will not work if multiple invited intervals are allocated*/
-
       if (m_bs->GetUplinkScheduler ()->GetIsIrIntrvlAllocated ())
         {
           irIntervalBoundary = m_bs->GetUlSubframeStartTime ()

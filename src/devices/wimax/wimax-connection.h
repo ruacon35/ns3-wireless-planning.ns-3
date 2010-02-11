@@ -56,10 +56,28 @@ public:
   uint8_t GetSchedulingType (void) const;
   bool Enqueue (Ptr<Packet> packet, const MacHeaderType &hdrType, const GenericMacHeader &hdr);
   Ptr<Packet> Dequeue (MacHeaderType::HeaderType packetType = MacHeaderType::HEADER_TYPE_GENERIC);
+  Ptr<Packet> Dequeue (MacHeaderType::HeaderType packetType, uint32_t availableByte);
   bool HasPackets (void) const;
   bool HasPackets (MacHeaderType::HeaderType packetType) const;
 
   std::string GetTypeStr (void) const;
+
+  // Definition of Fragments Queue data type
+  typedef std::list<Ptr<const Packet> > FragmentsQueue;
+  /**
+   * \brief get a queue of received fragments
+   */
+  const FragmentsQueue GetFragmentsQueue (void) const;
+  /**
+   * \brief enqueue a received packet (that is a fragment) into the fragments queue
+   * \param fragment received fragment
+   */
+  void FragmentEnqueue (Ptr<const Packet> fragment);
+  /**
+   * \brief delete all enqueued fragments
+   */
+  void ClearFragmentsQueue (void);
+
 private:
   virtual void DoDispose (void);
 
@@ -67,6 +85,9 @@ private:
   enum Cid::Type m_cidType;
   Ptr<WimaxMacQueue> m_queue;
   ServiceFlow *m_serviceFlow;
+
+  // FragmentsQueue stores all received fragments
+  FragmentsQueue m_fragmentsQueue;
 };
 
 } // namespace ns3

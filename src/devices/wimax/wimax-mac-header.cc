@@ -587,5 +587,95 @@ uint32_t GrantManagementSubheader::Deserialize (Buffer::Iterator start)
   return i.GetDistanceFrom (start);
 }
 
+// ----------------------------------------------------------------------------------------------------------
+
+NS_OBJECT_ENSURE_REGISTERED ( FragmentationSubheader);
+
+FragmentationSubheader::FragmentationSubheader (void)
+  : m_fc (0),
+    m_fsn (0)
+{
+}
+
+FragmentationSubheader::~FragmentationSubheader (void)
+{
+}
+
+void
+FragmentationSubheader::SetFc (uint8_t fc)
+{
+  m_fc = fc;
+}
+
+void
+FragmentationSubheader::SetFsn (uint8_t fsn)
+{
+  m_fsn = fsn;
+}
+
+uint8_t
+FragmentationSubheader::GetFc (void) const
+{
+  return m_fc;
+}
+
+uint8_t
+FragmentationSubheader::GetFsn (void) const
+{
+  return m_fsn;
+}
+
+
+std::string
+FragmentationSubheader::GetName (void) const
+{
+  return "Fragmentation Subheader";
+}
+
+TypeId
+FragmentationSubheader::GetTypeId (void)
+{
+  static TypeId tid = TypeId ("ns3::FragmentationSubheader").SetParent<
+      Header> ().AddConstructor<FragmentationSubheader> ();
+  return tid;
+}
+
+TypeId
+FragmentationSubheader::GetInstanceTypeId (void) const
+{
+  return GetTypeId ();
+}
+
+void
+FragmentationSubheader::Print (std::ostream &os) const
+{
+  os << " fc (fragment control) = " << (uint32_t) m_fc << ", fsn (fragmentation sequence number) = "
+     << (uint32_t) m_fsn << "\n";
+}
+
+uint32_t
+FragmentationSubheader::GetSerializedSize (void) const
+{
+  return 2;
+}
+
+void
+FragmentationSubheader::Serialize (Buffer::Iterator start) const
+{
+  Buffer::Iterator i = start;
+  i.WriteU8 (m_fc);
+  i.WriteU8 (m_fsn);
+}
+
+uint32_t
+FragmentationSubheader::Deserialize (Buffer::Iterator start)
+{
+  Buffer::Iterator i = start;
+  m_fc = i.ReadU8 ();
+  m_fsn = i.ReadU8 ();
+
+  return i.GetDistanceFrom (start);
+}
+
 }
 ; // namespace ns3

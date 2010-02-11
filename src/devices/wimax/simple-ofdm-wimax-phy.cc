@@ -815,51 +815,66 @@ SimpleOfdmWimaxPhy::SetBlockParameters (uint32_t burstSize, WimaxPhy::Modulation
 uint16_t
 SimpleOfdmWimaxPhy::DoGetTtg (void) const
 {
-  // assumed equal to 2 symbols, see Question 134
+  // assumed equal to 2 symbols
   return 2 * GetPsPerSymbol ();
 }
 
 uint16_t
 SimpleOfdmWimaxPhy::DoGetRtg (void) const
 {
-  // assumed equal to 2 symbols, see Question 134
+  // assumed equal to 2 symbols
   return 2 * GetPsPerSymbol ();
 }
 
 uint8_t
 SimpleOfdmWimaxPhy::DoGetFrameDurationCode (void) const
 {
-  double duration = GetFrameDuration ().GetSeconds () * 1000; // to milliseconds
-  if (duration == 2.5)
+  uint16_t duration = 0;
+  duration = GetFrameDuration ().GetSeconds () * 10000;
+  switch (duration)
     {
-      return FRAME_DURATION_2_POINT_5_MS;
+    case 25:
+      {
+        return FRAME_DURATION_2_POINT_5_MS;
+        break;
+      }
+    case 40:
+      {
+        return FRAME_DURATION_4_MS;
+        break;
+      }
+    case 50:
+      {
+        return FRAME_DURATION_5_MS;
+        break;
+      }
+    case 80:
+      {
+        return FRAME_DURATION_8_MS;
+        break;
+      }
+    case 100:
+      {
+        return FRAME_DURATION_10_MS;
+        break;
+      }
+    case 125:
+      {
+        return FRAME_DURATION_12_POINT_5_MS;
+        break;
+      }
+    case 200:
+      {
+        return FRAME_DURATION_20_MS;
+        break;
+      }
+    default:
+      {
+        NS_FATAL_ERROR ("Invalid frame duration = " << duration);
+        return 0;
+      }
     }
-  else if (duration == 4)
-    {
-      return FRAME_DURATION_4_MS;
-    }
-  else if (duration == 5)
-    {
-      return FRAME_DURATION_5_MS;
-    }
-  else if (duration == 8)
-    {
-      return FRAME_DURATION_8_MS;
-    }
-  else if (duration == 10)
-    {
-      return FRAME_DURATION_10_MS;
-    }
-  else if (duration == 12.5)
-    {
-      return FRAME_DURATION_12_POINT_5_MS;
-    }
-  else if (duration == 20)
-    {
-      return FRAME_DURATION_20_MS;
-    }
-
-  NS_FATAL_ERROR ("Invalid frame duration");
+  NS_FATAL_ERROR ("Invalid frame duration = " << duration);
   return 0;
 }
 

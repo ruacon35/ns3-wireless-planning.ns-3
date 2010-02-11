@@ -90,6 +90,17 @@ public:
 
   virtual Ptr<BaseStationNetDevice> GetBs (void);
   virtual void SetBs (Ptr<BaseStationNetDevice> bs);
+
+  /*
+   * \brief Check if the packet fragmentation is possible for transport connection.
+   * \param connection the downlink connection
+   * \param availableSymbols maximum number of OFDM symbols to be used by the burst
+   * \param modulationType the modulation type to be used for the burst
+   * \returns false if packet fragmentation is not possible, true otherwise
+   */
+  bool CheckForFragmentation (Ptr<WimaxConnection> connection,
+                              int availableSymbols,
+                              WimaxPhy::ModulationType modulationType);
 private:
   Ptr<BaseStationNetDevice> m_bs;
   std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > *m_downlinkBursts;

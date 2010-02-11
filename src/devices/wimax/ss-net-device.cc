@@ -740,6 +740,9 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
   Cid cid;
   uint32_t pktSize = packet->GetSize ();
   packet->RemoveHeader (gnrcMacHdr);
+  FragmentationSubheader fragSubhdr;
+  bool fragmentation = false;  // it becames true when there is a fragmentation subheader
+
   if (gnrcMacHdr.GetHt () == MacHeaderType::HEADER_TYPE_GENERIC)
     {
       if (gnrcMacHdr.check_hcs () == false)
@@ -752,7 +755,21 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
 
       cid = gnrcMacHdr.GetCid ();
 
-      if (cid == GetBroadcastConnection ()->GetCid ())
+      // checking for subheaders
+      uint8_t type = gnrcMacHdr.GetType ();
+      if (type)
+        {
+          // Check if there is a fragmentation Subheader
+          uint8_t tmpType = type;
+          if (((tmpType >> 2) & 1) == 1)
+            {
+              // a TRANSPORT packet with fragmentation subheader has been received!
+              fragmentation = true;
+              NS_LOG_INFO ("SS DoReceive -> the packet is a fragment" <<  std::endl);
+            }
+        }
+
+      if (cid == GetBroadcastConnection ()->GetCid () && !fragmentation)
         {
           packet->RemoveHeader (msgType);
           switch (msgType.GetType ())
@@ -769,7 +786,7 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
                     Simulator::Cancel (m_lostDlMapEvent);
                   }
 
-                m_linkManager->ScheduleScanningRestart (m_lostDlMapInterval, EVENT_LOST_DL_MAP, false, m_lostDlMapEvent); // see Question 35
+                m_linkManager->ScheduleScanningRestart (m_lostDlMapInterval, EVENT_LOST_DL_MAP, false, m_lostDlMapEvent);
 
                 if (m_dcdWaitTimeoutEvent.IsRunning ())
                   {
@@ -882,7 +899,7 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
                     m_linkManager->ScheduleScanningRestart (m_lostUlMapInterval,
                                                             EVENT_LOST_UL_MAP,
                                                             true,
-                                                            m_lostUlMapEvent); // see Question 35
+                                                            m_lostUlMapEvent);
                   }
                 break;
               }
@@ -890,7 +907,7 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
               NS_FATAL_ERROR ("Invalid management message type");
             }
         }
-      else if (GetInitialRangingConnection () != 0 && cid == GetInitialRangingConnection ()->GetCid ())
+      else if (GetInitialRangingConnection () != 0 && cid == GetInitialRangingConnection ()->GetCid () && !fragmentation)
         {
           m_traceSSRx (packet, GetMacAddress (), &cid);
           packet->RemoveHeader (msgType);
@@ -909,7 +926,7 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
               NS_FATAL_ERROR ("Invalid management message type");
             }
         }
-      else if (m_basicConnection != 0 && cid == m_basicConnection->GetCid ())
+      else if (m_basicConnection != 0 && cid == m_basicConnection->GetCid () && !fragmentation)
         {
           m_traceSSRx (packet, GetMacAddress (), &cid);
           packet->RemoveHeader (msgType);
@@ -928,7 +945,7 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
               NS_FATAL_ERROR ("Invalid management message type");
             }
         }
-      else if (m_primaryConnection != 0 && cid == m_primaryConnection->GetCid ())
+      else if (m_primaryConnection != 0 && cid == m_primaryConnection->GetCid () && !fragmentation)
         {
           m_traceSSRx (packet, GetMacAddress (), &cid);
           packet->RemoveHeader (msgType);
@@ -968,8 +985,56 @@ SubscriberStationNetDevice::DoReceive (Ptr<Packet> packet)
           record->UpdatePktsRcvd (1);
           record->UpdateBytesRcvd (pktSize);
 
-          m_ssRxTrace (packet);
-          ForwardUp (packet, m_baseStationId, GetMacAddress ()); // source shall be BS's address or sender SS's?
+          // If fragmentation is true, the packet is a fragment.
+          if (!fragmentation)
+            {
+              m_ssRxTrace (packet);
+              ForwardUp (packet, m_baseStationId, GetMacAddress ()); // source shall be BS's address or sender SS's?
+            }
+          else
+            {
+              NS_LOG_INFO ( "FRAG_DEBUG: SS DoReceive, the Packet is a fragment" << std::endl);
+              packet->RemoveHeader (fragSubhdr);
+              uint32_t fc = fragSubhdr.GetFc ();
+              NS_LOG_INFO ( "\t fragment size = " << packet->GetSize () << std::endl);
+
+              if (fc == 2)
+                {
+                  // This is the latest fragment.
+                  // Take the fragment queue, defragment a packet and send it to the upper layer
+                  NS_LOG_INFO ( "\t Received the latest fragment" << std::endl);
+                  GetConnectionManager ()->GetConnection (cid)
+                  ->FragmentEnqueue (packet);
+
+                  WimaxConnection::FragmentsQueue fragmentsQueue = GetConnectionManager ()->
+                    GetConnection (cid)->GetFragmentsQueue ();
+
+                  Ptr<Packet> fullPacket = Create<Packet> ();
+
+                  // DEFRAGMENTATION
+                  NS_LOG_INFO ( "\t SS PACKET DEFRAGMENTATION" << std::endl);
+                  for (std::list<Ptr<const Packet> >::const_iterator iter = fragmentsQueue.begin ();
+                       iter != fragmentsQueue.end (); ++iter)
+                    {
+                      // Create the whole Packet
+                      fullPacket->AddAtEnd (*iter);
+                    }
+                  GetConnectionManager ()->GetConnection (cid)
+                  ->ClearFragmentsQueue ();
+                  NS_LOG_INFO ( "\t fullPacket size = " << fullPacket->GetSize () << std::endl);
+
+                  m_ssRxTrace (fullPacket);
+                  ForwardUp (fullPacket, m_baseStationId, GetMacAddress ()); // source shall be BS's address or sender SS's?
+                }
+              else
+                {
+                  // This is the first or middle fragment.
+                  // Take the fragment queue, store the fragment into the queue
+                  NS_LOG_INFO ( "\t Received the first or the middle fragment" << std::endl);
+                  GetConnectionManager ()->GetConnection (cid)
+                  ->FragmentEnqueue (packet);
+                }
+            }
         }
       else if (cid.IsMulticast ())
         {

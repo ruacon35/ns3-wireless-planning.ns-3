@@ -40,7 +40,7 @@
 using namespace ns3;
 
 /*
- * Configure a network with 10 SS and 1 BS
+ * Configure a network with 3 SS and 1 BS
  * Install a SIMPLE OFDM PHY layer on all nodes and check that all SSs
  * could register with the BS
  *
@@ -92,6 +92,7 @@ Ns3WimaxSimpleOFDMTestCase::DoRunOnce (double FrameDuration)
       if (ssDevs.Get (i)->GetObject<SubscriberStationNetDevice> ()->IsRegistered ()
           == false)
         {
+          std::cout << "SS[" << i << "] not registered" << std::endl;
           return true; // Test fail because SS[i] is not registered
         }
     }
@@ -108,10 +109,9 @@ Ns3WimaxSimpleOFDMTestCase::DoRun (void)
   frameDuratioTab[7] = { 0.0025, 0.004, 0.005, 0.008, 0.01, 0.0125, 0.02 };
   for (int i = 0; i < 7; i++)
     {
-
+      std::cout << "Frame Duration = " << frameDuratioTab[i] << std::endl;
       if (DoRunOnce (frameDuratioTab[i]) != false)
         {
-
           return true;
         }
     }
@@ -154,7 +154,6 @@ bool Ns3WimaxSNRtoBLERTestCase::DoRunOnce (uint8_t modulationType)
     {
       BLERRec = l_SNRToBlockErrorRateManager.GetSNRToBlockErrorRateRecord (i,
                                                                            modulationType);
-
       delete BLERRec;
     }
   return false;
@@ -182,8 +181,9 @@ public:
 Ns3WimaxPhyTestSuite::Ns3WimaxPhyTestSuite ()
   : TestSuite ("wimax-phy-layer", UNIT)
 {
-  AddTestCase (new Ns3WimaxSimpleOFDMTestCase);
   AddTestCase (new Ns3WimaxSNRtoBLERTestCase);
+  AddTestCase (new Ns3WimaxSimpleOFDMTestCase);
+
 }
 
 Ns3WimaxPhyTestSuite ns3WimaxPhyTestSuite;

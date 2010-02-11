@@ -54,7 +54,8 @@ def build(bld):
 		    'wimax-service-flow-test.cc',
 		    'ss-mac-test.cc',
 		    'phy-test.cc',
-		    'qos-test.cc'
+		    'qos-test.cc',
+                    'wimax-fragmentation-test.cc'
 		            ]
 		            
     headers = bld.new_task_gen('ns3header')

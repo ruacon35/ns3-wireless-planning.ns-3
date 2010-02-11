@@ -200,7 +200,7 @@ BSSchedulerRtps::SelectConnection (Ptr<WimaxConnection> &connection)
   return false;
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerBroadcastConnection (uint32_t &availableSymbols)
 {
   Ptr<WimaxConnection> connection;
@@ -218,12 +218,25 @@ BSSchedulerRtps::BSSchedulerBroadcastConnection (uint32_t &availableSymbols)
       packet = connection->GetQueue ()->Peek (hdr);
       nrSymbolsRequired = GetBs ()->GetPhy ()->GetNrSymbols (packet->GetSize (), modulationType);
 
-      if (availableSymbols < nrSymbolsRequired)
+      // PIRO: check for fragmentation
+      if (availableSymbols < nrSymbolsRequired
+          && !CheckForFragmentation (connection, availableSymbols, modulationType))
         {
           break;
+        } 
+      else if (availableSymbols < nrSymbolsRequired
+               && CheckForFragmentation (connection, availableSymbols, modulationType))
+        {
+          uint32_t availableByte = GetBs ()->GetPhy ()->
+            GetNrBytes (availableSymbols, modulationType);
+          packet = connection->Dequeue (MacHeaderType::HEADER_TYPE_GENERIC, 
+                                        availableByte);
+        }
+      else
+        {
+          packet = connection->Dequeue ();
         }
 
-      packet = connection->Dequeue ();
       NS_ASSERT_MSG (hdr.GetCid ().GetIdentifier () == connection->GetCid (),
                      "Base station: Error while scheduling broadcast connection: header CID != connection CID");
       burst->AddPacket (packet);
@@ -235,7 +248,7 @@ BSSchedulerRtps::BSSchedulerBroadcastConnection (uint32_t &availableSymbols)
     }
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerInitialRangingConnection (uint32_t &availableSymbols)
 {
   Ptr<WimaxConnection> connection;
@@ -253,12 +266,25 @@ BSSchedulerRtps::BSSchedulerInitialRangingConnection (uint32_t &availableSymbols
       packet = connection->GetQueue ()->Peek (hdr);
       nrSymbolsRequired = GetBs ()->GetPhy ()->GetNrSymbols (packet->GetSize (), modulationType);
 
-      if (availableSymbols < nrSymbolsRequired)
+      // PIRO: check for fragmentation
+      if (availableSymbols < nrSymbolsRequired
+          && !CheckForFragmentation (connection, availableSymbols, modulationType))
         {
           break;
+        } 
+      else if (availableSymbols < nrSymbolsRequired
+               && CheckForFragmentation (connection, availableSymbols, modulationType))
+        {
+          uint32_t availableByte = GetBs ()->GetPhy ()->
+            GetNrBytes (availableSymbols, modulationType);
+          packet = connection->Dequeue (MacHeaderType::HEADER_TYPE_GENERIC, 
+                                        availableByte);
+        }
+      else
+        {
+          packet = connection->Dequeue ();
         }
 
-      packet = connection->Dequeue ();
       NS_ASSERT_MSG (hdr.GetCid () == connection->GetCid (),
                      "Base station: Error while scheduling initial ranging connection: header CID != connection CID");
       burst->AddPacket (packet);
@@ -270,7 +296,7 @@ BSSchedulerRtps::BSSchedulerInitialRangingConnection (uint32_t &availableSymbols
     }
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerBasicConnection (uint32_t &availableSymbols)
 {
   Ptr<WimaxConnection> connection;
@@ -298,12 +324,24 @@ BSSchedulerRtps::BSSchedulerBasicConnection (uint32_t &availableSymbols)
           packet = connection->GetQueue ()->Peek (hdr);
           nrSymbolsRequired = GetBs ()->GetPhy ()->GetNrSymbols (packet->GetSize (), modulationType);
 
-          if (availableSymbols < nrSymbolsRequired)
+          // PIRO: check for fragmentation
+          if (availableSymbols < nrSymbolsRequired
+              && !CheckForFragmentation (connection, availableSymbols, modulationType))
             {
               break;
+            } 
+          else if (availableSymbols < nrSymbolsRequired
+                   && CheckForFragmentation (connection, availableSymbols, modulationType))
+            {
+              uint32_t availableByte = GetBs ()->GetPhy ()->
+                GetNrBytes (availableSymbols, modulationType);
+              packet = connection->Dequeue (MacHeaderType::HEADER_TYPE_GENERIC, availableByte);
+            }
+          else
+            {
+              packet = connection->Dequeue ();
             }
 
-          packet = connection->Dequeue ();
           NS_ASSERT_MSG (hdr.GetCid () == connection->GetCid (),
                          "Base station: Error while scheduling basic connection: header CID != connection CID");
           burst->AddPacket (packet);
@@ -317,7 +355,7 @@ BSSchedulerRtps::BSSchedulerBasicConnection (uint32_t &availableSymbols)
     }
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerPrimaryConnection (uint32_t &availableSymbols)
 {
   Ptr<WimaxConnection> connection;
@@ -345,12 +383,24 @@ BSSchedulerRtps::BSSchedulerPrimaryConnection (uint32_t &availableSymbols)
           packet = connection->GetQueue ()->Peek (hdr);
           nrSymbolsRequired = GetBs ()->GetPhy ()->GetNrSymbols (packet->GetSize (), modulationType);
 
-          if (availableSymbols < nrSymbolsRequired)
+          // PIRO: check for fragmentation
+          if (availableSymbols < nrSymbolsRequired
+              && !CheckForFragmentation (connection, availableSymbols, modulationType))
             {
               break;
+            } 
+          else if (availableSymbols < nrSymbolsRequired
+                   && CheckForFragmentation (connection, availableSymbols, modulationType))
+            {
+              uint32_t availableByte = GetBs ()->GetPhy ()->
+                GetNrBytes (availableSymbols, modulationType);
+              packet = connection->Dequeue (MacHeaderType::HEADER_TYPE_GENERIC, availableByte);
+            }
+          else
+            {
+              packet = connection->Dequeue ();
             }
 
-          packet = connection->Dequeue ();
           NS_ASSERT_MSG (hdr.GetCid () == connection->GetCid (),
                          "Base station: Error while scheduling primary connection: header CID != connection CID");
           burst->AddPacket (packet);
@@ -363,7 +413,7 @@ BSSchedulerRtps::BSSchedulerPrimaryConnection (uint32_t &availableSymbols)
     }
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerUGSConnection (uint32_t &availableSymbols)
 {
   Ptr<WimaxConnection> connection;
@@ -402,6 +452,7 @@ BSSchedulerRtps::BSSchedulerUGSConnection (uint32_t &availableSymbols)
 
           nrSymbolsRequired = connection->GetServiceFlow ()->GetRecord ()->GetGrantSize ();
 
+          // PIRO: packet fragmentation for UGS connections has not been implemented yet!
           if (availableSymbols > nrSymbolsRequired)
             {
               availableSymbols -= nrSymbolsRequired;
@@ -416,7 +467,7 @@ BSSchedulerRtps::BSSchedulerUGSConnection (uint32_t &availableSymbols)
 
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerRTPSConnection (uint32_t &availableSymbols)
 {
 
@@ -434,7 +485,6 @@ BSSchedulerRtps::BSSchedulerRTPSConnection (uint32_t &availableSymbols)
   std::vector<ServiceFlow*> serviceFlows;
 
   std::deque<WimaxMacQueue::QueueElement>::const_iterator iter3;
-  int nbPacket[100];
   uint32_t symbolsRequired[100];
   WimaxPhy::ModulationType modulationType_[100];
   uint8_t diuc_[100];
@@ -442,7 +492,6 @@ BSSchedulerRtps::BSSchedulerRTPSConnection (uint32_t &availableSymbols)
   uint32_t dataToSend;
   uint32_t totSymbolsRequired = 0;
   int nbConnection = 0;
-  uint32_t transmittedData = 0;
 
   NS_LOG_INFO ("\tDL Scheduler for rtPS flows \n" << "\t\tavailableSymbols = " << availableSymbols);
 
@@ -450,7 +499,7 @@ BSSchedulerRtps::BSSchedulerRTPSConnection (uint32_t &availableSymbols)
   nbConnection = 0;
   for (iter2 = serviceFlows.begin (); iter2 != serviceFlows.end (); ++iter2)
     {
-      // DL Scheduler must works for all rtPS connection that have packets to transmitt!!!
+      // DL RTPS Scheduler works for all rtPS connection that have packets to transmitt!!!
       serviceFlowRecord = (*iter2)->GetRecord ();
 
       if ((*iter2)->HasPackets ())
@@ -471,40 +520,13 @@ BSSchedulerRtps::BSSchedulerRTPSConnection (uint32_t &availableSymbols)
             = GetBs ()->GetBurstProfileManager ()->GetBurstProfile (modulationType_[nbConnection],
                                                                     WimaxNetDevice::DIRECTION_DOWNLINK);
 
-          uint32_t queueLength = rtPSConnection[nbConnection]->GetQueue ()->GetNBytes ();
-          dataToSend = queueLength;
-          NS_LOG_INFO ("\t\tDL Scheduler for CID = " << rtPSConnection[nbConnection]->GetCid ()
-                                                     << "\n\t\t\tqueueLength = " << queueLength << " dataToSend = "
-                                                     << dataToSend);
+          dataToSend = rtPSConnection[nbConnection]->GetQueue ()->GetQueueLengthWithMACOverhead ();
+          NS_LOG_INFO ("\t\tRTPS DL Scheduler for CID = " << rtPSConnection[nbConnection]->GetCid ()
+                                                          << "\n\t\t\t dataToSend = " << dataToSend);
 
-          symbolsRequired[nbConnection] = 0;
-          nbPacket[nbConnection] = 0;
-          transmittedData = 0;
+          symbolsRequired[nbConnection] = GetBs ()->GetPhy ()->GetNrSymbols (dataToSend,
+                                                                             modulationType_[nbConnection]);
 
-          // max nbPacket & max symbolsRequired
-          for (iter3 = rtPSConnection[nbConnection]->GetQueue ()->GetPacketQueue ().begin (); iter3
-               != rtPSConnection[nbConnection]->GetQueue ()->GetPacketQueue ().end (); ++iter3)
-            {
-              nbPacket[nbConnection]++;
-              transmittedData += iter3->GetSize ();
-
-              packet = iter3->m_packet;
-              NS_ASSERT_MSG (iter3->m_hdrType.GetType () == MacHeaderType::HEADER_TYPE_GENERIC,
-                             "Base station: Error while scheduling RTPs connection: header type is not generic");
-              // Header Size
-              int headerSize = iter3->m_hdr.GetSerializedSize () + iter3->m_hdrType.GetSerializedSize ();
-              symbolsRequired[nbConnection] += GetBs ()->GetPhy ()->GetNrSymbols (packet->GetSize () + headerSize,
-                                                                                  modulationType_[nbConnection]);
-
-              NS_LOG_INFO ("\t\t\tpacketSize = " << iter3->GetSize () << " symbolsRequired = "
-                                                 << symbolsRequired[nbConnection] << " nbPkts to send = " << nbPacket[nbConnection]
-                                                 << " nbConnection = " << nbConnection);
-
-              if (transmittedData >= dataToSend)
-                {
-                  break;
-                }
-            }
           totSymbolsRequired += symbolsRequired[nbConnection];
           nbConnection++;
         }
@@ -532,22 +554,47 @@ BSSchedulerRtps::BSSchedulerRTPSConnection (uint32_t &availableSymbols)
   // Downlink Bandwidth Allocation
   for (int i = 0; i < nbConnection; i++)
     {
-      uint32_t transmittedSymbols = 0;
+      packet = rtPSConnection[i]->GetQueue ()->Peek (hdr);
+      uint32_t symbolsForPacketTransmission = 0;
       burst = Create<PacketBurst> ();
-      NS_LOG_INFO ("\t\tCID = " << rtPSConnection[i]->GetCid () << " nbPkts to send = " << nbPacket[i]);
-      for (int j = 0; j < nbPacket[i]; j++)
+      NS_LOG_INFO ("\t\tCID = " << rtPSConnection[i]->GetCid () << " assignedSymbols = " << symbolsRequired[i]);
+
+      while (symbolsRequired[i] > 0)
         {
-          packet = rtPSConnection[i]->GetQueue ()->Peek (hdr);
-          transmittedSymbols += GetBs ()->GetPhy ()->GetNrSymbols (packet->GetSize (), modulationType_[i]);
-          if (transmittedSymbols > symbolsRequired[i])
+          symbolsForPacketTransmission = GetBs ()->GetPhy ()
+            ->GetNrSymbols (rtPSConnection[i]->GetQueue ()
+                            ->GetFirstPacketRequiredByte (MacHeaderType::HEADER_TYPE_GENERIC),
+                            modulationType_[i]);
+
+          // PIRO: check for fragmentation
+          if (symbolsForPacketTransmission > symbolsRequired[i]
+              && !CheckForFragmentation (rtPSConnection[i],
+                                         symbolsRequired[i],
+                                         modulationType_[i]))
             {
               break;
+            } 
+          else if (symbolsForPacketTransmission > symbolsRequired[i]
+                   && CheckForFragmentation (rtPSConnection[i],
+                                             symbolsRequired[i],
+                                             modulationType_[i]))
+            {
+              uint32_t availableByte = GetBs ()->GetPhy ()->
+                GetNrBytes (symbolsRequired[i], modulationType_[i]);
+              packet = rtPSConnection[i]->Dequeue (MacHeaderType::HEADER_TYPE_GENERIC, availableByte);
+              symbolsRequired[i] = 0;
             }
-          packet = rtPSConnection[i]->Dequeue ();
+          else
+            {
+              packet = rtPSConnection[i]->Dequeue ();
+              symbolsRequired[i] -= symbolsForPacketTransmission;
+            }
+
           NS_ASSERT_MSG (hdr.GetCid () == rtPSConnection[i]->GetCid (),
                          "Base station: Error while scheduling RTPs connection: header CID != connection CID");
           burst->AddPacket (packet);
         }
+
       if (burst->GetNPackets () != 0)
         {
           AddDownlinkBurst (rtPSConnection[i], diuc_[i], modulationType_[i], burst);
@@ -557,7 +604,7 @@ BSSchedulerRtps::BSSchedulerRTPSConnection (uint32_t &availableSymbols)
   availableSymbols -= totSymbolsRequired;
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerNRTPSConnection (uint32_t &availableSymbols)
 {
   Ptr<WimaxConnection> connection;
@@ -614,7 +661,7 @@ BSSchedulerRtps::BSSchedulerNRTPSConnection (uint32_t &availableSymbols)
     }
 }
 
-void
+void 
 BSSchedulerRtps::BSSchedulerBEConnection (uint32_t &availableSymbols)
 {
   Ptr<WimaxConnection> connection;
