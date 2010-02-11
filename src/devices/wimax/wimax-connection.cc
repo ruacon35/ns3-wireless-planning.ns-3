@@ -78,6 +78,7 @@ void
 WimaxConnection::DoDispose (void)
 {
   m_queue = 0;
+  // m_serviceFlow = 0;
 }
 
 Cid
@@ -129,6 +130,12 @@ WimaxConnection::Dequeue (MacHeaderType::HeaderType packetType)
   return m_queue->Dequeue (packetType);
 }
 
+Ptr<Packet> 
+WimaxConnection::Dequeue (MacHeaderType::HeaderType packetType, uint32_t availableByte)
+{
+  return m_queue->Dequeue (packetType, availableByte);
+}
+
 bool
 WimaxConnection::HasPackets (void) const
 {
@@ -171,4 +178,22 @@ WimaxConnection::GetTypeStr (void) const
   return "";
 }
 
+// Defragmentation Function
+const 
+WimaxConnection::FragmentsQueue WimaxConnection::GetFragmentsQueue (void) const
+{
+  return m_fragmentsQueue;
+}
+
+void 
+WimaxConnection::FragmentEnqueue (Ptr<const Packet>  fragment)
+{
+  m_fragmentsQueue.push_back (fragment);
+}
+
+void 
+WimaxConnection::ClearFragmentsQueue (void)
+{
+  m_fragmentsQueue.clear ();
+}
 } // namespace ns3

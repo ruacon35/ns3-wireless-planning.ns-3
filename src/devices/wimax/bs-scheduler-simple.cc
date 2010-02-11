@@ -57,10 +57,8 @@ BSSchedulerSimple::BSSchedulerSimple ()
 BSSchedulerSimple::BSSchedulerSimple (Ptr<BaseStationNetDevice> bs)
   : m_downlinkBursts (new std::list<std::pair<OfdmDlMapIe*, Ptr<PacketBurst> > > ())
 {
-  /*
-   * m_downlinkBursts is filled by AddDownlinkBurst and emptied by
-   * wimax-bs-net-device::sendBurst and wimax-ss-net-device::sendBurst
-   */
+  // m_downlinkBursts is filled by AddDownlinkBurst and emptied by
+  // wimax-bs-net-device::sendBurst and wimax-ss-net-device::sendBurst
   SetBs (bs);
 }
 
@@ -163,15 +161,32 @@ BSSchedulerSimple::Schedule (void)
           nrSymbolsRequired = GetBs ()->GetPhy ()->GetNrSymbols (packet->GetSize (), modulationType);
         }
 
-      if (availableSymbols < nrSymbolsRequired)
+      /* PIRO: packet fragmentation
+        actually, packet fragmentation for UGS connections has not been implemented yet */
+      if (availableSymbols < nrSymbolsRequired && schedulingType == ServiceFlow::SF_TYPE_UGS)
         {
-
           break;
         }
 
       if (schedulingType != ServiceFlow::SF_TYPE_UGS)
         {
-          packet = connection->Dequeue ();
+          if (availableSymbols < nrSymbolsRequired
+              && !CheckForFragmentation (connection, availableSymbols, modulationType))
+            {
+              break;
+            }
+          else if (availableSymbols < nrSymbolsRequired
+                   && CheckForFragmentation (connection, availableSymbols, modulationType))
+            {
+              uint32_t availableByte = GetBs ()->GetPhy ()->
+                GetNrBytes (availableSymbols, modulationType);
+              packet = connection->Dequeue (MacHeaderType::HEADER_TYPE_GENERIC, availableByte);
+            }
+          else
+            {
+              packet = connection->Dequeue ();
+            }
+ 
           NS_ASSERT_MSG (hdr.GetCid () == connection->GetCid (),
                          "Base station: Error while scheduling connection: header CID != connection CID");
 

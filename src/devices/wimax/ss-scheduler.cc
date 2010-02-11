@@ -64,10 +64,11 @@ SSScheduler::GetPollMe (void) const
   return m_pollMe;
 }
 
-Ptr<PacketBurst>
+Ptr<PacketBurst> 
 SSScheduler::Schedule (uint16_t availableSymbols,
                        WimaxPhy::ModulationType modulationType,
-                       MacHeaderType::HeaderType packetType, Ptr<WimaxConnection> &connection)
+                       MacHeaderType::HeaderType packetType, 
+                       Ptr<WimaxConnection> &connection)
 {
   Time timeStamp;
   Ptr<PacketBurst> burst = Create<PacketBurst> ();
@@ -76,11 +77,9 @@ SSScheduler::Schedule (uint16_t availableSymbols,
   if (!connection)
     {
       connection = SelectConnection ();
-
-    }
+    } 
   else
     {
-
       NS_ASSERT_MSG (connection->HasPackets (),
                      "SS: Error while scheduling packets: The selected connection has no packets");
     }
@@ -90,24 +89,70 @@ SSScheduler::Schedule (uint16_t availableSymbols,
 
   while (connection && connection->HasPackets (packetType))
     {
-      packet = connection->GetQueue ()->Peek (packetType);
+      NS_LOG_INFO ("FRAG_DEBUG: SS Scheduler" << std::endl);
       serviceFlow = connection->GetServiceFlow ();
 
-      nrSymbolsRequired = m_ss->GetPhy ()->GetNrSymbols (packet->GetSize (),
-                                                         modulationType);
+      uint32_t availableByte = m_ss->GetPhy ()->
+        GetNrBytes (availableSymbols, modulationType);
 
-      if (availableSymbols < nrSymbolsRequired)
+      uint32_t requiredByte = connection->GetQueue ()->GetFirstPacketRequiredByte (packetType); 
+
+      NS_LOG_INFO ("\t availableByte = " << availableByte <<
+                   ", requiredByte = " << requiredByte);
+
+      if (availableByte >= requiredByte)
         {
+          // The SS could sent a packet without a other fragmentation
+          NS_LOG_INFO ("\t availableByte >= requiredByte"
+                       "\n\t Send packet without other fragmentation" << std::endl);
 
-          break;
+          packet = connection->Dequeue (packetType);
+          burst->AddPacket (packet);
 
+          nrSymbolsRequired = m_ss->GetPhy ()->
+            GetNrSymbols (packet->GetSize (), modulationType);
+          availableSymbols -= nrSymbolsRequired;
         }
+      else
+        {
+          if (connection->GetType () == Cid::TRANSPORT)
+            {
+              NS_LOG_INFO ("\t availableByte < requiredByte"
+                           "\n\t Check if the fragmentation is possible");
 
-      packet = connection->Dequeue (packetType);
-      burst->AddPacket (packet);
-      availableSymbols -= nrSymbolsRequired;
+              uint32_t headerSize = connection->GetQueue ()->GetFirstPacketHdrSize (packetType);
+              if (!connection->GetQueue ()->CheckForFragmentation (packetType))
+                {
+                  NS_LOG_INFO ("\t Add fragmentSubhdrSize = 2");
+                  headerSize += 2;
+                }
+              NS_LOG_INFO ("\t availableByte = " << availableByte <<
+                           " headerSize = " << headerSize);
+
+              if (availableByte > headerSize) 
+                {
+                  NS_LOG_INFO ("\t Fragmentation IS possible");
+                  packet = connection->Dequeue (packetType, availableByte);
+                  burst->AddPacket (packet);
+
+                  nrSymbolsRequired = m_ss->GetPhy ()->
+                    GetNrSymbols (packet->GetSize (), modulationType);
+                  availableSymbols -= nrSymbolsRequired;
+                } 
+              else
+                {
+                  NS_LOG_INFO ("\t Fragmentation IS NOT possible" << std::endl);
+                  break;
+                }
+            }
+          else
+            {
+              NS_LOG_INFO ("\t no Transport Connection "
+                           "\n\t Fragmentation IS NOT possible, " << std::endl);
+              break;
+            }
+        }
     }
-
   return burst;
 }
 

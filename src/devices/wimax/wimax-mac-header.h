@@ -226,3 +226,42 @@ private:
 ; // namespace ns3
 
 #endif /* GRANT_MANAGEMENT_SUBHEADER_H */
+
+// ----------------------------------------------------------------------------------------------------------
+
+#ifndef FRAGMENTATION_SUBHEADER_H
+#define FRAGMENTATION_SUBHEADER_H
+
+#include <stdint.h>
+#include "ns3/header.h"
+
+namespace ns3 {
+
+class FragmentationSubheader : public Header
+{
+public:
+  FragmentationSubheader (void);
+  ~FragmentationSubheader (void);
+
+  void SetFc (uint8_t fc);
+  void SetFsn (uint8_t fsn);
+
+  uint8_t GetFc (void) const;
+  uint8_t GetFsn (void) const;
+
+  std::string GetName (void) const;
+  static TypeId GetTypeId (void);
+  virtual TypeId GetInstanceTypeId (void) const;
+  void Print (std::ostream &os) const;
+  uint32_t GetSerializedSize (void) const;
+  void Serialize (Buffer::Iterator start) const;
+  uint32_t Deserialize (Buffer::Iterator start);
+
+private:
+  uint8_t m_fc;  // Fragment Control
+  uint8_t m_fsn; // Fragment Sequence Number
+};
+}
+; // namespace ns3
+
+#endif /* FRAGMENTATION_SUBHEADER_H */

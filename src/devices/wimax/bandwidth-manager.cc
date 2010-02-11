@@ -132,8 +132,7 @@ BandwidthManager::SelectFlowForRequest (uint32_t &bytesToRequest)
           if (serviceFlow->HasPackets (MacHeaderType::HEADER_TYPE_GENERIC))
             {
               // bandwidth is requested for all packets
-              bytesToRequest = serviceFlow->GetQueue ()->GetNBytes ();
-
+              bytesToRequest = serviceFlow->GetQueue ()->GetQueueLengthWithMACOverhead ();
             }
         }
     }
