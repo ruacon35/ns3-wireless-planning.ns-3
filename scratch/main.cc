@@ -127,7 +127,8 @@ SetNetworkConfiguration ()
   * Read information from RadioMobile report.txt
   */
  
- ifstream file ("report.txt");
+// ifstream file ("report.txt");
+ ifstream file ("short-report.txt");
  NS_LOG_INFO ("Reading Radio Mobile report: " << file);
  RmReportReader rrr;
  NetDataStruct::NetData netData = rrr.ReadRmReport (file);
