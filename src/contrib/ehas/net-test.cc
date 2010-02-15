@@ -50,7 +50,9 @@ namespace ns3
  TypeId
  NetTest::GetTypeId (void)
  {
-  static TypeId  tid = TypeId ("ns3::NetTest");
+  static TypeId tid = TypeId ("ns3::NetTest")
+          .SetParent<Object > ()
+          ;
   return tid;
  }
 

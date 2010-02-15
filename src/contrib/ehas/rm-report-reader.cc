@@ -45,7 +45,9 @@ namespace ns3
  TypeId
  RmReportReader::GetTypeId (void)
  {
-  static TypeId tid = TypeId ("ns3::RmReportReader");
+  static TypeId tid = TypeId ("ns3::RmReportReader")
+          .SetParent<Object > ()
+          ;
   return tid;
  }
 

@@ -11,6 +11,7 @@
 #include "net-data-struct.h"
 #include "network-config.h"
 #include "ns3/type-id.h"
+#include "ns3/object.h"
 
 
 namespace ns3 {

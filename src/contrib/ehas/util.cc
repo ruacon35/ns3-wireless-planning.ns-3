@@ -25,48 +25,49 @@
 
 NS_LOG_COMPONENT_DEFINE ("util");
 
-namespace ns3 {
+namespace ns3
+{
 
-Util::Util()
-{}
+ Util::Util () { }
 
-Util::~Util()
-{}
+ Util::~Util () { }
 
  TypeId
  Util::GetTypeId (void)
  {
-  static TypeId  tid = TypeId ("ns3::Util");
+  static TypeId tid = TypeId ("ns3::Util")
+          .SetParent<Object > ()
+          ;
   return tid;
  }
-   
-Ipv4Address
-Util::GetIpAddrFromNode (Ptr<Node> node)
-{
-  Ptr<Ipv4>  ipv4 = node->GetObject<Ipv4>();
-  Ipv4InterfaceAddress iaddr = ipv4->GetAddress (1,0);
+
+ Ipv4Address
+ Util::GetIpAddrFromNode (Ptr<Node> node)
+ {
+  Ptr<Ipv4> ipv4 = node->GetObject<Ipv4 > ();
+  Ipv4InterfaceAddress iaddr = ipv4->GetAddress (1, 0);
   Ipv4Address ipAddr = iaddr.GetLocal (); //Get's the address of the 1st device?
-  
+
   NS_LOG_INFO ("Node: " << node << " Ipv4Address: " << ipAddr);
-  
-  return ipAddr;
-}
 
-Ipv4Address
-Util::GetIpAddrFromName (std::string name)
-{
-  Ptr<Node> node = Names::Find<Node> (name);
+  return ipAddr;
+ }
+
+ Ipv4Address
+ Util::GetIpAddrFromName (std::string name)
+ {
+  Ptr<Node> node = Names::Find<Node > (name);
   Ipv4Address ipAddr = GetIpAddrFromNode (node);
-  
-  NS_LOG_INFO ("Node: " << name << " Ipv4Address: " << ipAddr);
-  
-  return ipAddr;
-}
 
-uint8_t
-Util::QosUtilsMapAcToTid (enum AccessClass ac)
-{
-  uint8_t tid = 9;// >8 by default
+  NS_LOG_INFO ("Node: " << name << " Ipv4Address: " << ipAddr);
+
+  return ipAddr;
+ }
+
+ uint8_t
+ Util::QosUtilsMapAcToTid (enum AccessClass ac)
+ {
+  uint8_t tid = 9; // >8 by default
   switch (ac)
    {
    case 0:// AC_VO
@@ -87,28 +88,28 @@ Util::QosUtilsMapAcToTid (enum AccessClass ac)
    case 5:// AC_UNDEF
     tid = 8; // >7 AC_VI;
     break;
-  }
+   }
   return tid;
-}
+ }
 
-    int16_t
-    Util::FindStrInVectorStr (string str, vector<string> vStr)
-    {
-     int16_t index = -1;
+ int16_t
+ Util::FindStrInVectorStr (string str, vector<string> vStr)
+ {
+  int16_t index = -1;
 
-       for (uint16_t i = 0; i < vStr.size (); i++)
-       {
-        int16_t match = str.compare (vStr.at (i));
-        NS_LOG_INFO ("match: " << match << " str: " << str << " vStr(" << i << "): " << vStr.at(i));
+  for (uint16_t i = 0; i < vStr.size (); i++)
+   {
+    int16_t match = str.compare (vStr.at (i));
+    NS_LOG_INFO ("match: " << match << " str: " << str << " vStr(" << i << "): " << vStr.at (i));
 
-        if (match == 0)
-         {
-          index = i;
-          break;//stops search
-         }
-       }
-     return index;
-    }
+    if (match == 0)
+     {
+      index = i;
+      break; //stops search
+     }
+   }
+  return index;
+ }
 
 } // namespace ns3
 

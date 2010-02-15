@@ -62,7 +62,9 @@ namespace ns3
   TypeId
  NetMeasure::GetTypeId (void)
  {
-  static TypeId  tid = TypeId ("ns3::NetMeasure");
+  static TypeId  tid = TypeId ("ns3::NetMeasure")
+    .SetParent<Object> ()
+  ;
   return tid;
  }
 

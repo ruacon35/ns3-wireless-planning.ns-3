@@ -34,7 +34,9 @@ namespace ns3
  TypeId
  Report2ConfigData::GetTypeId (void)
  {
-  static TypeId tid = TypeId ("ns3::Report2ConfigData");
+  static TypeId tid = TypeId ("ns3::Report2ConfigData")
+    .SetParent<Object> ()
+  ;
   return tid;
  }
 

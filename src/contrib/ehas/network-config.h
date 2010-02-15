@@ -5,6 +5,7 @@
 
 #include "ns3/ipv4-address.h"
 #include "ns3/type-id.h"
+#include "ns3/object.h"
 
 
 namespace ns3 {

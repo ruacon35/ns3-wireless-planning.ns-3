@@ -54,7 +54,9 @@ namespace ns3
  TypeId
  CreateNetwork::GetTypeId (void)
  {
-  static TypeId  tid = TypeId ("ns3::CreateNetwork");
+  static TypeId tid = TypeId ("ns3::CreateNetwork")
+          .SetParent<Object > ()
+          ;
   return tid;
  }
 
