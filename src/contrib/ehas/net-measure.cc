@@ -85,8 +85,8 @@ namespace ns3
  {
   NS_LOG_INFO ("Setup plot");
   m_measurements.push_back ("rxBytes");
-  m_measurements.push_back ("delaySum");
-  m_measurements.push_back ("lostPackets");
+//  m_measurements.push_back ("delaySum");
+//  m_measurements.push_back ("lostPackets");
   m_measurements.push_back ("delayHistogram");
 
   for (uint32_t i = 0; i < m_measurements.size (); i++)
@@ -154,7 +154,7 @@ namespace ns3
   flowStats.rxPackets = 0;
   flowStats.lostPackets = 0;
   flowStats.timesForwarded = 0;
-  //flowStats.delayHistogram.SetDefaultBinWidth (m_delayBinWidth);
+  flowStats.delayHistogram.SetDefaultBinWidth (0.1);
   //flowStats.jitterHistogram.SetDefaultBinWidth (m_jitterBinWidth);
   //flowStats.packetSizeHistogram.SetDefaultBinWidth (m_packetSizeBinWidth);
  }
@@ -191,7 +191,7 @@ namespace ns3
          {
           preInitTime = 0;
          }
-        newDataSet.Add (preInitTime, 0);
+        //newDataSet.Add (preInitTime, 0);// It's not usefull for HISTOGRAMS
         vDataSet.push_back (newDataSet);
         m_mMeasurementDataset[measurement] = vDataSet;
        }
@@ -279,8 +279,8 @@ namespace ns3
       /// Doesn't work comparing directly time.GetSeconds () == lastIteration.GetSeconds ()
       if (timeD == lastIterationD)
        {
-        NS_LOG_INFO ("now " << timeD);
-        if (measurement.compare ("delayHistogram") == 0 && i == 4)// eg FlowID 5
+        NS_LOG_INFO ("last iteration:  " << timeD);
+        if (measurement.compare ("delayHistogram") == 0)
          {
           //gnuplot.SetLegend ("Histogram, Frecuency"); En EndPlot?
 
