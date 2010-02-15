@@ -30,6 +30,7 @@
 #include "ns3/gnuplot.h"
 #include "ns3/flow-monitor-helper.h"
 #include "ns3/type-id.h"
+#include "ns3/object.h"
 
 namespace ns3 {
 

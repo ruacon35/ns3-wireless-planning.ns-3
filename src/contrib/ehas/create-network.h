@@ -29,6 +29,7 @@
 #include "ns3/nqos-wifi-mac-helper.h"
 #include "ns3/qos-wifi-mac-helper.h"
 #include "ns3/type-id.h"
+#include "ns3/object.h"
 
 
 

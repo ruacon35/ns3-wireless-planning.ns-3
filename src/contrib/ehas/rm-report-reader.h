@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "ns3/type-id.h"
+#include "ns3/object.h"
 
 #include "net-data-struct.h"
 

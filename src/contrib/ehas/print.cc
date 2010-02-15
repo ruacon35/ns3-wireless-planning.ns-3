@@ -38,10 +38,12 @@ namespace ns3
 
  Print::~Print () { }
 
-  TypeId
+ TypeId
  Print::GetTypeId (void)
  {
-  static TypeId  tid = TypeId ("ns3::Print");
+  static TypeId tid = TypeId ("ns3::Print")
+          .SetParent<Object > ()
+          ;
   return tid;
  }
 

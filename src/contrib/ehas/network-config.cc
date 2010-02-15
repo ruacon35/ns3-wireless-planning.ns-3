@@ -7,10 +7,12 @@ namespace ns3
 
  NetworkConfig::~NetworkConfig () { }
 
-  TypeId
+ TypeId
  NetworkConfig::GetTypeId (void)
  {
-  static TypeId  tid = TypeId ("ns3::NetworkConfig");
+  static TypeId tid = TypeId ("ns3::NetworkConfig")
+          .SetParent<Object > ()
+          ;
   return tid;
  }
 
