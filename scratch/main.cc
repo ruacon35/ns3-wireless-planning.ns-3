@@ -68,18 +68,21 @@ Time eos = Seconds (30);// End Of Simulation in seconds, necessary to finish som
   */
  NetTest netTest;
  // Echos
- netTest.Echo ("URCOS", "KCAURI", 1);
+ //netTest.Echo ("URCOS", "KCAURI", 1);
  //netTest.Echo ("URPAY", "HUIRACOCHAN", 2);
  //netTest.Echo ("ACOMAYO", "RED SUR CUSCO", 3);
 
- /*
+ 
  // OnOff
  /// Short simulations
  NS_LOG_DEBUG ("AC_VO: " << AC_VO);
  NS_LOG_DEBUG ("AC_VI: " << AC_VI);
- netTest.ApplicationSetup ("RED SUR CUSCO", 9, "KCAURI", 4, 6, "64Kbps", 200, AC_VO);
- netTest.ApplicationSetup ("URCOS", 9, "URPAY", 8, 10, "64Kbps", 200, AC_VI);
-*/
+// netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);
+// netTest.ApplicationSetup ("URPAY", 9, "CCATCCA", 6, 8, "15Mbps", 200, AC_VO);
+
+ //netTest.ApplicationSetup ("URCOS", 9, "URPAY", 4, 10, "15Mbps", 200, AC_VO);
+ netTest.ApplicationSetup ("CCATCCA", 9, "KCAURI", 6, 8, "15Mbps", 200, AC_VO);
+
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...
