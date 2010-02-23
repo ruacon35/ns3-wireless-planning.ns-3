@@ -372,7 +372,7 @@ namespace ns3
 
 
     /*
-     * Reading Node names
+     * General Information
      */
 
     string generalBegining = "General information";
@@ -386,7 +386,7 @@ namespace ns3
 
 
     /*
-     * Reading Node names
+     * Nodes
      */
     string nodesBegining = "Active units information";
     string nodesHeader = "Name                Location                                     Elevation";
@@ -408,7 +408,7 @@ namespace ns3
     NS_LOG_DEBUG ("end of systems " << retval);
 
     /*
-     * Links / Nets
+     * Nets
      */
     string netsBegining = "Active nets information";
     string netsHeader = "";

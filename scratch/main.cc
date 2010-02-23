@@ -10,7 +10,8 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You
+ *  should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307  USA
  *
@@ -47,7 +48,7 @@ int
 main (int argc, char *argv[])
 {
 
-Time eos = Seconds (30);// End Of Simulation in seconds, necessary to finish some methods.
+Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish some methods.
 //g_eos??
 
  /*
@@ -77,11 +78,15 @@ Time eos = Seconds (30);// End Of Simulation in seconds, necessary to finish som
  /// Short simulations
  NS_LOG_DEBUG ("AC_VO: " << AC_VO);
  NS_LOG_DEBUG ("AC_VI: " << AC_VI);
+
+
+netTest.ApplicationSetup ("URCOS", 9 , "HUIRACOCHAN", 4, 10, "150Mbps", 200, AC_VO);
+
 // netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);
 // netTest.ApplicationSetup ("URPAY", 9, "CCATCCA", 6, 8, "15Mbps", 200, AC_VO);
 
- //netTest.ApplicationSetup ("URCOS", 9, "URPAY", 4, 10, "15Mbps", 200, AC_VO);
- netTest.ApplicationSetup ("CCATCCA", 9, "KCAURI", 6, 8, "15Mbps", 200, AC_VO);
+// netTest.ApplicationSetup ("URCOS", 9, "URPAY", 4, 10, "15Mbps", 200, AC_VO);
+// netTest.ApplicationSetup ("CCATCCA", 9, "KCAURI", 6, 8, "15Mbps", 200, AC_VO);
 
 
  /*
