@@ -121,8 +121,11 @@ namespace ns3 {
 
         /*
          * @brief Expands all the needed vectors and initializes FlowStats
+         *
+         * @param oldSize
+         * @param newSize
          */
-        void ExpandFlowStats(uint32_t newSize);
+        void ExpandFlowStats(uint32_t oldSize, uint32_t newSize);
 
         /*
          * @brief Initializes FlowMonitor::FlowStats structure.
@@ -184,7 +187,8 @@ namespace ns3 {
         Time m_interval;
         Ptr<FlowMonitor> m_flowMon;
 
-        std::vector < std::string > m_measurements; ///< List of measurements
+        std::vector < std::string > m_flowMonMeas; ///< List of measurements
+        std::vector < Measurement > m_measurements; ///< List of measurements
 
         MeasurementDataset m_mMeasurementDataset; ///< One data set vector per measurement
         //std::map < std::string, std::vector<Gnuplot2dDataset>  > m_mvPlotDataSetFlow; ///< One data set vector per measurement
