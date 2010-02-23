@@ -85,15 +85,22 @@ namespace ns3 {
   NetMeasure::SetupPlot ()
   {
     NS_LOG_INFO ("Setup plot");
-    m_measurements.push_back ("Throughput");
-    m_measurements.push_back ("Delay");
 
-    for (uint32_t i = 0; i < m_measurements.size (); i++)
+    PlotData plotData = {"Throughput", "Time [sec]", "Throughput [Mbps]", TIMEDOMAIN};
+    m_MeasPlotData["Throughput"] = plotData;
+
+    plotData.title = "Delay Histogram";
+    plotData.x = "Delay [sec]";
+    plotData.y = "Frequency [%]";
+    plotData.plotType = HISTOGRAM;
+    m_MeasPlotData["Delay"] = plotData;
+
+
+    for (MeasPlotData::const_iterator it = m_MeasPlotData.begin (); it != m_MeasPlotData.end (); ++it)
     {
       std::vector< Gnuplot2dDataset > vDataSet;
-      m_mMeasurementDataset [m_measurements.at (i)] = vDataSet;
+      m_mMeasurementDataset [it->first] = vDataSet;
     }
-
     Simulator::Schedule (m_eos, &NetMeasure::EndPlot, this); // call to EndPlot at End of Simulation
   }
 
@@ -106,11 +113,12 @@ namespace ns3 {
     {
       std::string measurement = it->first;
       std::vector < Gnuplot2dDataset > vDataSetFlow = it->second;
-
+      
+      PlotData plotData = m_MeasPlotData[measurement];
       // svg or png
-      Gnuplot gnuplot (measurement + ".png", measurement);
+      Gnuplot gnuplot (measurement + ".png", plotData.title);
       gnuplot.SetTerminal ("png"); // non detected terminal
-      gnuplot.SetLegend ("X", "Y");
+      gnuplot.SetLegend (plotData.x, plotData.y);
 
       NS_LOG_INFO ("Plot name: " << measurement);
       for (uint32_t j = 0; j < vDataSetFlow.size (); j++)
@@ -144,6 +152,7 @@ namespace ns3 {
   void
   NetMeasure::InitFlowStats (FlowMonitor::FlowStats &flowStats)
   {
+    // alt: flowStat = {0};
     flowStats.delaySum = Seconds (0);
     flowStats.jitterSum = Seconds (0);
     flowStats.lastDelay = Seconds (0);
@@ -153,7 +162,7 @@ namespace ns3 {
     flowStats.rxPackets = 0;
     flowStats.lostPackets = 0;
     flowStats.timesForwarded = 0;
-    flowStats.delayHistogram.SetDefaultBinWidth (0.1);
+    flowStats.delayHistogram.SetDefaultBinWidth (0.1);// this values is not set propertly
     //flowStats.jitterHistogram.SetDefaultBinWidth (m_jitterBinWidth);
     //flowStats.packetSizeHistogram.SetDefaultBinWidth (m_packetSizeBinWidth);
   }
@@ -219,6 +228,33 @@ namespace ns3 {
   }
 
   void
+  NetMeasure::CalcDelayHist (FlowMonitor::FlowStats stats, Gnuplot2dDataset& plotDataSet)
+  {
+    NS_LOG_INFO ("Calculating delay histogram");
+    //gnuplot.SetLegend ("Histogram, Frecuency"); in EndPlot?
+
+    // FSTEP see gnuplot help styles fsteps vs histeps
+    // style histograms not implemented in gnuplot.cc
+    enum Gnuplot2dDataset::Style style = Gnuplot2dDataset::FSTEPS;
+    plotDataSet.SetStyle (style);
+
+    Histogram hist = stats.delayHistogram;
+    double delay;
+    double freq;
+    double width = hist.GetBinWidth (0); // All bins have the same width
+    uint32_t rxPackets = stats.rxPackets;
+
+    for (uint32_t index = 0; index < hist.GetNBins (); index++)
+    {
+      delay = index * width;
+      double count = hist.GetBinCount (index);
+      freq = count / rxPackets * 100; //Normalize to 100
+
+      plotDataSet.Add (delay, freq);
+    }
+  }
+
+  void
   NetMeasure::GetFlowStats ()
   {
     MonStats stats;
@@ -252,67 +288,49 @@ namespace ns3 {
         Measurement measurement = ite->first;
         std::vector < Gnuplot2dDataset > vDataSet = ite->second;
         Gnuplot2dDataset plotDataSet = vDataSet.at (i);
+        enum PlotType plotType = m_MeasPlotData[measurement].plotType;
 
         NS_LOG_DEBUG ("measurement " << measurement);
-
-        // Time vs Magnitude
         Time time = Simulator::Now ();
-        double data;
-        if (measurement.compare ("Throughput") == 0)
-        {
-          data = CalcThroughput (newStats, oldStats);
-          plotDataSet.Add (time.GetSeconds (), data);
-        } else if (measurement.compare ("delaySum") == 0)
-        {
-          data = CalcMeanDelay (newStats);
-          plotDataSet.Add (time.GetSeconds (), data);
-        } else if (measurement.compare ("lostPackets") == 0)
-        {
-          data = newStats.lostPackets;
-          plotDataSet.Add (time.GetSeconds (), data);
-        }
-
-        // Histograms
-        // Works only in the last iteration
-        Time lastIteration = m_eos - m_interval;
-        double lastIterationD = lastIteration.GetSeconds (); // errors debugging with timeD
         double timeD = time.GetSeconds ();
-        /// Doesn't work comparing directly time.GetSeconds () == lastIteration.GetSeconds ()
-        if (timeD == lastIterationD)
+
+        switch (plotType)
         {
-          NS_LOG_INFO ("last iteration:  " << timeD);
-          if (measurement.compare ("Delay") == 0)
-          {
-            NS_LOG_INFO ("Delay");
-            //gnuplot.SetLegend ("Histogram, Frecuency"); En EndPlot?
-
-            // FSTEP see gnuplot help styles fsteps vs histeps
-            // style histograms not implemented in gnuplot.cc
-            enum Gnuplot2dDataset::Style style = Gnuplot2dDataset::FSTEPS;
-            plotDataSet.SetStyle (style);
-
-            Histogram hist = newStats.delayHistogram;
-            double delay;
-            double freq;
-            double width = hist.GetBinWidth (0); // All bins have the same width
-
-            uint32_t rxPackets = newStats.rxPackets;
-
-            for (uint32_t index = 0; index < hist.GetNBins (); index++)
+          case TIMEDOMAIN:
+            double data;
+            if (measurement.compare ("Throughput") == 0)
             {
-              delay = index * width;
-              double count = hist.GetBinCount (index);
-              freq = count / rxPackets * 100; //Normalize to 100
-
-              plotDataSet.Add (delay, freq);
+              data = CalcThroughput (newStats, oldStats);
+            } else if (measurement.compare ("delaySum") == 0)
+            {
+              data = CalcMeanDelay (newStats);
+            } else if (measurement.compare ("lostPackets") == 0)
+            {
+              data = newStats.lostPackets;
             }
+            plotDataSet.Add (timeD, data);
+
+            break;
+          case HISTOGRAM:// Works only in the last iteration
+          {
+
+            Time lastIteration = m_eos - m_interval;
+            double lastIterationD = lastIteration.GetSeconds (); // errors debugging with timeD
+            /// Doesn't work comparing directly time.GetSeconds () == lastIteration.GetSeconds ()
+            if (timeD == lastIterationD)
+            {
+              NS_LOG_INFO ("last iteration:  " << timeD);
+              if (measurement.compare ("Delay") == 0)
+              {
+                CalcDelayHist (newStats, plotDataSet);
+              }
+            }// end of Last Iteration
+            break;
           }
-
-        }// end of Last Iteration
-
-
-
-
+          default:
+            NS_LOG_ERROR ("  No correct plot type selected");
+            exit (-1);
+        }
         //Restore plot data set
         vDataSet.at (i) = plotDataSet;
       }

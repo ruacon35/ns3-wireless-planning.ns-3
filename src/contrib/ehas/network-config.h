@@ -82,7 +82,7 @@ namespace ns3 {
         NetworkConfig();
         ~NetworkConfig();
 
-        static TypeId GetTypeId (void);
+        static TypeId GetTypeId(void);
 
         /**
          * @brief Sets device data into DeviceData struct.

@@ -32,6 +32,8 @@
 #include "ns3/type-id.h"
 #include "ns3/object.h"
 
+using namespace std;
+
 namespace ns3 {
 
     /**
@@ -49,6 +51,28 @@ namespace ns3 {
      */
     class NetMeasure {
     public:
+
+        enum PlotType {
+            TIMEDOMAIN,
+            HISTOGRAM,
+        };
+
+        static TypeId GetTypeId(void);
+
+        typedef map< FlowId, FlowMonitor::FlowStats > MonStats;
+        typedef string Measurement;
+        typedef map < Measurement, vector< Gnuplot2dDataset > > MeasurementDataset;
+
+        struct PlotData {
+            string title;
+            string x;
+            string y;
+            enum PlotType plotType;
+        };
+        typedef struct PlotData PlotData;
+
+        typedef map < Measurement, PlotData> MeasPlotData;
+
         /**
          * Constructor:
          */
@@ -65,13 +89,6 @@ namespace ns3 {
          */
         ~NetMeasure();
 
-        static TypeId GetTypeId(void);
-
-        typedef std::map< FlowId, FlowMonitor::FlowStats > MonStats;
-        typedef std::string Measurement;
-        typedef std::map < Measurement, std::vector< Gnuplot2dDataset > > MeasurementDataset;
-
-
         /**
          * @brief Defines the name of the gnuplot resultant image
          *
@@ -83,7 +100,7 @@ namespace ns3 {
          *
          * @return The name of the image.
          */
-        std::string ImageName(int i);
+        string ImageName(int i);
 
 
         /**
@@ -175,24 +192,23 @@ namespace ns3 {
          * Translates it to gnuplot dataset
          *
          * @param stats EOS statistics
-         *
-         * @return data Gnuplot data set
+         * @param data Gnuplot data set
          */
-        Gnuplot2dDataset CalcDelayHist(FlowMonitor::FlowStats lasts);
+        void CalcDelayHist(FlowMonitor::FlowStats stas, Gnuplot2dDataset &plotDataSet);
 
 
 
 
         Time m_eos;
         Time m_interval;
-        Ptr<FlowMonitor> m_flowMon;
+        Ptr < FlowMonitor > m_flowMon;
 
-        std::vector < std::string > m_flowMonMeas; ///< List of measurements
-        std::vector < Measurement > m_measurements; ///< List of measurements
+        vector < Measurement > m_measurements; ///< List of measurements
+        map < Measurement, PlotData> m_MeasPlotData;
 
         MeasurementDataset m_mMeasurementDataset; ///< One data set vector per measurement
-        //std::map < std::string, std::vector<Gnuplot2dDataset>  > m_mvPlotDataSetFlow; ///< One data set vector per measurement
-        std::vector< FlowMonitor::FlowStats > m_vOldFlowStats; ///< One flow stats per flow
+        //map < string, vector<Gnuplot2dDataset>  > m_mvPlotDataSetFlow; ///< One data set vector per measurement
+        vector< FlowMonitor::FlowStats > m_vOldFlowStats; ///< One flow stats per flow
     };
 
 } // namespace ns3
