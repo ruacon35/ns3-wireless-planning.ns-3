@@ -80,8 +80,11 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
  NS_LOG_DEBUG ("AC_VI: " << AC_VI);
 
 
-netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);
-netTest.ApplicationSetup ("URPAY", 9, "CCATCCA", 6, 8, "15Mbps", 200, AC_VO);
+netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, AC_VO);
+netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, AC_VO);
+
+//netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);
+//netTest.ApplicationSetup ("URPAY", 9, "CCATCCA", 6, 8, "15Mbps", 200, AC_VO);
 
 // netTest.ApplicationSetup ("URCOS", 9, "URPAY", 4, 10, "15Mbps", 200, AC_VO);
 // netTest.ApplicationSetup ("CCATCCA", 9, "KCAURI", 6, 8, "15Mbps", 200, AC_VO);
@@ -134,8 +137,9 @@ SetNetworkConfiguration ()
   */
  
 // ifstream file ("report.txt");
- ifstream file ("short-report.txt");
- NS_LOG_INFO ("Reading Radio Mobile report: " << file);
+ //ifstream file ("short-report.txt");
+ ifstream file ("cusco-nw-report-ns3.txt");
+ NS_LOG_INFO ("Reading simplified Radio Mobile report: " << file);
  RmReportReader rrr;
  NetDataStruct::NetData netData = rrr.ReadRmReport (file);
  Print::RmReportInfo (netData);
@@ -155,7 +159,7 @@ SetNetworkConfiguration ()
 
  for (uint16_t i = 0; i < netData.vSubnetData.size (); i++)
   {
-   config.SetChannelData (i, "wifib-5.5mbs", vectorChannelData);
+   config.SetChannelData (i, netData.vSubnetData[i].mode, vectorChannelData);
   }
  networkData.vectorChannelData = vectorChannelData;
 

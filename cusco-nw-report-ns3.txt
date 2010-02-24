@@ -1,0 +1,50 @@
+= General information
+
+Netfile: CUSCO-NW.NET
+Generated: 2010-02-23T12:13:46
+
+= Nodes
+
+Josjojauarina 1
+Josjojauarina 2
+Ccatcca
+Kcauri
+Urpay
+Huiracochan
+Urcos
+
+= Nets
+
+== Josjo1-Josjo2
+
+Mode: wifib-5.5mbs
+
+Node	Role	Distance to AP [km]
+Josjojauarina 1	AP	0.00
+Josjojauarina 2	Terminal	22.48
+
+== Josjo2
+
+Mode: wifib-5.5mbs
+
+Node	Role	Distance to AP [km]
+Josjojauarina 2	AP	0.00
+Ccatcca	Terminal	15.62
+Kcauri	Terminal	15.67
+
+== Josjo1
+
+Mode: wifib-5.5mbs
+
+Node	Role	Distance to AP [km]
+Josjojauarina 1	AP	0.00
+Urpay	Terminal	16.37
+Huiracochan	Terminal	14.18
+
+== Huiracochan
+
+Mode: wifib-5.5mbs
+
+Node	Role	Distance to AP [km]
+Huiracochan	AP	0.00
+Urcos	Terminal	12.89

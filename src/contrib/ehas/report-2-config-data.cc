@@ -86,8 +86,8 @@ namespace ns3
   NetworkConfig::MacType macType = NetworkConfig::QSTA;
   vector<string> roles;
 
-  roles.push_back ("Node"); //0
-  roles.push_back ("Terminal"); //1
+  roles.push_back ("AP"); //0
+  roles.push_back ("STA"); //1
   roles.push_back ("Master"); //2
   roles.push_back ("Slave"); //3
 

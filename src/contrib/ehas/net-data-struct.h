@@ -44,6 +44,7 @@ namespace ns3 {
          */
         struct SubnetData {
             string name;
+            string mode;
             vector<string> nodes;
             vector<string> roles;
             vector<string> systems;
