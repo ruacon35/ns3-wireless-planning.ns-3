@@ -31,8 +31,6 @@
 #include <string>
 #include <vector>
 
-
-
 using namespace ns3;
 using namespace std;
 
@@ -42,7 +40,7 @@ NS_LOG_COMPONENT_DEFINE ("main");
  * @brief network main Script (reading from report.txt)
  */
 
-NetworkConfig::NetworkData SetNetworkConfiguration ();
+NetworkConfig::NetworkData SetNetworkConfiguration (string netInfoFile);
 
 int
 main (int argc, char *argv[])
@@ -55,7 +53,10 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   * Network Creation
   */
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
- NetworkConfig::NetworkData networkData = SetNetworkConfiguration ();
+ CommandLine cmd;
+ cmd.Parse (argc, argv);
+ 
+ NetworkConfig::NetworkData networkData = SetNetworkConfiguration ("cusco-ne-netinfo.txt");
  Print::NetworkData (networkData);
 
  NS_LOG_INFO ("Creating the network...");
@@ -124,20 +125,12 @@ netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, AC_VO);
  * @see CreateNetwork::Create
  */
 NetworkConfig::NetworkData
-SetNetworkConfiguration ()
+SetNetworkConfiguration (string netInfoFile)
 {
- NetworkConfig::NetworkData networkData; // retval
- /*
-  * Configuration Data
-  */
- NS_LOG_INFO ("Configuration Data");
+ NetworkConfig::NetworkData networkData;
 
- /*
-  * Read information from RadioMobile report.txt
-  */
- 
- ifstream file ("cusco-nw-report-ns3.txt");
- NS_LOG_INFO ("Reading simplified Radio Mobile report: " << file);
+ ifstream file (netInfoFile.c_str());
+ NS_LOG_INFO ("Reading simplified netinfo: " << file);
  RmReportReader rrr;
  NetDataStruct::NetData netData = rrr.ReadRmReport (file);
  Print::RmReportInfo (netData);
