@@ -106,9 +106,9 @@ namespace ns3
  }
 
  void
- Print::RmReportInfo (NetDataStruct::NetData netData)
+ Print::Netinfo (NetDataStruct::NetData netData)
  {
-  NS_LOG_INFO ("-- -- Radio Mobile Report Information -- --");
+  NS_LOG_INFO ("-- -- Netinfo -- --");
   NS_LOG_INFO ("-- general info --");
   VectorString (netData.generalInfo);
 
