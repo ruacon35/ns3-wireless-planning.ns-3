@@ -71,13 +71,11 @@ namespace ns3 {
         static void VectorSubnet(NetDataStruct::VectorSubnetData);
 
         /**
-         * @brief Prints all information extracted from report.txt
-         *
-         * Should I implement this method in rm-report-reader class?
+         * @brief Prints all information extracted from a netinfo text file
          *
          * @param netData
          */
-        static void RmReportInfo(NetDataStruct::NetData netData);
+        static void Netinfo(NetDataStruct::NetData netData);
 
         /**
          * @brief Prints all the network data set by the user.
