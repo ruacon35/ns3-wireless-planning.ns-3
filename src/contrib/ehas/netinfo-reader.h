@@ -5,8 +5,8 @@
  * Created on 22 December 2009, 16:31
  */
 
-#ifndef _RM_REPORT_READER_H
-#define	_RM_REPORT_READER_H
+#ifndef _NETINFO_READER_H
+#define	_NETINFO_READER_H
 
 #include <iostream>
 #include <fstream>
