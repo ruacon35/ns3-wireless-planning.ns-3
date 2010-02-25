@@ -73,7 +73,7 @@ namespace ns3 {
         /**
          * @brief Set Ipv4AddressHelper vector
          */
-        void SetAddresser();
+        void SetIpAddresser();
 
         //
         /**
@@ -107,19 +107,14 @@ namespace ns3 {
          *
          * @return Ipv4InterfaceContainer contains all the interfaces.
          */
-        void SetAddress(NetDevice &device, Ipv4Address address);
+        void SetIpAddress (NetDevice &device, Ipv4Address address);
 
         /**
          * @brief Sets all the devices of a node given all the necessary information.
          *
-         * The new device will be pushed to the tail of the device list.
-         * The parameters act as the return of the method. They are all passed by reference.
-         * Does it make sense to return them? Or only the device list is necessary? or the node container?
+         * NEEDS TO RENAME
          *
-         * @param vectorPhy contains all the possible PHY implementations of the network.
-         * @param mac NqosWifiMacHelper
-         * @param deviceList contains all installed devices in a vector.
-         * @param interfaces contains all the IP interfaces.
+         * The new device will be pushed to the tail of the device list.
          */
         void SetAllNodes(void);
 
@@ -131,6 +126,9 @@ namespace ns3 {
          * @param node
          */
         NetDeviceContainer DeviceInstallation(NetworkConfig::DeviceData deviceData, Ptr<Node> node);
+
+        NetDeviceContainer WifiInstall (const WifiPhyHelper &phyHelper,
+                     const WifiMacHelper &macHelper, NodeContainer c);
 
         NetworkConfig m_networkDataStruct; ///< NetworkConfig object.
         NetworkConfig::NetworkData m_networkData; ///< NetworkData an attribute.
