@@ -136,32 +136,15 @@ SetNetworkConfiguration ()
   * Read information from RadioMobile report.txt
   */
  
-// ifstream file ("report.txt");
- //ifstream file ("short-report.txt");
  ifstream file ("cusco-nw-report-ns3.txt");
  NS_LOG_INFO ("Reading simplified Radio Mobile report: " << file);
  RmReportReader rrr;
  NetDataStruct::NetData netData = rrr.ReadRmReport (file);
  Print::RmReportInfo (netData);
 
- /*
-  * Setting all the data of all the nodes
-  */
  Report2ConfigData r2c;
  networkData = r2c.NetData2NetworkData (netData);
  Print::NetworkData (networkData);
-
- /*
-  * Setting all the data of all the channels
-  */
- NetworkConfig config;
- NetworkConfig::VectorChannelData vectorChannelData;
-
- for (uint16_t i = 0; i < netData.vSubnetData.size (); i++)
-  {
-   config.SetChannelData (i, netData.vSubnetData[i].mode, vectorChannelData);
-  }
- networkData.vectorChannelData = vectorChannelData;
 
  return networkData;
 }

@@ -68,6 +68,16 @@ namespace ns3
     vectorNodeData.push_back (node); // add node to the tail of the vector.
    }
   network.vectorNodeData = vectorNodeData;
+
+  NetworkConfig config;
+  NetworkConfig::VectorChannelData vectorChannelData;
+
+  for (uint16_t i = 0; i < net.vSubnetData.size (); i++)
+    {
+      config.SetChannelData (i, net.vSubnetData[i].mode, vectorChannelData);
+    }
+  network.vectorChannelData = vectorChannelData;
+  
   return network;
  }
 
