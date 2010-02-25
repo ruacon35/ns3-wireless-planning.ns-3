@@ -10,7 +10,7 @@ def build(bld):
         'net-data-struct.cc',
       	'print.cc',
         'report-2-config-data.cc',
-        'rm-report-reader.cc',
+        'netinfo-reader.cc',
       	'util.cc',
         ]
 
@@ -24,6 +24,6 @@ def build(bld):
         'net-data-struct.h',
       	'print.h',
         'report-2-config-data.h',
-        'rm-report-reader.h',
+        'netinfo-reader.h',
       	'util.h',
         ]
