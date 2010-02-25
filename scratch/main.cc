@@ -37,7 +37,7 @@ using namespace std;
 NS_LOG_COMPONENT_DEFINE ("main");
 
 /**
- * @brief network main Script (reading from report.txt)
+ * @brief network main Script (read from netinfo text file)
  */
 
 NetworkConfig::NetworkData SetNetworkConfiguration (string netInfoFile);
@@ -131,8 +131,8 @@ SetNetworkConfiguration (string netInfoFile)
 
  ifstream file (netInfoFile.c_str());
  NS_LOG_INFO ("Reading simplified netinfo: " << file);
- RmReportReader rrr;
- NetDataStruct::NetData netData = rrr.ReadRmReport (file);
+ NetinfoReader reader;
+ NetDataStruct::NetData netData = reader.Read (file);
  Print::RmReportInfo (netData);
 
  Report2ConfigData r2c;

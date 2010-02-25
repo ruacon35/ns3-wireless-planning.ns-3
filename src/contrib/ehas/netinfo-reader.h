@@ -1,5 +1,5 @@
 /* 
- * File:   rm-report-reader.h
+ * File:   netinfo-reader.h
  * Author: patxi
  *
  * Created on 22 December 2009, 16:31
@@ -26,22 +26,22 @@ using namespace std;
  * @brief A class to read simplified Radio Mobile reports.
  *
  */
-class RmReportReader
+class NetinfoReader
 {
 public:
-  RmReportReader();
-  ~RmReportReader();
+  NetinfoReader();
+  ~NetinfoReader();
   static TypeId GetTypeId(void);
 
   /**
-   * @brief Reads and parses simplified Radio Mobile report.
+   * @brief Reads and parses a netinfo text file .
    *
    * This is the main method of the class.
    *
-   * @param file simple-report.txt
+   * @param file netinfo.txt
    *
    */
-  NetDataStruct::NetData ReadRmReport(ifstream &file);
+  NetDataStruct::NetData Read(ifstream &file);
 private:  
   vector<string> GetSection (vector<string> &input_lines, string start, string end);
   vector<string> GetSubSectionNames (vector<string> &input_lines, string header);
@@ -50,4 +50,4 @@ private:
 
 } // namespace ns3
 
-#endif	/* _RM_REPORT_READER_H */
+#endif

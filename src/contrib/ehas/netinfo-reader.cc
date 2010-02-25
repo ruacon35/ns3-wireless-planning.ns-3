@@ -21,29 +21,29 @@
 #include "ns3/log.h"
 #include "print.h"
 
-#include "rm-report-reader.h"
+#include "netinfo-reader.h"
 
-NS_LOG_COMPONENT_DEFINE ("rm-report-reader");
+NS_LOG_COMPONENT_DEFINE ("netinfo-reader");
 
 using namespace std;
 
 namespace ns3 {
 
-RmReportReader::RmReportReader () { }
+NetinfoReader::NetinfoReader () { }
 
-RmReportReader::~RmReportReader () { }
+NetinfoReader::~NetinfoReader () { }
 
 TypeId
-RmReportReader::GetTypeId (void)
+NetinfoReader::GetTypeId (void)
 {
-  static TypeId tid = TypeId ("ns3::RmReportReader")
+  static TypeId tid = TypeId ("ns3::NetinfoReader")
     .SetParent<Object > ()
     ;
   return tid;
 }
 
 vector<string> 
-RmReportReader::split (const string &s, char delim) 
+NetinfoReader::split (const string &s, char delim) 
 {
   vector<string> elems;
   stringstream ss(s);
@@ -56,7 +56,7 @@ RmReportReader::split (const string &s, char delim)
 }
 
 vector<string>
-RmReportReader::GetSection (vector<string> &lines, string start, string end)
+NetinfoReader::GetSection (vector<string> &lines, string start, string end)
 {
   vector<string> output_lines;
   string line;
@@ -73,7 +73,7 @@ RmReportReader::GetSection (vector<string> &lines, string start, string end)
 }
 
 vector<string>
-RmReportReader::GetSubSectionNames (vector<string> &lines, string header)
+NetinfoReader::GetSubSectionNames (vector<string> &lines, string header)
 {
   vector<string> names;
   for (uint32_t i = 0; i < lines.size(); i++)
@@ -89,20 +89,20 @@ RmReportReader::GetSubSectionNames (vector<string> &lines, string header)
 }
 
 NetDataStruct::NetData
-RmReportReader::ReadRmReport (ifstream &file)
+NetinfoReader::Read (ifstream &file)
 { 
   NetDataStruct::NetData netData;
-  vector<string> report_lines, lines;
+  vector<string> netinfo_lines, lines;
   string line;
     
   while (getline(file, line))
-     report_lines.push_back (line);
+     netinfo_lines.push_back (line);
      
   // General information
-  netData.generalInfo = GetSection (report_lines, string("= General information"), string("= "));
+  netData.generalInfo = GetSection (netinfo_lines, string("= General information"), string("= "));
 
   // Nodes
-  lines = GetSection (report_lines, string("= Nodes"), string("= "));
+  lines = GetSection (netinfo_lines, string("= Nodes"), string("= "));
   for (uint32_t i = 0; i < lines.size(); i++)
     {
       netData.nodesInfo.names.push_back(lines[i]);
@@ -110,7 +110,7 @@ RmReportReader::ReadRmReport (ifstream &file)
 
   // Nets
   string net_header ("== ");
-  lines = GetSection (report_lines, string("= Nets"), string("= "));
+  lines = GetSection (netinfo_lines, string("= Nets"), string("= "));
   vector<string> net_names = GetSubSectionNames (lines, net_header);
 
   for (uint32_t i = 0; i < net_names.size(); i++)
