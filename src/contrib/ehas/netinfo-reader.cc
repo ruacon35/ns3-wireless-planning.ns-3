@@ -106,7 +106,9 @@ NetinfoReader::Read (ifstream &file)
       string net_name = net_names[i];
       vector<string> net_lines = GetSection (lines, net_header+net_name, net_header);
       subnetData.name = net_name;
-      subnetData.mode = split(net_lines[0], ' ')[1];      
+      vector<string> node_info = split(net_lines[0], ' ');
+      subnetData.mode = node_info[1];      
+      //subnetData.speed = node_info[2];
       for (uint32_t j = 2; j < net_lines.size(); j++) 
         {
         string net_line = net_lines[j];
