@@ -29,10 +29,6 @@ using namespace std;
 class NetinfoReader
 {
 public:
-  NetinfoReader();
-  ~NetinfoReader();
-  static TypeId GetTypeId(void);
-
   /**
    * @brief Reads and parses a netinfo text file .
    *
@@ -41,11 +37,11 @@ public:
    * @param file netinfo.txt
    *
    */
-  NetDataStruct::NetData Read(ifstream &file);
+  static NetDataStruct::NetData Read(ifstream &file);
 private:  
-  vector<string> GetSection (vector<string> &input_lines, string start, string end);
-  vector<string> GetSubSectionNames (vector<string> &input_lines, string header);
-  vector<string> split(const string &s, char delim);
+  static vector<string> GetSection (vector<string> &input_lines, string start, string end);
+  static vector<string> GetSubSectionNames (vector<string> &input_lines, string header);
+  static vector<string> split(const string &s, char delim);
 };
 
 } // namespace ns3

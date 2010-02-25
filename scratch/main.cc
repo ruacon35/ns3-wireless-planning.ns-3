@@ -131,8 +131,7 @@ SetNetworkConfiguration (string netInfoFile)
 
  ifstream file (netInfoFile.c_str());
  NS_LOG_INFO ("Reading simplified netinfo: " << file);
- NetinfoReader reader;
- NetDataStruct::NetData netData = reader.Read (file);
+ NetDataStruct::NetData netData = NetinfoReader::Read (file);
  Print::RmReportInfo (netData);
 
  Report2ConfigData r2c;

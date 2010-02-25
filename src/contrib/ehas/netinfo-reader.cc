@@ -29,19 +29,6 @@ using namespace std;
 
 namespace ns3 {
 
-NetinfoReader::NetinfoReader () { }
-
-NetinfoReader::~NetinfoReader () { }
-
-TypeId
-NetinfoReader::GetTypeId (void)
-{
-  static TypeId tid = TypeId ("ns3::NetinfoReader")
-    .SetParent<Object > ()
-    ;
-  return tid;
-}
-
 vector<string> 
 NetinfoReader::split (const string &s, char delim) 
 {
