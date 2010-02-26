@@ -41,15 +41,9 @@ NS_LOG_COMPONENT_DEFINE ("create-network");
 namespace ns3
 {
 
- CreateNetwork::CreateNetwork ()
- {  
-  NS_LOG_INFO ("CreateNetwork() constructor");
- }
+ CreateNetwork::CreateNetwork () { }
 
- CreateNetwork::~CreateNetwork ()
- {
-  NS_LOG_FUNCTION_NOARGS ();
- }
+ CreateNetwork::~CreateNetwork () { }
 
  TypeId
  CreateNetwork::GetTypeId (void)
@@ -195,7 +189,7 @@ namespace ns3
  }
 
  void
- CreateNetwork::SetAllNodes (void)
+ CreateNetwork::NetworkBuilding (void)
  {
   NetDeviceContainer devices;
   for (uint32_t i = 0; i < m_nNodes; i++)
@@ -261,29 +255,29 @@ namespace ns3
     device = wifi.Install (phy, mac, node);
    }
 
-//    //Adaptation for long distances
-//
-//    double distance = 2; //km
-//    double c0 = 30000000.0; // speed of light
-//    double maxPropagationDelay = distance / c0;// sec
-//
-//    Ptr< WifiNetDevice > dev;
-//    Ptr< NetDevice > netDev;
-//    netDev = device.Get (0);
-//
-//    dev = netDev->GetObject<WifiNetDevice>();
-//
-//    Ptr< WifiMac > mac;
-//    mac = dev->GetMac ();
-//
-//    mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
-//
-//    //ACK Timeout
-//    Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
-//                               + mac->GetSlot ().GetSeconds ()
-//                               + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
-//    mac->SetAckTimeout (ackTimeout);
-  
+  //    //Adaptation for long distances
+  //
+  //    double distance = 2; //km
+  //    double c0 = 30000000.0; // speed of light
+  //    double maxPropagationDelay = distance / c0;// sec
+  //
+  //    Ptr< WifiNetDevice > dev;
+  //    Ptr< NetDevice > netDev;
+  //    netDev = device.Get (0);
+  //
+  //    dev = netDev->GetObject<WifiNetDevice>();
+  //
+  //    Ptr< WifiMac > mac;
+  //    mac = dev->GetMac ();
+  //
+  //    mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
+  //
+  //    //ACK Timeout
+  //    Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
+  //                               + mac->GetSlot ().GetSeconds ()
+  //                               + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
+  //    mac->SetAckTimeout (ackTimeout);
+
   //  // CTS Timeout
   //  mac->SetCtsTimeout (ackTimeout);// se queda colgado la aplicación!!!
 
@@ -307,16 +301,13 @@ namespace ns3
  CreateNetwork::Create (NetworkConfig::NetworkData networkData)
  {
   // Reading network information data
-  m_nNodes = 0;
   m_networkData = networkData;
   m_vectorNodeData = m_networkData.vectorNodeData;
   m_vectorChannelData = m_networkData.vectorChannelData;
-
   m_nNodes = m_vectorNodeData.size (); //number of nodes
   m_nodes.Create (m_nNodes);
 
   NS_LOG_INFO ("Creating " << m_nNodes << " nodes.");
-
 
   // Install network stacks on the nodes
   InternetStackHelper internet;
@@ -324,13 +315,11 @@ namespace ns3
 
   NS_LOG_INFO ("Create channels.");
   SetPhy ();
-  //class WimaxPhy : public Object
-  //  It doesn't derive from yans
 
   SetIpAddresser ();
 
   //Node Configuration
-  SetAllNodes ();
+  NetworkBuilding ();
 
   /*
    * Mobility

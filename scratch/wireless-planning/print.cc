@@ -128,13 +128,13 @@ namespace ns3
 
   for (uint32_t i = 0; i < vectorNodeData.size (); i++)
    {
-    nodeData = vectorNodeData[i];
+    nodeData = vectorNodeData.at (i);
     uint16_t nDev = nodeData.vectorDeviceData.size (); // number of devices
     NS_LOG_DEBUG ("  Node: " << i << " " << nodeData.name << " has " << nDev << " device(s)");
 
     for (uint32_t j = 0; j < nDev; j++)
      {
-      NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData[j];
+      NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData.at (j);
       NS_LOG_DEBUG ("   Device: " << j << " in total " << i_if);
       i_if++;
       NS_LOG_DEBUG ("    IP address: " << deviceData.address);
@@ -152,7 +152,7 @@ namespace ns3
   NS_LOG_DEBUG ("Channel data: " << vectorChannelData.size () << " channels.");
   for (uint32_t i = 0; i < vectorChannelData.size (); i++)
    {
-    chData = vectorChannelData[i];
+    chData = vectorChannelData.at (i);
     NS_LOG_DEBUG (" Ch: " << i + 1 << " Mode: " << chData.mode);
    }
  }
