@@ -30,6 +30,8 @@
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/names.h"
+#include "ns3/net-device.h"
+#include "ns3/wifi-net-device.h"
 
 
 #include "create-network.h"
@@ -132,16 +134,6 @@ namespace ns3
  {
   QosWifiMacHelper macHelper = QosWifiMacHelper::Default (); // Qsta
 
-  
-
-
-//  // ACKTimeout
-//  double distance = 2; //km
-//  double c0 = 30000000.0; // speed of light
-//  double maxPropagationDelay = distance / c0;
-
-
-
   //ssid name
   std::ostringstream oss;
   oss.str ("");
@@ -151,42 +143,23 @@ namespace ns3
   switch (deviceData.macType)
    {
    case NetworkConfig::QAP :
-   {
-//      QapWifiMac mac;
-//  mac.SetMaxPropagationDelay (Seconds (maxPropagationDelay));
-//
-//
-//  //ACK Timeout
-//  Time ackTimeout = Seconds (mac.GetEifsNoDifs ().GetSeconds ()
-//          + mac.GetSlot ().GetSeconds ()
-//          + mac.GetMaxPropagationDelay ().GetSeconds () * 2);
-//  mac.SetAckTimeout (ackTimeout);
-//  //mac.SetCtsTimeout (ackTimeout);
+    {
 
-            macHelper.SetType ("ns3::QapWifiMac", "Ssid", SsidValue (ssid),
-                               "BeaconGeneration", BooleanValue (true),
-                               "BeaconInterval", TimeValue (Seconds (2.5)));
-    break;
-   }
+
+     macHelper.SetType ("ns3::QapWifiMac",
+                        "Ssid", SsidValue (ssid),
+                        "BeaconGeneration", BooleanValue (true),
+                        "BeaconInterval", TimeValue (Seconds (2.5)));
+     break;
+    }
    case NetworkConfig::QSTA :
-   {
-//      QstaWifiMac mac;
-//  mac.SetMaxPropagationDelay (Seconds (maxPropagationDelay));
-//
-//
-//  //ACK Timeout
-//  Time ackTimeout = Seconds (mac.GetEifsNoDifs ().GetSeconds ()
-//          + mac.GetSlot ().GetSeconds ()
-//          + mac.GetMaxPropagationDelay ().GetSeconds () * 2);
-//  mac.SetAckTimeout (ackTimeout);
-//  //mac.SetCtsTimeout (ackTimeout);
-
-            macHelper.SetType ("ns3::QstaWifiMac",
-                               "Ssid", SsidValue (ssid),
-                               "ActiveProbing", BooleanValue (false));
-    NS_LOG_DEBUG ("  QoS Station");
-    break;
-   }
+    {
+     macHelper.SetType ("ns3::QstaWifiMac",
+                        "Ssid", SsidValue (ssid),
+                        "ActiveProbing", BooleanValue (false));
+     NS_LOG_DEBUG ("  QoS Station");
+     break;
+    }
    case NetworkConfig::QADHOC :
             macHelper.SetType ("ns3::QadhocWifiMac");
     NS_LOG_DEBUG ("  QoS Ad-Hoc");
@@ -212,6 +185,7 @@ namespace ns3
   int32_t interface = ipv4->GetInterfaceForDevice (&device);
   if (interface == -1)
    {
+
     interface = ipv4->AddInterface (&device);
    }
   NS_ASSERT_MSG (interface >= 0, "Ipv4AddressHelper::Allocate(): "
@@ -219,7 +193,6 @@ namespace ns3
 
   Ipv4InterfaceAddress ipv4Addr = Ipv4InterfaceAddress (address, "255.255.255.0");
   NS_LOG_DEBUG ("Ipv4Addr: " << ipv4Addr);
-  //NS_LOG_DEBUG ("Ipv4Addr: " << ipv4->Address);
   ipv4->AddAddress (interface, ipv4Addr);
   ipv4->SetMetric (interface, 1);
   ipv4->SetUp (interface);
@@ -241,6 +214,7 @@ namespace ns3
     NS_LOG_INFO ("  Device Installation");
     for (uint32_t j = 0; j < nodeData.vectorDeviceData.size (); j++)
      {
+
       /*
        * Device installation
        */
@@ -291,12 +265,41 @@ namespace ns3
     device = wifi.Install (phy, mac, node);
    }
 
+  //Adaptation for long distances
+
+  double distance = 2; //km
+  double c0 = 30000000.0; // speed of light
+  double maxPropagationDelay = distance / c0;// sec
+
+  Ptr< WifiNetDevice > dev;
+  Ptr< NetDevice > netDev;
+  netDev = device.Get (0);
+//  dev = static_cast < Ptr<WifiNetDevice> > (netDev);
+  dev = netDev->GetObject();
+
+  Ptr< WifiMac > mac;
+  mac = dev->GetMac ();
+
+  mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
+
+  //ACK Timeout
+  Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
+                             + mac->GetSlot ().GetSeconds ()
+                             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
+  mac->SetAckTimeout (ackTimeout);
+
+  // CTS Timeout
+  mac->SetCtsTimeout (ackTimeout);
+
+
+
   if (deviceData.address.IsEqual (""))
    {
     address.Assign (device);
    }
   else
    {
+
     SetIpAddress (*device.Get (0), Ipv4Address (deviceData.address));
    }
   m_vectorAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
