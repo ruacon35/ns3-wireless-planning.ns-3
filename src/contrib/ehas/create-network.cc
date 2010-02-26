@@ -42,12 +42,8 @@ namespace ns3
 {
 
  CreateNetwork::CreateNetwork ()
- {
-  NS_LOG_FUNCTION_NOARGS ();
-  NetworkConfig m_networkDataStruct;
-  m_networkData = m_networkDataStruct.m_networkData;
+ {  
   NS_LOG_INFO ("CreateNetwork() constructor");
-  m_nNodes = 0;
  }
 
  CreateNetwork::~CreateNetwork ()
@@ -265,31 +261,31 @@ namespace ns3
     device = wifi.Install (phy, mac, node);
    }
 
-  //Adaptation for long distances
-
-  double distance = 2; //km
-  double c0 = 30000000.0; // speed of light
-  double maxPropagationDelay = distance / c0;// sec
-
-  Ptr< WifiNetDevice > dev;
-  Ptr< NetDevice > netDev;
-  netDev = device.Get (0);
-//  dev = static_cast < Ptr<WifiNetDevice> > (netDev);
-  dev = netDev->GetObject();
-
-  Ptr< WifiMac > mac;
-  mac = dev->GetMac ();
-
-  mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
-
-  //ACK Timeout
-  Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
-                             + mac->GetSlot ().GetSeconds ()
-                             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
-  mac->SetAckTimeout (ackTimeout);
-
-  // CTS Timeout
-  mac->SetCtsTimeout (ackTimeout);
+  //  //Adaptation for long distances
+  //
+  //  double distance = 2; //km
+  //  double c0 = 30000000.0; // speed of light
+  //  double maxPropagationDelay = distance / c0;// sec
+  //
+  //  Ptr< WifiNetDevice > dev;
+  //  Ptr< NetDevice > netDev;
+  //  netDev = device.Get (0);
+  //
+  //  dev = netDev->GetObject<WifiNetDevice>();
+  //
+  //  Ptr< WifiMac > mac;
+  //  mac = dev->GetMac ();
+  //
+  //  mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
+  //
+  //  //ACK Timeout
+  //  Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
+  //                             + mac->GetSlot ().GetSeconds ()
+  //                             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
+  //  mac->SetAckTimeout (ackTimeout);
+  //
+  ////  // CTS Timeout
+  ////  mac->SetCtsTimeout (ackTimeout);// se queda colgado la aplicación!!!
 
 
 
@@ -311,13 +307,15 @@ namespace ns3
  CreateNetwork::Create (NetworkConfig::NetworkData networkData)
  {
   // Reading network information data
+  m_nNodes = 0;
   m_networkData = networkData;
   m_vectorNodeData = m_networkData.vectorNodeData;
   m_vectorChannelData = m_networkData.vectorChannelData;
 
-  NS_LOG_INFO ("Create nodes.");
   m_nNodes = m_vectorNodeData.size (); //number of nodes
   m_nodes.Create (m_nNodes);
+
+  NS_LOG_INFO ("Creating " << m_nNodes << " nodes.");
 
 
   // Install network stacks on the nodes
