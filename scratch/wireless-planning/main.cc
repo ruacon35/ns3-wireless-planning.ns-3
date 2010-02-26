@@ -24,8 +24,16 @@
 #include "ns3/wifi-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/common-module.h" 
-#include "ns3/contrib-module.h" 
-#include "ns3/ehas-module.h"
+#include "ns3/contrib-module.h"
+
+#include "net-test.h"
+#include "create-network.h"
+#include "network-config.h" 
+#include "print.h"
+#include "netinfo-reader.h"
+#include "report-2-config-data.h"
+
+
 
 #include <map>
 #include <string>
