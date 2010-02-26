@@ -20,6 +20,8 @@
 
 #include "ns3/log.h"
 #include "ns3/wifi-mac.h"
+#include "ns3/qap-wifi-mac.h"
+#include "ns3/qsta-wifi-mac.h"
 #include "ns3/string.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/ipv4-global-routing-helper.h"
@@ -28,6 +30,8 @@
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/mobility-helper.h"
 #include "ns3/names.h"
+#include "ns3/net-device.h"
+#include "ns3/wifi-net-device.h"
 
 
 #include "create-network.h"
@@ -38,12 +42,8 @@ namespace ns3
 {
 
  CreateNetwork::CreateNetwork ()
- {
-  NS_LOG_FUNCTION_NOARGS ();
-  NetworkConfig m_networkDataStruct;
-  m_networkData = m_networkDataStruct.m_networkData;
+ {  
   NS_LOG_INFO ("CreateNetwork() constructor");
-  m_nNodes = 0;
  }
 
  CreateNetwork::~CreateNetwork ()
@@ -73,7 +73,7 @@ namespace ns3
  }
 
  void
- CreateNetwork::SetAddresser (void)
+ CreateNetwork::SetIpAddresser (void)
  {
   std::ostringstream network;
   for (uint32_t i = 0; i < m_vectorChannelData.size (); i++)
@@ -128,7 +128,7 @@ namespace ns3
  QosWifiMacHelper
  CreateNetwork::SetQosMac (NetworkConfig::DeviceData deviceData)
  {
-  QosWifiMacHelper mac = QosWifiMacHelper::Default ();
+  QosWifiMacHelper macHelper = QosWifiMacHelper::Default (); // Qsta
 
   //ssid name
   std::ostringstream oss;
@@ -139,29 +139,36 @@ namespace ns3
   switch (deviceData.macType)
    {
    case NetworkConfig::QAP :
-            mac.SetType ("ns3::QapWifiMac", "Ssid", SsidValue (ssid),
-                         "BeaconGeneration", BooleanValue (true),
-                         "BeaconInterval", TimeValue (Seconds (2.5)));
-    break;
+    {
+
+
+     macHelper.SetType ("ns3::QapWifiMac",
+                        "Ssid", SsidValue (ssid),
+                        "BeaconGeneration", BooleanValue (true),
+                        "BeaconInterval", TimeValue (Seconds (2.5)));
+     break;
+    }
    case NetworkConfig::QSTA :
-            mac.SetType ("ns3::QstaWifiMac",
-                         "Ssid", SsidValue (ssid),
-                         "ActiveProbing", BooleanValue (false));
-    NS_LOG_DEBUG ("  QoS Station");
-    break;
+    {
+     macHelper.SetType ("ns3::QstaWifiMac",
+                        "Ssid", SsidValue (ssid),
+                        "ActiveProbing", BooleanValue (false));
+     NS_LOG_DEBUG ("  QoS Station");
+     break;
+    }
    case NetworkConfig::QADHOC :
-            mac.SetType ("ns3::QadhocWifiMac");
+            macHelper.SetType ("ns3::QadhocWifiMac");
     NS_LOG_DEBUG ("  QoS Ad-Hoc");
     break;
    default:
     NS_LOG_ERROR ("  No correct MAC type selected");
     exit (-1);
    }
-  return mac;
+  return macHelper;
  }
 
  void
- CreateNetwork::SetAddress (NetDevice &device, Ipv4Address address)
+ CreateNetwork::SetIpAddress (NetDevice &device, Ipv4Address address)
  {
   NS_LOG_FUNCTION_NOARGS ();
 
@@ -174,6 +181,7 @@ namespace ns3
   int32_t interface = ipv4->GetInterfaceForDevice (&device);
   if (interface == -1)
    {
+
     interface = ipv4->AddInterface (&device);
    }
   NS_ASSERT_MSG (interface >= 0, "Ipv4AddressHelper::Allocate(): "
@@ -181,7 +189,6 @@ namespace ns3
 
   Ipv4InterfaceAddress ipv4Addr = Ipv4InterfaceAddress (address, "255.255.255.0");
   NS_LOG_DEBUG ("Ipv4Addr: " << ipv4Addr);
-  //NS_LOG_DEBUG ("Ipv4Addr: " << ipv4->Address);
   ipv4->AddAddress (interface, ipv4Addr);
   ipv4->SetMetric (interface, 1);
   ipv4->SetUp (interface);
@@ -203,6 +210,7 @@ namespace ns3
     NS_LOG_INFO ("  Device Installation");
     for (uint32_t j = 0; j < nodeData.vectorDeviceData.size (); j++)
      {
+
       /*
        * Device installation
        */
@@ -239,9 +247,6 @@ namespace ns3
   wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
                                 "DataMode", StringValue (mode));
 
-  //  WifiMacHelper mac = SetMac (deviceData.macType);
-  // WifiMacHelper is an abstract class with virtual methods.
-  // Must think on templates, base classes...
 
   NetDeviceContainer device;
 
@@ -256,16 +261,43 @@ namespace ns3
     device = wifi.Install (phy, mac, node);
    }
 
+//    //Adaptation for long distances
+//
+//    double distance = 2; //km
+//    double c0 = 30000000.0; // speed of light
+//    double maxPropagationDelay = distance / c0;// sec
+//
+//    Ptr< WifiNetDevice > dev;
+//    Ptr< NetDevice > netDev;
+//    netDev = device.Get (0);
+//
+//    dev = netDev->GetObject<WifiNetDevice>();
+//
+//    Ptr< WifiMac > mac;
+//    mac = dev->GetMac ();
+//
+//    mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
+//
+//    //ACK Timeout
+//    Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
+//                               + mac->GetSlot ().GetSeconds ()
+//                               + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
+//    mac->SetAckTimeout (ackTimeout);
+  
+  //  // CTS Timeout
+  //  mac->SetCtsTimeout (ackTimeout);// se queda colgado la aplicación!!!
+
+
+
   if (deviceData.address.IsEqual (""))
    {
     address.Assign (device);
    }
   else
    {
-    SetAddress (*device.Get (0), Ipv4Address (deviceData.address));
+
+    SetIpAddress (*device.Get (0), Ipv4Address (deviceData.address));
    }
-
-
   m_vectorAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
 
   return device;
@@ -275,13 +307,15 @@ namespace ns3
  CreateNetwork::Create (NetworkConfig::NetworkData networkData)
  {
   // Reading network information data
+  m_nNodes = 0;
   m_networkData = networkData;
   m_vectorNodeData = m_networkData.vectorNodeData;
   m_vectorChannelData = m_networkData.vectorChannelData;
 
-  NS_LOG_INFO ("Create nodes.");
   m_nNodes = m_vectorNodeData.size (); //number of nodes
   m_nodes.Create (m_nNodes);
+
+  NS_LOG_INFO ("Creating " << m_nNodes << " nodes.");
 
 
   // Install network stacks on the nodes
@@ -293,9 +327,9 @@ namespace ns3
   //class WimaxPhy : public Object
   //  It doesn't derive from yans
 
-  SetAddresser ();
+  SetIpAddresser ();
 
-  //Node Configuration 
+  //Node Configuration
   SetAllNodes ();
 
   /*

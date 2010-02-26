@@ -97,10 +97,10 @@ namespace ns3
     subnetData = vSubnetData.at (i);
     NS_LOG_INFO ("  -- subnet name --");
     NS_LOG_INFO (1 + i << " " << subnetData.name);
-    NS_LOG_INFO ("    -- nodes --       -- roles --       -- systems --");
+    NS_LOG_INFO ("    -- nodes --       -- roles --");//       -- distance --");
     for (uint8_t j = 0; j < subnetData.nodes.size (); j++)
      {
-      NS_LOG_INFO ("    " << 1 + j << " " << subnetData.nodes.at (j) << "    " << subnetData.roles.at (j) << "    " << subnetData.systems.at (j));
+      NS_LOG_INFO ("    " << 1 + j << " " << subnetData.nodes.at (j) << "    " << subnetData.roles.at (j));
      }
    }
  }
@@ -114,9 +114,6 @@ namespace ns3
 
   NS_LOG_INFO ("-- nodes info --");
   VectorString (netData.nodesInfo.names);
-
-  NS_LOG_INFO ("-- systems info --");
-  VectorString (netData.systemsInfo.names);
 
   NS_LOG_INFO ("-- subnet info --");
   VectorSubnet (netData.vSubnetData);
