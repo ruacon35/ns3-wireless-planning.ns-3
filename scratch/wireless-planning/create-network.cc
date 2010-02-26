@@ -255,28 +255,28 @@ namespace ns3
     device = wifi.Install (phy, mac, node);
    }
 
-  //    //Adaptation for long distances
-  //
-  //    double distance = 2; //km
-  //    double c0 = 30000000.0; // speed of light
-  //    double maxPropagationDelay = distance / c0;// sec
-  //
-  //    Ptr< WifiNetDevice > dev;
-  //    Ptr< NetDevice > netDev;
-  //    netDev = device.Get (0);
-  //
-  //    dev = netDev->GetObject<WifiNetDevice>();
-  //
-  //    Ptr< WifiMac > mac;
-  //    mac = dev->GetMac ();
-  //
-  //    mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
-  //
-  //    //ACK Timeout
-  //    Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
-  //                               + mac->GetSlot ().GetSeconds ()
-  //                               + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
-  //    mac->SetAckTimeout (ackTimeout);
+//      //Adaptation for long distances
+//
+//      double distance = 2; //km
+//      double c0 = 30000000.0; // speed of light
+//      double maxPropagationDelay = distance / c0;// sec
+//
+//      Ptr< WifiNetDevice > dev;
+//      Ptr< NetDevice > netDev;
+//      netDev = device.Get (0);
+//
+//      dev = netDev->GetObject<WifiNetDevice>();
+//
+//      Ptr< WifiMac > mac;
+//      mac = dev->GetMac ();
+//
+//      mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
+//
+//      //ACK Timeout
+//      Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
+//                                 + mac->GetSlot ().GetSeconds ()
+//                                 + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
+//      mac->SetAckTimeout (ackTimeout);
 
   //  // CTS Timeout
   //  mac->SetCtsTimeout (ackTimeout);// se queda colgado la aplicación!!!
