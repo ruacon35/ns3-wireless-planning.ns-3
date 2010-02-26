@@ -144,7 +144,6 @@ SetNetworkConfiguration (string netInfoFile)
 
  Report2ConfigData r2c;
  networkData = r2c.NetData2NetworkData (netData);
- Print::NetworkData (networkData);
 
  return networkData;
 }
