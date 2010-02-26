@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "ns3/wifi-mac.h"
 #include "ns3/qap-wifi-mac.h"
+#include "ns3/qsta-wifi-mac.h"
 #include "ns3/string.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/ipv4-global-routing-helper.h"
@@ -131,33 +132,15 @@ namespace ns3
  {
   QosWifiMacHelper macHelper = QosWifiMacHelper::Default (); // Qsta
 
-  QapWifiMac mac;
+  
 
 
-  // ACKTimeout
-  double distance = 2; //km
-  double c0 = 30000000.0; // speed of light
-  double maxPropagationDelay = distance / c0;
+//  // ACKTimeout
+//  double distance = 2; //km
+//  double c0 = 30000000.0; // speed of light
+//  double maxPropagationDelay = distance / c0;
 
-  mac.SetMaxPropagationDelay (Seconds (maxPropagationDelay));
 
-  //ACK Timeout
-  Time ackTimeout = Seconds (mac.GetEifsNoDifs ().GetSeconds ()
-          + mac.GetSlot ().GetSeconds ()
-          + mac.GetMaxPropagationDelay ().GetSeconds () * 2);
-  mac.SetAckTimeout (ackTimeout);
-  //mac.SetCtsTimeout (ackTimeout);
-
-  //  void
-  //WifiMac::Configure80211b  (void)
-  //{
-  //  SetSifs(MicroSeconds(10));
-  //  SetSlot(MicroSeconds(20));
-  //  SetEifsNoDifs(MicroSeconds(10+304));
-  //  SetPifs(MicroSeconds(10+20));
-  //  SetCtsTimeout(MicroSeconds(10+304+20+GetDefaultMaxPropagationDelay().GetMicroSeconds ()*2));
-  //  SetAckTimeout(MicroSeconds(10+304+20+GetDefaultMaxPropagationDelay().GetMicroSeconds ()*2));
-  //}
 
   //ssid name
   std::ostringstream oss;
@@ -168,16 +151,42 @@ namespace ns3
   switch (deviceData.macType)
    {
    case NetworkConfig::QAP :
+   {
+//      QapWifiMac mac;
+//  mac.SetMaxPropagationDelay (Seconds (maxPropagationDelay));
+//
+//
+//  //ACK Timeout
+//  Time ackTimeout = Seconds (mac.GetEifsNoDifs ().GetSeconds ()
+//          + mac.GetSlot ().GetSeconds ()
+//          + mac.GetMaxPropagationDelay ().GetSeconds () * 2);
+//  mac.SetAckTimeout (ackTimeout);
+//  //mac.SetCtsTimeout (ackTimeout);
+
             macHelper.SetType ("ns3::QapWifiMac", "Ssid", SsidValue (ssid),
                                "BeaconGeneration", BooleanValue (true),
                                "BeaconInterval", TimeValue (Seconds (2.5)));
     break;
+   }
    case NetworkConfig::QSTA :
+   {
+//      QstaWifiMac mac;
+//  mac.SetMaxPropagationDelay (Seconds (maxPropagationDelay));
+//
+//
+//  //ACK Timeout
+//  Time ackTimeout = Seconds (mac.GetEifsNoDifs ().GetSeconds ()
+//          + mac.GetSlot ().GetSeconds ()
+//          + mac.GetMaxPropagationDelay ().GetSeconds () * 2);
+//  mac.SetAckTimeout (ackTimeout);
+//  //mac.SetCtsTimeout (ackTimeout);
+
             macHelper.SetType ("ns3::QstaWifiMac",
                                "Ssid", SsidValue (ssid),
                                "ActiveProbing", BooleanValue (false));
     NS_LOG_DEBUG ("  QoS Station");
     break;
+   }
    case NetworkConfig::QADHOC :
             macHelper.SetType ("ns3::QadhocWifiMac");
     NS_LOG_DEBUG ("  QoS Ad-Hoc");
