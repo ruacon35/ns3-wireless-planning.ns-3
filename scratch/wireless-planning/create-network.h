@@ -109,6 +109,13 @@ namespace ns3 {
          */
         void SetIpAddress (NetDevice &device, Ipv4Address address);
 
+        /*
+         * @ Adapts MAC layer for long distance communication
+         *
+         * The modifyed values are: ACKTimeout, CTSTimeout and SlotTime
+         */
+        void Adaptation4LongDistances (NetDeviceContainer device, double distance);
+
         /**
          * @brief Builds the network installing all the devices to all the nodes
          * and connection all the devices to the proper link.

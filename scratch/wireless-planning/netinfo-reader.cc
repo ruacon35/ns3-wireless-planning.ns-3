@@ -108,13 +108,13 @@ NetinfoReader::Read (ifstream &file)
       subnetData.name = net_name;
       vector<string> node_info = split(net_lines[0], ' ');
       subnetData.mode = node_info[1];      
-      //subnetData.distance = node_info[2];
       for (uint32_t j = 2; j < net_lines.size(); j++) 
         {
         string net_line = net_lines[j];
         vector<string> fields = split(net_line, '\t');
         subnetData.nodes.push_back (fields[0]);
         subnetData.roles.push_back (fields[1]);
+        subnetData.distance.push_back (fields[2]);
         }
       netData.vSubnetData.push_back (subnetData); 
     }    

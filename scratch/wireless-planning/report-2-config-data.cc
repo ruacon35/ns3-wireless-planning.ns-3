@@ -16,6 +16,8 @@
  *
  */
 
+#include <stdlib.h>
+
 #include "ns3/log.h"
 #include "util.h"
 
@@ -24,98 +26,102 @@
 
 NS_LOG_COMPONENT_DEFINE ("report-2-config-data");
 
-namespace ns3
-{
+namespace ns3 {
 
- Report2ConfigData::Report2ConfigData () { }
+  Report2ConfigData::Report2ConfigData ()
+  {
+  }
 
- Report2ConfigData::~Report2ConfigData () { }
+  Report2ConfigData::~Report2ConfigData ()
+  {
+  }
 
- TypeId
- Report2ConfigData::GetTypeId (void)
- {
-  static TypeId tid = TypeId ("ns3::Report2ConfigData")
-    .SetParent<Object> ()
-  ;
-  return tid;
- }
+  TypeId
+  Report2ConfigData::GetTypeId (void)
+  {
+    static TypeId tid = TypeId ("ns3::Report2ConfigData")
+            .SetParent<Object > ()
+            ;
+    return tid;
+  }
 
- NetworkConfig::NetworkData
- Report2ConfigData::NetData2NetworkData (NetDataStruct::NetData net)
- {
-  NetworkConfig::NetworkData network;
+  NetworkConfig::NetworkData
+  Report2ConfigData::NetData2NetworkData (NetDataStruct::NetData net)
+  {
+    NetworkConfig::NetworkData network;
 
-  NetworkConfig::VectorNodeData vectorNodeData;
+    NetworkConfig::VectorNodeData vectorNodeData;
 
-  vector<string> nodeNames = net.nodesInfo.names;
+    vector<string> nodeNames = net.nodesInfo.names;
 
-  for (uint16_t i = 0; i < nodeNames.size (); i++) // loop throw nodes
-   {
-    NetworkConfig::NodeData node;
-    node.name = nodeNames.at (i);
-    NS_LOG_INFO ("Node: " << i << " " << node.name);
-    for (uint16_t j = 0; j < net.vSubnetData.size (); j++) // loop throw subnets
-     {
-      NS_LOG_INFO ("  subnet: " << j);
-      NetDataStruct::SubnetData subnet = net.vSubnetData.at (j);
-      // Search if the node has a device in each subnet
-      int16_t index = Util::FindStrInVectorStr (node.name, subnet.nodes);
-      if (index >= 0)// found
-       {
-        AddDevice2Node (node, subnet, index, j + 1);
-       }
-     }
-    vectorNodeData.push_back (node); // add node to the tail of the vector.
-   }
-  network.vectorNodeData = vectorNodeData;
+    for (uint16_t i = 0; i < nodeNames.size (); i++) // loop throw nodes
+    {
+      NetworkConfig::NodeData node;
+      node.name = nodeNames.at (i);
+      NS_LOG_INFO ("Node: " << i << " " << node.name);
+      for (uint16_t j = 0; j < net.vSubnetData.size (); j++) // loop throw subnets
+      {
+        NS_LOG_INFO ("  subnet: " << j);
+        NetDataStruct::SubnetData subnet = net.vSubnetData.at (j);
+        // Search if the node has a device in each subnet
+        int16_t index = Util::FindStrInVectorStr (node.name, subnet.nodes);
+        if (index >= 0)// found
+        {
+          AddDevice2Node (node, subnet, index, j + 1);
+        }
+      }
+      vectorNodeData.push_back (node); // add node to the tail of the vector.
+    }
+    network.vectorNodeData = vectorNodeData;
 
-  NetworkConfig config;
-  NetworkConfig::VectorChannelData vectorChannelData;
+    NetworkConfig config;
+    NetworkConfig::VectorChannelData vectorChannelData;
 
-  for (uint16_t i = 0; i < net.vSubnetData.size (); i++)
+    for (uint16_t i = 0; i < net.vSubnetData.size (); i++)
     {
       config.SetChannelData (i, net.vSubnetData[i].mode, vectorChannelData);
     }
-  network.vectorChannelData = vectorChannelData;
-  
-  return network;
- }
+    network.vectorChannelData = vectorChannelData;
 
- void
- Report2ConfigData::AddDevice2Node (NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId)
- {
-  NS_LOG_INFO ("index: " << index << " " << subnet.roles.at (index));
-  NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
-  NetworkConfig::DeviceData deviceData = m_config.SetDeviceData (chId, macType);
-  node.vectorDeviceData.push_back (deviceData);
- }
+    return network;
+  }
 
- NetworkConfig::MacType
- Report2ConfigData::Role2MacType (string role)
- {
-  NetworkConfig::MacType macType = NetworkConfig::QSTA;
-  vector<string> roles;
+  void
+  Report2ConfigData::AddDevice2Node (NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId)
+  {
+    NS_LOG_INFO ("index: " << index << " " << subnet.roles.at (index));
+    NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
+    double distance = strtod (subnet.distance.at (index).c_str (), NULL);
+    NetworkConfig::DeviceData deviceData = m_config.SetDeviceData (chId, macType, distance);
+    node.vectorDeviceData.push_back (deviceData);
+  }
 
-  roles.push_back ("AP"); //0
-  roles.push_back ("STA"); //1
-  roles.push_back ("Master"); //2
-  roles.push_back ("Slave"); //3
+  NetworkConfig::MacType
+  Report2ConfigData::Role2MacType (string role)
+  {
+    NetworkConfig::MacType macType = NetworkConfig::QSTA;
+    vector<string> roles;
 
-  // Correspondance between Roles and NetworkConfig::MacType 3 = QAP, 4 = QSTA
-  uint16_t table [] = {3, 4, 3, 4};
+    roles.push_back ("AP"); //0
+    roles.push_back ("STA"); //1
+    roles.push_back ("Master"); //2
+    roles.push_back ("Slave"); //3
 
-  int match;
-  for (uint16_t i = 0; i < roles.size (); i++)
-   {
-    match = roles.at (i).compare (role);
-    if (match == 0)
-     {
-      macType = NetworkConfig::MacType (table [i]);
-      break;
-     }
-   }
-  NS_LOG_INFO ("role: " << role << " MAC type: " << macType);
-  return macType;
- }
+    // Correspondance between Roles and NetworkConfig::MacType 3 = QAP, 4 = QSTA
+    uint16_t table [] = {3, 4, 3, 4};
+
+    int match;
+    for (uint16_t i = 0; i < roles.size (); i++)
+    {
+      match = roles.at (i).compare (role);
+      if (match == 0)
+      {
+        macType = NetworkConfig::MacType (table [i]);
+        break;
+      }
+    }
+    NS_LOG_INFO ("role: " << role << " MAC type: " << macType);
+    return macType;
+  }
 
 } // namespace ns3

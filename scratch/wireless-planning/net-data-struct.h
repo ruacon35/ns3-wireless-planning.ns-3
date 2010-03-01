@@ -48,6 +48,7 @@ namespace ns3 {
             vector<string> nodes;
             vector<string> roles;
             vector<string> systems;
+            vector<string> distance;
         };
         typedef struct SubnetData SubnetData;
 
