@@ -69,18 +69,6 @@ namespace ns3 {
     return tid;
   }
 
-  std::string
-  NetMeasure::ImageName (int i)
-  {
-    std::string rootName = "net-measure";
-    std::string run = "run-";
-    std::string num[6] = {"0", "1", "2", "3", "4", "5"};
-    std::string sufix = ".svg";
-    std::string n = num[i];
-    std::string imageName = rootName + sufix;
-    return imageName;
-  }
-
   void
   NetMeasure::SetupPlot ()
   {
@@ -116,7 +104,7 @@ namespace ns3 {
       
       PlotData plotData = m_MeasPlotData[measurement];
       // svg or png
-      Gnuplot gnuplot (measurement + ".png", plotData.title);
+      Gnuplot gnuplot ("net-measure_"+ measurement + ".png", plotData.title);
       gnuplot.SetTerminal ("png"); // non detected terminal
       gnuplot.SetLegend (plotData.x, plotData.y);
 

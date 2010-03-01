@@ -90,20 +90,6 @@ namespace ns3 {
         ~NetMeasure();
 
         /**
-         * @brief Defines the name of the gnuplot resultant image
-         *
-         * ./waf --run scratch/NetMeasure
-         * gnuplot NetMeasure.plt
-         * -Then open the *.png file.
-         *
-         * @param Number of realization.
-         *
-         * @return The name of the image.
-         */
-        string ImageName(int i);
-
-
-        /**
          * @brief Image representation setup
          *
          * @param eos

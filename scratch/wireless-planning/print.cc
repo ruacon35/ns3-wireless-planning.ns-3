@@ -137,10 +137,11 @@ namespace ns3
       NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData.at (j);
       NS_LOG_DEBUG ("   Device: " << j << " in total " << i_if);
       i_if++;
-      NS_LOG_DEBUG ("    IP address: " << deviceData.address);
+      NS_LOG_DEBUG ("    IP address: " << deviceData.ipAddress);
       NS_LOG_DEBUG ("    Name: " << deviceData.name);
       NS_LOG_DEBUG ("    Channel ID: " << deviceData.chId);
       NS_LOG_DEBUG ("    MAC type: " << deviceData.macType);
+      NS_LOG_DEBUG ("    Distance to AP: " << deviceData.distance);
      }
    }
  }
