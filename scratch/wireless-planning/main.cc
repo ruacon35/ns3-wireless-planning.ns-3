@@ -85,12 +85,11 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
  
  // OnOff
  /// Short simulations
- NS_LOG_DEBUG ("AC_VO: " << AC_VO);
- NS_LOG_DEBUG ("AC_VI: " << AC_VI);
 
-
-netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, AC_VO);
-netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, AC_VO);
+ AppState appState1 (AC_BK);
+ netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, &appState1);
+ AppState appState2 (AC_VI);
+ netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, &appState2);
 
 //netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);
 //netTest.ApplicationSetup ("URPAY", 9, "CCATCCA", 6, 8, "15Mbps", 200, AC_VO);

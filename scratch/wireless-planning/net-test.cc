@@ -43,6 +43,16 @@ NS_LOG_COMPONENT_DEFINE ("net-test");
 namespace ns3
 {
 
+  AppState::AppState(uint8_t tid) { m_tid = tid; }
+  void
+  AppState::OnOffTxPacketCallback (std::string context, Ptr<const Packet> packet)
+    {
+      NS_LOG_FUNCTION ("Packet tagged" << context << "- tid=" << (AccessClass)m_tid);
+      QosTag qosTag;
+      qosTag.SetTid (m_tid);
+      packet->AddPacketTag (qosTag); 
+    }
+
  NetTest::NetTest () { }
 
  NetTest::~NetTest () { }
@@ -59,7 +69,7 @@ namespace ns3
  void
  NetTest::ApplicationSetup (std::string server, uint8_t port, std::string client,
                             double start, double stop, std::string rate,
-                            uint32_t packetSize, enum AccessClass ac)
+                            uint32_t packetSize, AppState *appState)
  {
   // Obtain server node pointer from server name
   Ptr<Node> serverNode = Names::Find<Node > (server);
@@ -80,7 +90,7 @@ namespace ns3
    * On Off Application
    */
   NS_LOG_INFO ("Setup application: OnOff");
-  NS_LOG_DEBUG (" Server: " << server << " Client: " << client << " Start: " << start << " Stop: " << stop << " Rate: " << rate << " Packet size: " << packetSize << " AccessClass: " << ac);
+  NS_LOG_DEBUG (" Server: " << server << " Client: " << client << " Start: " << start << " Stop: " << stop << " Rate: " << rate << " Packet size: " << packetSize);
 
   // Create the OnOff applications to send UDP to the server
   OnOffHelper onOff ("ns3::UdpSocketFactory", Address ());
@@ -104,7 +114,8 @@ namespace ns3
   std::ostringstream oss;
   oss << "/NodeList/" << clientNode->GetId () <<
           "/ApplicationList/0/$ns3::OnOffApplication/Tx";
-  // Config::Connect (oss.str (), MakeCallback (&OnOffTxPacketCallback));
+   Config::Connect (oss.str (), MakeCallback (&AppState::OnOffTxPacketCallback, appState));
+  NS_LOG_UNCOND ("set callback: " << oss.str () << " - tid = " << (AccessClass)appState->m_tid);
 
   clientApps.Start (Seconds (start));
   clientApps.Stop (Seconds (stop));
@@ -114,15 +125,6 @@ namespace ns3
 
   nApp = clientNode->GetNApplications ();
   NS_LOG_DEBUG ("nApp of client node " << clientNode->GetId () << " : " << nApp);
- }
-
- void
- NetTest::OnOffTxPacketCallback (std::string context, Ptr<const Packet> packet)
- {
-  NS_LOG_UNCOND ("Packet Traced - " << context << " - " << packet->GetSize ());
-
-  QosTag qosTag (10);
-  packet->AddPacketTag (qosTag);
  }
 
  void
