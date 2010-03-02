@@ -50,7 +50,8 @@ namespace ns3 {
             std::string name; ///< e.g. "eth0", "ath1": unused
             uint16_t chId; ///< ID of the channel wich is connected to.
             enum MacType macType;
-            Ipv4Address address;
+            double distance; ///< km
+            Ipv4Address ipAddress;
         };
         typedef struct DeviceData DeviceData;
 
@@ -100,12 +101,14 @@ namespace ns3 {
         /**
          * @brief Sets device data into DeviceData struct.
          *
-         * @param channel number (Unused, remove it?)
+         * @param channel id (link id)
          * @param macType AP, STA or ADHOC (enum type)
+         * @param distance to AP in km
          *
          * @return NetworkConfig::DeviceData
          */
-        NetworkConfig::DeviceData SetDeviceData(uint16_t chId, enum NetworkConfig::MacType macType);
+        NetworkConfig::DeviceData SetDeviceData(uint16_t chId,
+                enum NetworkConfig::MacType macType, double distance);
 
         /**
          * @brief Sets channel data into a vector of channel data struct.
