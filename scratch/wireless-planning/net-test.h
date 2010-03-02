@@ -34,6 +34,17 @@
 
 namespace ns3 {
  
+
+class AppState 
+{  
+public:
+  uint8_t m_tid;
+  AppState(uint8_t tid);
+  void
+  OnOffTxPacketCallback (std::string context, Ptr<const Packet> packet);
+}; 
+
+
 /**
  * @brief A class to test a net.
  * 
@@ -109,7 +120,7 @@ public:
   */
   void ApplicationSetup (std::string server, uint8_t port, std::string client,
                            double start, double stop, std::string rate, 
-                           uint32_t packetSize, AccessClass ac); 
+                           uint32_t packetSize, AppState *appState); 
                            
  /**
   * @brief Packet Callback
