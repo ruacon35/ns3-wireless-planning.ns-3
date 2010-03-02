@@ -342,7 +342,7 @@ namespace ns3 {
      * Traces: pcap
      */
     NS_LOG_INFO ("Enabling pcap traces");
-    //m_vectorWifiPhy.at (0).EnablePcapAll ("cusco"); //We only need a YansWifiPhyHelper
+    m_vectorWifiPhy.at (0).EnablePcapAll ("cusco"); //We only need a YansWifiPhyHelper
 
     return m_nodes; // return all nodes
   }
