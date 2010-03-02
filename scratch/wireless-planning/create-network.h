@@ -109,14 +109,20 @@ namespace ns3 {
          */
         void SetIpAddress (NetDevice &device, Ipv4Address address);
 
-        /**
-         * @brief Sets all the devices of a node given all the necessary information.
+        /*
+         * @ Adapts MAC layer for long distance communication
          *
-         * NEEDS TO RENAME
-         *
-         * The new device will be pushed to the tail of the device list.
+         * The modifyed values are: ACKTimeout, CTSTimeout and SlotTime
          */
-        void SetAllNodes(void);
+        void Adaptation4LongDistances (NetDeviceContainer device, double distance);
+
+        /**
+         * @brief Builds the network installing all the devices to all the nodes
+         * and connection all the devices to the proper link.
+         *
+         * The result is ilustrated in the m_nodes NodeContainer.
+         */
+        void NetworkBuilding(void);
 
         /**
          * @brief Sets a device given all the necessary information.
@@ -127,10 +133,6 @@ namespace ns3 {
          */
         NetDeviceContainer DeviceInstallation(NetworkConfig::DeviceData deviceData, Ptr<Node> node);
 
-        NetDeviceContainer WifiInstall (const WifiPhyHelper &phyHelper,
-                     const WifiMacHelper &macHelper, NodeContainer c);
-
-        NetworkConfig m_networkDataStruct; ///< NetworkConfig object.
         NetworkConfig::NetworkData m_networkData; ///< NetworkData an attribute.
         NetworkConfig::VectorNodeData m_vectorNodeData;
         NetworkConfig::VectorChannelData m_vectorChannelData;
