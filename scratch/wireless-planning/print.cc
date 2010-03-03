@@ -21,6 +21,7 @@
 #include "ns3/ipv4.h"
 #include "ns3/node.h"
 #include "ns3/names.h"
+#include "ns3/mobility-model.h"
 
 #include "print.h"
 #include "net-data-struct.h"
@@ -64,6 +65,12 @@ namespace ns3
     node_p = nodes.Get (i);
     std::string nodeName = Names::FindName (node_p);
     NS_LOG_INFO ("NodeId: " << node_p->GetId () << " Name: " << nodeName);
+
+    // creates a new one, does not get the installed one.
+    Ptr<MobilityModel> mobility = node_p->GetObject <MobilityModel> ();
+    Vector pos = mobility->GetPosition ();
+    NS_LOG_INFO ("  Mobility Model: " << mobility->GetInstanceTypeId ());
+    NS_LOG_INFO ("  Position: " << pos.x << " " << pos.y << " " << pos.z);
     for (uint32_t j = 0; j < node_p->GetNDevices (); j++)
      {
       ipv4 = node_p->GetObject<Ipv4 > ();
@@ -131,7 +138,7 @@ namespace ns3
     nodeData = vectorNodeData.at (i);
     uint16_t nDev = nodeData.vectorDeviceData.size (); // number of devices
     NS_LOG_DEBUG ("  Node: " << i << " " << nodeData.name << " has " << nDev << " device(s)");
-    NS_LOG_DEBUG ("   Position: (x,y,z) [m]" << nodeData.position.x << " " << nodeData.position.y << " " << nodeData.position.z);
+    NS_LOG_DEBUG ("   Position: (x,y,z) [m] " << nodeData.position.x << " " << nodeData.position.y << " " << nodeData.position.z);
 
     for (uint32_t j = 0; j < nDev; j++)
      {
