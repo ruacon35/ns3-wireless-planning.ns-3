@@ -86,9 +86,9 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
  // OnOff
  /// Short simulations
 
- AppState appState1 (AC_BK);
+ AppState appState1 (AC_BE);
  netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, &appState1);
- AppState appState2 (AC_VI);
+ AppState appState2 (AC_VO);
  netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, &appState2);
 
 //netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);

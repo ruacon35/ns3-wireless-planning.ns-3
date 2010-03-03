@@ -292,34 +292,28 @@ namespace ns3 {
     mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
 
     //ACK Timeout
-    NS_LOG_DEBUG ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds ());
+    NS_LOG_DEBUG ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds () << "s");
     Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
             + mac->GetSlot ().GetSeconds ()
             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
-    NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds ());
+    NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
     ackTimeout = Time (NanoSeconds (int(ackTimeout.GetNanoSeconds ()))); // reconvertion
-    NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds ());
+    NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
 
     mac->SetAckTimeout (ackTimeout);
     // CTS Timeout
-    NS_LOG_DEBUG ("CTSTimeout: " << mac->GetCtsTimeout ().GetSeconds ());
+    NS_LOG_DEBUG ("CTSTimeout: " << mac->GetCtsTimeout ().GetSeconds () << "s");
     mac->SetCtsTimeout (ackTimeout);
-    NS_LOG_DEBUG ("New CTSTimeout: " << mac->GetCtsTimeout ().GetSeconds ());
+    NS_LOG_DEBUG ("New CTSTimeout: " << mac->GetCtsTimeout ().GetSeconds () << "s");
 
-//    // Slot Time
-//    NS_LOG_DEBUG ("Slot Time: " << mac->GetSlot ().GetNanoSeconds ());
-//    NS_LOG_DEBUG ("Slot Time: " << mac->GetSlot ().GetSeconds ());
-//    Time slot = NanoSeconds (5);
-//    Time slotTime = Seconds (/*mac->GetSlot ().GetNanoSeconds ()*/ slot.GetNanoSeconds ()
-//            + mac->GetMaxPropagationDelay ().GetNanoSeconds () * 2);
-//    NS_LOG_DEBUG ("2x Max prop delay: " << Seconds (mac->GetMaxPropagationDelay ().GetSeconds () * 2));
-//    mac->SetSlot (slotTime);
-//    NS_LOG_DEBUG ("New Slot Time: " << mac->GetSlot ().GetNanoSeconds ());
-//    NS_LOG_DEBUG ("New Slot Time: " << mac->GetSlot ().GetSeconds ());
+    // Slot Time
+    NS_LOG_DEBUG ("Slot Time: " << mac->GetSlot ().GetMicroSeconds () << "us");
+    Time slotTime = NanoSeconds (mac->GetSlot ().GetNanoSeconds ()
+            + mac->GetMaxPropagationDelay ().GetNanoSeconds () * 2);
+    NS_LOG_DEBUG ("2x Max prop delay: " << Seconds (mac->GetMaxPropagationDelay ().GetSeconds () * 2));
 
-    
-    
-    wifiNetDev->SetMac (mac);//is it necessary?
+    mac->SetSlot (slotTime);
+    NS_LOG_DEBUG ("New Slot Time: " << mac->GetSlot ().GetMicroSeconds () << "us");
   }
 
   NodeContainer
