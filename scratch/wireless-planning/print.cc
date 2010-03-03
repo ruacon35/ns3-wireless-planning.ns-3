@@ -131,6 +131,7 @@ namespace ns3
     nodeData = vectorNodeData.at (i);
     uint16_t nDev = nodeData.vectorDeviceData.size (); // number of devices
     NS_LOG_DEBUG ("  Node: " << i << " " << nodeData.name << " has " << nDev << " device(s)");
+    NS_LOG_DEBUG ("   Position: (x,y,z) [m]" << nodeData.position.x << " " << nodeData.position.y << " " << nodeData.position.z);
 
     for (uint32_t j = 0; j < nDev; j++)
      {

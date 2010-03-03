@@ -6,6 +6,7 @@
 #include "ns3/ipv4-address.h"
 #include "ns3/type-id.h"
 #include "ns3/object.h"
+#include "ns3/vector.h"
 
 
 namespace ns3 {
@@ -59,6 +60,7 @@ namespace ns3 {
 
         struct NodeData {
             std::string name;
+            Vector position;
             VectorDeviceData vectorDeviceData; ///< Contains all the devices of a node. Each interface corresponds to a device.
         };
         typedef struct NodeData NodeData;

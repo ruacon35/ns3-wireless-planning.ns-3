@@ -56,7 +56,7 @@ namespace ns3
  Ipv4Address
  Util::GetIpAddrFromName (std::string name)
  {
-  Ptr<Node> node = Names::Find<Node > (name);
+  Ptr<Node> node = Names::Find <Node> (name);
   Ipv4Address ipAddr = GetIpAddrFromNode (node);
 
   NS_LOG_INFO ("Node: " << name << " Ipv4Address: " << ipAddr);
