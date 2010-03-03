@@ -5,13 +5,13 @@ Generated: 2010-02-23T12:13:46
 
 = Nodes
 
-Josjojauarina 1
-Josjojauarina 2
-Ccatcca
-Kcauri
-Urpay
-Huiracochan
-Urcos
+Josjojauarina 1	-9.31972,-75.14583	0,0
+Josjojauarina 2	-9.26694,-74.94806	21728,5837
+Ccatcca	-9.20917,-74.81833	35979,12228
+Kcauri	-9.31278,-74.81306	36559,768
+Urpay	-9.32917,-75.29472	-16357,-1045
+Huiracochan	-9.42694,-75.21583	-7690,-11859
+Urcos	-9.49778,-75.12278	2533,-19694
 
 = Nets
 
@@ -21,7 +21,7 @@ Mode: wifib-5.5mbs
 
 Node	Role	Distance to AP [km]
 Josjojauarina 1	AP	0.00
-Josjojauarina 2	Terminal	22.48
+Josjojauarina 2	STA	22.48
 
 == Josjo2
 
@@ -29,8 +29,8 @@ Mode: wifib-5.5mbs
 
 Node	Role	Distance to AP [km]
 Josjojauarina 2	AP	0.00
-Ccatcca	Terminal	15.62
-Kcauri	Terminal	15.67
+Ccatcca	STA	15.62
+Kcauri	STA	15.67
 
 == Josjo1
 
@@ -38,8 +38,8 @@ Mode: wifib-5.5mbs
 
 Node	Role	Distance to AP [km]
 Josjojauarina 1	AP	0.00
-Urpay	Terminal	16.37
-Huiracochan	Terminal	14.18
+Urpay	STA	16.37
+Huiracochan	STA	14.18
 
 == Huiracochan
 
@@ -47,4 +47,4 @@ Mode: wifib-5.5mbs
 
 Node	Role	Distance to AP [km]
 Huiracochan	AP	0.00
-Urcos	Terminal	12.89
+Urcos	STA	12.89

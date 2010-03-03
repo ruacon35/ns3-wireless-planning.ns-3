@@ -47,7 +47,6 @@ all_modules = (
     'test/ns3tcp',
     'test/ns3wifi',
     'contrib/flow-monitor',
-	'contrib/ehas',
     'applications/udp-client-server',
     'devices/wimax',
     )

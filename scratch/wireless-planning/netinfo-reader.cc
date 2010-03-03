@@ -92,7 +92,15 @@ NetinfoReader::Read (ifstream &file)
   lines = GetSection (netinfo_lines, string("= Nodes"), string("= "));
   for (uint32_t i = 0; i < lines.size(); i++)
     {
-      netData.nodesInfo.names.push_back(lines[i]);
+      vector<string> fields = split(lines[i], '\t');
+      netData.nodesInfo.names.push_back(fields[0]);
+      NetDataStruct::Position position;
+      vector<string> positions = split(fields[2], ',');
+      std::istringstream x(positions[0]);
+      x >> position.x;
+      std::istringstream y(positions[1]);
+      y >> position.y;
+      netData.nodesInfo.positions.push_back(position);
     }
 
   // Nets
@@ -103,18 +111,22 @@ NetinfoReader::Read (ifstream &file)
   for (uint32_t i = 0; i < net_names.size(); i++)
     {
       NetDataStruct::SubnetData subnetData;
+      double distance;
+      
       string net_name = net_names[i];
       vector<string> net_lines = GetSection (lines, net_header+net_name, net_header);
       subnetData.name = net_name;
       vector<string> node_info = split(net_lines[0], ' ');
       subnetData.mode = node_info[1];      
-      //subnetData.distance = node_info[2];
       for (uint32_t j = 2; j < net_lines.size(); j++) 
         {
         string net_line = net_lines[j];
         vector<string> fields = split(net_line, '\t');
         subnetData.nodes.push_back (fields[0]);
         subnetData.roles.push_back (fields[1]);
+        std::istringstream sdistance(fields[2]);
+        sdistance >> distance;
+        subnetData.distances.push_back (distance);
         }
       netData.vSubnetData.push_back (subnetData); 
     }    
