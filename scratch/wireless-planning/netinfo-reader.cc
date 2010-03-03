@@ -102,6 +102,7 @@ NetinfoReader::Read (ifstream &file)
       y >> position.y;
       std::istringstream z(fields[1]);
       z >> position.z;
+      NS_LOG_DEBUG ("Position (x y z) " << position.x << " " << position.y << " " << position.z);
       netData.nodesInfo.positions.push_back(position);
     }
 

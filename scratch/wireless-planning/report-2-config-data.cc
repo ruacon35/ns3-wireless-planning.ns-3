@@ -52,12 +52,18 @@ namespace ns3 {
 
     NetworkConfig::VectorNodeData vectorNodeData;
 
-    vector<string> nodeNames = net.nodesInfo.names;
+    NetDataStruct::NodesInfo nodesInfo = net.nodesInfo;
+    vector<string> nodeNames = nodesInfo.names;
 
     for (uint16_t i = 0; i < nodeNames.size (); i++) // loop throw nodes
     {
       NetworkConfig::NodeData node;
       node.name = nodeNames.at (i);
+
+      NetDataStruct::Position pos = nodesInfo.positions.at (i);
+      Vector position (pos.x, pos.y, pos.z);
+      node.position = position;
+      
       NS_LOG_INFO ("Node: " << i << " " << node.name);
       for (uint16_t j = 0; j < net.vSubnetData.size (); j++) // loop throw subnets
       {

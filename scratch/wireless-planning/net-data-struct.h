@@ -26,51 +26,47 @@ namespace ns3 {
     public:
 
         typedef struct {
-          uint32_t x;
-          uint32_t y;
-          uint32_t z;
+          double x;
+          double y;
+          double z;
         } Position;
         
-        struct NodesInfo {
+        typedef struct {
             vector<string> names;
             vector<Position> positions;
             // location
             // elevation
-        };
-        typedef struct NodesInfo NodesInfo;
+        }NodesInfo;
 
-        struct SystemInfo {
+        typedef struct {
             vector<string> names;
             // Pwr Tx
             // Loss ...
-        };
-        typedef struct SystemInfo SystemInfo;
-
+        } SystemInfo;
+        
         /**
          * @struct Subnetwork Data
          */
-        struct SubnetData {
+        typedef struct{
             string name;
             string mode;
             vector<string> nodes;
             vector<string> roles;
             vector<string> systems;
             vector<double> distances;
-        };
-        typedef struct SubnetData SubnetData;
+        }SubnetData;
 
         typedef vector<SubnetData> VectorSubnetData;
 
         /**
          * @struct Network Data
          */
-        struct NetData {
+        typedef struct  {
             vector<string> generalInfo;
             NodesInfo nodesInfo;
             SystemInfo systemsInfo;
             VectorSubnetData vSubnetData;
-        };
-        typedef struct NetData NetData;
+        }NetData;
 
                NetDataStruct();
 
