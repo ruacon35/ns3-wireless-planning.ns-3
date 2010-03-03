@@ -25,8 +25,14 @@ namespace ns3 {
     class NetDataStruct {
     public:
 
-         struct NodesInfo {
+        typedef struct {
+          uint32_t x;
+          uint32_t y;
+        } Position;
+        
+        struct NodesInfo {
             vector<string> names;
+            vector<Position> positions;
             // location
             // elevation
         };
@@ -48,7 +54,7 @@ namespace ns3 {
             vector<string> nodes;
             vector<string> roles;
             vector<string> systems;
-            vector<string> distance;
+            vector<double> distances;
         };
         typedef struct SubnetData SubnetData;
 
