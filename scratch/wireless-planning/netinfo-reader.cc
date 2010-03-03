@@ -95,11 +95,13 @@ NetinfoReader::Read (ifstream &file)
       vector<string> fields = split(lines[i], '\t');
       netData.nodesInfo.names.push_back(fields[0]);
       NetDataStruct::Position position;
-      vector<string> positions = split(fields[2], ',');
+      vector<string> positions = split(fields[3], ',');
       std::istringstream x(positions[0]);
       x >> position.x;
       std::istringstream y(positions[1]);
       y >> position.y;
+      std::istringstream z(fields[1]);
+      z >> position.z;
       netData.nodesInfo.positions.push_back(position);
     }
 
