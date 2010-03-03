@@ -91,7 +91,7 @@ namespace ns3 {
   {
     NS_LOG_INFO ("index: " << index << " " << subnet.roles.at (index));
     NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
-    double distance = strtod (subnet.distance.at (index).c_str (), NULL);
+    double distance = subnet.distances.at (index);
     NetworkConfig::DeviceData deviceData = m_config.SetDeviceData (chId, macType, distance);
     node.vectorDeviceData.push_back (deviceData);
   }
