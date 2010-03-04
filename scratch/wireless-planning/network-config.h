@@ -105,7 +105,7 @@ namespace ns3 {
          *
          * @param channel id (link id)
          * @param macType AP, STA or ADHOC (enum type)
-         * @param distance to AP in km
+         * @param distance to AP (meters)
          *
          * @return NetworkConfig::DeviceData
          */
