@@ -60,11 +60,17 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
  /*
   * Network Creation
   */
+
+string netInfoFile = "cusco-ne-netinfo.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
+ cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
  cmd.Parse (argc, argv);
+
+
+
  
- NetworkConfig::NetworkData networkData = SetNetworkConfiguration ("cusco-ne-netinfo.txt");
+ NetworkConfig::NetworkData networkData = SetNetworkConfiguration (netInfoFile);
  Print::NetworkData (networkData);
 
  NS_LOG_INFO ("Creating the network...");
@@ -135,9 +141,9 @@ NetworkConfig::NetworkData
 SetNetworkConfiguration (string netInfoFile)
 {
  NetworkConfig::NetworkData networkData;
-
+ 
  ifstream file (netInfoFile.c_str());
- NS_LOG_INFO ("Reading simplified netinfo: " << file);
+ NS_LOG_INFO ("Reading simplified netinfo: " << netInfoFile);
  NetDataStruct::NetData netData = NetinfoReader::Read (file);
  Print::Netinfo (netData);
 
