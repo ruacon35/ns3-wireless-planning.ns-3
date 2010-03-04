@@ -283,7 +283,7 @@ namespace ns3
  CreateNetwork::Adaptation4LongDistances (NetDeviceContainer device, double distance)
  {
 
-  double c0 = 300000.0; // speed of light [km/sec]
+  double c0 = 3e8; // speed of light [m/sec]
   double maxPropagationDelay = distance / c0; // sec
 
   Ptr< WifiNetDevice > wifiNetDev;
@@ -295,7 +295,7 @@ namespace ns3
   Ptr< WifiMac > mac;
   mac = wifiNetDev->GetMac ();
 
-  NS_LOG_DEBUG ("Distance: " << distance << " km");
+  NS_LOG_DEBUG ("Distance: " << distance << " m");
   NS_LOG_DEBUG ("Max propagation delay: " << Seconds (maxPropagationDelay));
   mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
 
