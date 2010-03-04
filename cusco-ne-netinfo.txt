@@ -19,32 +19,32 @@ Urcos	274	-9.49778,-75.12278	2533,-19694
 
 Mode: wifib-5.5mbs
 
-Node	Role	Distance to AP [km]
+Node	Role	Distance to AP
 Josjojauarina 1	AP	0.00
-Josjojauarina 2	STA	22.48
+Josjojauarina 2	STA	22480
 
 == Josjo2
 
 Mode: wifib-5.5mbs
 
-Node	Role	Distance to AP [km]
+Node	Role	Distance to AP
 Josjojauarina 2	AP	0.00
-Ccatcca	STA	15.62
-Kcauri	STA	15.67
+Ccatcca	STA	15620
+Kcauri	STA	15670
 
 == Josjo1
 
 Mode: wifib-5.5mbs
 
-Node	Role	Distance to AP [km]
+Node	Role	Distance to AP
 Josjojauarina 1	AP	0.00
-Urpay	STA	16.37
-Huiracochan	STA	14.18
+Urpay	STA	16370
+Huiracochan	STA	14180
 
 == Huiracochan
 
 Mode: wifib-5.5mbs
 
-Node	Role	Distance to AP [km]
+Node	Role	Distance to AP
 Huiracochan	AP	0.00
-Urcos	STA	12.89
+Urcos	STA	12890
