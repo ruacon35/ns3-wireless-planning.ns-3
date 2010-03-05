@@ -36,7 +36,7 @@ namespace ns3 {
             vector<Position> positions;
             // location
             // elevation
-        }NodesInfo;
+        } NodesInfo;
 
         typedef struct {
             vector<string> names;
@@ -47,14 +47,14 @@ namespace ns3 {
         /**
          * @struct Subnetwork Data
          */
-        typedef struct{
+        typedef struct {
             string name;
             string mode;
             vector<string> nodes;
             vector<string> roles;
             vector<string> systems;
             vector<double> distances;
-        }SubnetData;
+        } SubnetData;
 
         typedef vector<SubnetData> VectorSubnetData;
 
