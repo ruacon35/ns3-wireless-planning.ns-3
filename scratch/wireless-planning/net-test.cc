@@ -103,11 +103,6 @@ namespace ns3
   onOff.SetAttribute ("DataRate", DataRateValue (DataRate (rate)));
   onOff.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
-  //  /// translate AC to uint8 ?
-  //  uint8_t tidAc = Util::QosUtilsMapAcToTid (ac);
-  //  NS_LOG_DEBUG ("ac: " << ac << " tid: " << tidAc);
-  //  onOffQos.SetAttribute ("AccessClassTid", UintegerValue (tidAc));
-
   ApplicationContainer clientApps;
 
   AddressValue remoteAddress (InetSocketAddress (serverIpAddr, port));
