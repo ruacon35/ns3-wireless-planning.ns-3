@@ -130,6 +130,7 @@ NetinfoReader::Read (ifstream &file)
         std::istringstream sdistance(fields[2]);
         sdistance >> distance;
         subnetData.distances.push_back (distance);
+        subnetData.systems.push_back (fields[3]);
         }
       netData.vSubnetData.push_back (subnetData); 
     }    
