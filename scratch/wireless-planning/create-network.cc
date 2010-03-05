@@ -213,8 +213,8 @@ namespace ns3 {
       mobility.SetPositionAllocator (positionAlloc);
       mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
-      //    mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel",
-      //                               "Position", VectorValue (nodeData.position));
+//          mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel",
+//                                     "Position", VectorValue (nodeData.position)); /// It doesn't work!!!
       mobility.Install (m_nodes.Get (i));
 
       NS_LOG_INFO ("  Device Installation");
