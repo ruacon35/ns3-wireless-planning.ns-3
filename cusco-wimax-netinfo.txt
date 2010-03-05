@@ -1,0 +1,50 @@
+= General information
+
+Netfile: CUSCO-NW.NET
+Generated: 2010-02-23T12:13:46
+
+= Nodes
+
+Josjojauarina 1	280	-9.31972,-75.14583	0,0
+Josjojauarina 2	217	-9.26694,-74.94806	21728,5837
+Ccatcca	367	-9.20917,-74.81833	35979,12228
+Kcauri	839	-9.31278,-74.81306	36559,768
+Urpay	247	-9.32917,-75.29472	-16357,-1045
+Huiracochan	254	-9.42694,-75.21583	-7690,-11859
+Urcos	274	-9.49778,-75.12278	2533,-19694
+
+= Nets
+
+== Josjo1-Josjo2
+
+Mode: wimax
+
+Node	Role	Distance to AP	Modulation
+Josjojauarina 1	AP	0.00	All
+Josjojauarina 2	STA	22480	BPSK 1/2 
+
+== Josjo2
+
+Mode: wimax
+
+Node	Role	Distance to AP	Modulation
+Josjojauarina 2	AP	0.00	All
+Ccatcca	STA	15620	64QAM 2/3
+Kcauri	STA	15670	64QAM 3/4
+
+== Josjo1
+
+Mode: wimax
+
+Node	Role	Distance to AP	Modulation
+Josjojauarina 1	AP	0.00	All
+Urpay	STA	16370	QPSK 1/2
+Huiracochan	STA	14180	QPSK 3/4
+
+== Huiracochan
+
+Mode: wimax
+
+Node	Role	Distance to AP	Modulation
+Huiracochan	AP	0.00	All
+Urcos	STA	12890	16QAM 3/4
