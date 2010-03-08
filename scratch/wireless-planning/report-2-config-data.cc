@@ -85,9 +85,11 @@ namespace ns3 {
 
     for (uint16_t i = 0; i < net.vSubnetData.size (); i++)
     {
-      config.SetChannelData (i, net.vSubnetData[i].mode, vectorChannelData);
+      //Wifi
+      config.SetWifiChannelData (i, net.vSubnetData.at (i).mode ,vectorChannelData.vWifiChData);
+      //Wimax
     }
-    network.vectorChannelData = vectorChannelData;
+    network.vectorChannelData.vWifiChData = vectorChannelData.vWifiChData;
 
     return network;
   }
@@ -98,7 +100,7 @@ namespace ns3 {
     NS_LOG_INFO ("index: " << index << " " << subnet.roles.at (index));
     NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
     double distance = subnet.distances.at (index);
-    NetworkConfig::DeviceData deviceData = m_config.SetDeviceData (chId, macType, distance);
+    NetworkConfig::DeviceData deviceData = m_config.SetWifiDeviceData (chId, macType, distance);
     node.vectorDeviceData.push_back (deviceData);
   }
 

@@ -70,7 +70,7 @@ namespace ns3
     Ptr<MobilityModel> mobility = node_p->GetObject <MobilityModel> ();
     Vector pos = mobility->GetPosition ();
     NS_LOG_INFO ("  Mobility Model: " << mobility->GetInstanceTypeId ());
-    NS_LOG_INFO ("  Position: " << pos.x << " " << pos.y << " " << pos.z);
+    NS_LOG_INFO ("  Position (x,y,z) [m]: " << pos.x << " " << pos.y << " " << pos.z);
     for (uint32_t j = 0; j < node_p->GetNDevices (); j++)
      {
       ipv4 = node_p->GetObject<Ipv4 > ();
@@ -148,7 +148,7 @@ namespace ns3
       NS_LOG_DEBUG ("    IP address: " << deviceData.ipAddress);
       NS_LOG_DEBUG ("    Name: " << deviceData.name);
       NS_LOG_DEBUG ("    Channel ID: " << deviceData.chId);
-      NS_LOG_DEBUG ("    MAC type: " << deviceData.macType);
+      NS_LOG_DEBUG ("    MAC type: " << deviceData.wifiMacType);
       NS_LOG_DEBUG ("    Distance to AP: " << deviceData.distance);
      }
    }
@@ -157,12 +157,15 @@ namespace ns3
  void
  Print::ChannelData (NetworkConfig::VectorChannelData vectorChannelData)
  {
-  NetworkConfig::ChannelData chData;
-  NS_LOG_DEBUG ("Channel data: " << vectorChannelData.size () << " channels.");
-  for (uint32_t i = 0; i < vectorChannelData.size (); i++)
+   NetworkConfig::VectorWifiChannelData vWifiChData = vectorChannelData.vWifiChData;
+//   NetworkConfig::VectorWifiChannelData vWimaxChData = vectorChannelData.vWimaxChData;
+
+  NetworkConfig::WifiChannelData wifiChData;
+  NS_LOG_DEBUG ("Channel data: " << vWifiChData.size () << " channels.");
+  for (uint32_t i = 0; i < vectorChannelData.vWifiChData.size (); i++)
    {
-    chData = vectorChannelData.at (i);
-    NS_LOG_DEBUG (" Ch: " << i + 1 << " Mode: " << chData.mode);
+    wifiChData = vWifiChData.at (i);
+    NS_LOG_DEBUG (" Wifi Ch: " << i + 1 << " Mode: " << wifiChData.wifiMode);
    }
  }
 
@@ -172,6 +175,5 @@ namespace ns3
   NodeData (networkData.vectorNodeData);
   ChannelData (networkData.vectorChannelData);
  }
-
-
+ 
 } // namespace ns3

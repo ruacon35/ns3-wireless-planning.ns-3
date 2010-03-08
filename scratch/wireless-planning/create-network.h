@@ -31,8 +31,6 @@
 #include "ns3/type-id.h"
 #include "ns3/object.h"
 
-
-
 #include "network-config.h"
 
 namespace ns3 {
@@ -68,34 +66,26 @@ namespace ns3 {
         /**
          * @brief Set PHY
          */
-        void SetPhy();
+        void SetWifiPhy();
 
         /**
          * @brief Set Ipv4AddressHelper vector
          */
         void SetIpAddresser();
 
-        //
-        /**
-         * @brief Set Wifi MAC
-         *
-         *  UNDER CONSTRUCTION
-         */
-        // WifiMacHelper SetMac (enum NetworkConfig::MacType type);
-
         /**
          * @brief Set non-QoS Wifi MAC
          *
          * UNDER CONSTRUCTION
          */
-        NqosWifiMacHelper SetNqosMac(NetworkConfig::DeviceData deviceData);
+        NqosWifiMacHelper SetWifiNqosMac(NetworkConfig::DeviceData deviceData);
 
         /**
          * @brief Set QoS Wifi MAC
          *
          *  UNDER CONSTRUCTION
          */
-        QosWifiMacHelper SetQosMac(NetworkConfig::DeviceData deviceData);
+        QosWifiMacHelper SetWifiQosMac(NetworkConfig::DeviceData deviceData);
 
         /**
          * @brief Assigns an Ipv4 address to a device.
@@ -114,7 +104,7 @@ namespace ns3 {
          *
          * The modifyed values are: ACKTimeout, CTSTimeout and SlotTime
          */
-        void Adaptation4LongDistances (NetDeviceContainer device, double distance);
+        void WifiLongDistances (NetDeviceContainer device, double distance);
 
         /**
          * @brief Builds the network installing all the devices to all the nodes
@@ -131,16 +121,21 @@ namespace ns3 {
          * @param deviceData
          * @param node
          */
-        NetDeviceContainer DeviceInstallation(NetworkConfig::DeviceData deviceData, Ptr<Node> node);
+        NetDeviceContainer WifiDeviceInstallation(NetworkConfig::DeviceData deviceData, Ptr<Node> node);
+
+        NodeContainer m_nodes;// substitude with NodeContainer::GetGlobal()??
+        NetworkConfig::NodeData m_nodeData;
 
         NetworkConfig::NetworkData m_networkData; ///< NetworkData an attribute.
         NetworkConfig::VectorNodeData m_vectorNodeData;
         NetworkConfig::VectorChannelData m_vectorChannelData;
-        NodeContainer m_nodes;
-        NetworkConfig::NodeData m_nodeData;
+        NetworkConfig::VectorWifiChannelData m_vWifiChData;
+        NetworkConfig::VectorWimaxChannelData m_vWimaxChData;
+
+
+        
         uint32_t m_nNodes;
 
-    private:
         std::vector<YansWifiPhyHelper> m_vectorWifiPhy;
         std::vector<Ipv4AddressHelper> m_vectorAddresser;
     };
