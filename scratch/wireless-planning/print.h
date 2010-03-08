@@ -114,8 +114,6 @@ namespace ns3 {
          *
          */
         static void ChannelData(NetworkConfig::VectorChannelData vectorChannelData);
-
-
     };
 
 }// namespace ns3

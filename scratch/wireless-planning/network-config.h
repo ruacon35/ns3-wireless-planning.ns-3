@@ -7,7 +7,11 @@
 #include "ns3/type-id.h"
 #include "ns3/object.h"
 #include "ns3/vector.h"
+#include "ns3/wimax-phy.h"
+#include "ns3/wimax-helper.h"
 
+
+using namespace std;
 
 namespace ns3 {
 
@@ -26,6 +30,11 @@ namespace ns3 {
      */
     class NetworkConfig {
     public:
+
+        enum CommunicationStandard {
+            WIFI,
+            WIMAX
+        };
 
         /**
          * @enum macType
@@ -47,40 +56,51 @@ namespace ns3 {
         /**
          * @struct Device Data
          */
-        struct DeviceData {
-            std::string name; ///< e.g. "eth0", "ath1": unused
-            uint16_t chId; ///< ID of the channel wich is connected to.
-            enum MacType macType;
+        typedef struct {
+            string name; ///< Unused          
+            Ipv4Address ipAddress; ///< Unused
+            //Separte chs for wifi and wimax?
+            uint16_t chId; ///< Unique Ch ID to wich the device is connected to.
             double distance; ///< km
-            Ipv4Address ipAddress;
-        };
-        typedef struct DeviceData DeviceData;
+            enum CommunicationStandard comStandard;
+            //WIFI
+            enum MacType wifiMacType; // AP / STA / ADHOC + QoS / non-QoS
+            //WIMAX
+            enum WimaxHelper::NetDeviceType wimaxDeviceType; /// BS / SS
+            enum WimaxHelper::SchedulerType scherdulerType;
+            enum WimaxPhy::ModulationType modulationType;
+        } DeviceData;
 
-        typedef std::vector<DeviceData> VectorDeviceData;
+        typedef vector<DeviceData> VectorDeviceData;
 
-        struct NodeData {
-            std::string name;
+        typedef struct {
+            string name;
             Vector position;
             VectorDeviceData vectorDeviceData; ///< Contains all the devices of a node. Each interface corresponds to a device.
-        };
-        typedef struct NodeData NodeData;
+        } NodeData;
 
-        typedef std::vector<NodeData> VectorNodeData;
+        typedef vector<NodeData> VectorNodeData;
 
-        struct ChannelData {
+        typedef struct {
             uint16_t id; ///< channel number
-            std::string mode; ///< e.g. wifia-6mbs @see WifiPhy
-        };
-        typedef struct ChannelData ChannelData;
+            string wifiMode; ///< e.g. wifia-6mbs @see WifiPhy
+        } WifiChannelData;
+        typedef vector<WifiChannelData> VectorWifiChannelData;
 
-        typedef std::vector<ChannelData> VectorChannelData;
+        typedef struct {
+            uint16_t id; ///< channel number
+        } WimaxChannelData;
+        typedef vector<WimaxChannelData> VectorWimaxChannelData;
 
-        struct NetworkData {
+        typedef struct {
+            VectorWifiChannelData vWifiChData;
+            VectorWimaxChannelData vWimaxChData;
+        } VectorChannelData;
+
+        typedef struct {
             VectorChannelData vectorChannelData;
             VectorNodeData vectorNodeData;
-        };
-        typedef struct NetworkData NetworkData;
-
+        } NetworkData;
 
         NetworkConfig();
         ~NetworkConfig();
@@ -97,7 +117,7 @@ namespace ns3 {
          *
          * @return NetworkConfig::DeviceData
          */
-        NetworkConfig::DeviceData SetDeviceData(std::string name, Ipv4Address address,
+        NetworkConfig::DeviceData SetWifiDeviceData(string name, Ipv4Address address,
                 uint16_t chId, enum NetworkConfig::MacType macType);
 
         /**
@@ -109,22 +129,24 @@ namespace ns3 {
          *
          * @return NetworkConfig::DeviceData
          */
-        NetworkConfig::DeviceData SetDeviceData(uint16_t chId,
+        NetworkConfig::DeviceData SetWifiDeviceData(uint16_t chId,
                 enum NetworkConfig::MacType macType, double distance);
 
         /**
          * @brief Sets channel data into a vector of channel data struct.
          *
          * @param ID number
-         * @param mode @see WifiPhy
-         * @param channel number (Unused, remove it?)
-         * @param vectorChannelData stores all the information of all the channels of the network. When we set a channel it is automatically added.
+         * @param mode @see WifiPhy 
+         * @param vectorWifiChannelData stores all the information of all the channels of the network. When we set a channel it is automatically added.
          */
-        void SetChannelData(uint16_t id, std::string mode, NetworkConfig::VectorChannelData& vectorChannelData);
+        void SetWifiChannelData(uint16_t id,  string mode, NetworkConfig::VectorWifiChannelData& vectorWifiChannelData);
 
+        NetworkConfig::DeviceData SetWimaxDeviceData(uint16_t chId, double distance,
+                enum WimaxHelper::NetDeviceType wimaxDeviceType,
+                enum WimaxHelper::SchedulerType scherdulerType,
+                enum WimaxPhy::ModulationType modulationType);
 
         NetworkData m_networkData;
-
     };
 
 } // namespace ns3

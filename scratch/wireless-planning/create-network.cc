@@ -59,9 +59,9 @@ namespace ns3 {
   }
 
   void
-  CreateNetwork::SetPhy (void)
+  CreateNetwork::SetWifiPhy (void)
   {
-    for (uint32_t i = 0; i < m_vectorChannelData.size (); i++)
+    for (uint32_t i = 0; i < m_vWifiChData.size (); i++)
     {
       YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
       YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
@@ -74,7 +74,7 @@ namespace ns3 {
   CreateNetwork::SetIpAddresser (void)
   {
     std::ostringstream network;
-    for (uint32_t i = 0; i < m_vectorChannelData.size (); i++)
+    for (uint32_t i = 0; i < m_vWifiChData.size (); i++)
     {
       Ipv4AddressHelper addressHelper;
       network.str ("");
@@ -87,7 +87,7 @@ namespace ns3 {
   }
 
   NqosWifiMacHelper
-  CreateNetwork::SetNqosMac (NetworkConfig::DeviceData deviceData)
+  CreateNetwork::SetWifiNqosMac (NetworkConfig::DeviceData deviceData)
   {
     NqosWifiMacHelper mac = NqosWifiMacHelper::Default ();
 
@@ -97,7 +97,7 @@ namespace ns3 {
     oss << "ssid-" << deviceData.chId;
     Ssid ssid = Ssid (oss.str ());
 
-    switch (deviceData.macType)
+    switch (deviceData.wifiMacType)
     {
       case NetworkConfig::AP :
                 mac.SetType ("ns3::NqapWifiMac",
@@ -124,7 +124,7 @@ namespace ns3 {
   }
 
   QosWifiMacHelper
-  CreateNetwork::SetQosMac (NetworkConfig::DeviceData deviceData)
+  CreateNetwork::SetWifiQosMac (NetworkConfig::DeviceData deviceData)
   {
     QosWifiMacHelper macHelper = QosWifiMacHelper::Default (); // Qsta
 
@@ -134,7 +134,7 @@ namespace ns3 {
     oss << "ssid-" << deviceData.chId;
     Ssid ssid = Ssid (oss.str ());
 
-    switch (deviceData.macType)
+    switch (deviceData.wifiMacType)
     {
       case NetworkConfig::QAP :
       {
@@ -226,7 +226,7 @@ namespace ns3 {
          */
         NS_LOG_INFO ("  Device " << j);
         NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData[j];
-        NetDeviceContainer device = DeviceInstallation (deviceData, m_nodes.Get (i));
+        NetDeviceContainer device = WifiDeviceInstallation (deviceData, m_nodes.Get (i));
         devices.Add (device);
         //Names::Add (deviceData.name, device.Get (0)); Doesn't work but It's not important: for improvements
 
@@ -238,9 +238,9 @@ namespace ns3 {
   }
 
   NetDeviceContainer
-  CreateNetwork::DeviceInstallation (NetworkConfig::DeviceData deviceData, Ptr<Node> node)
+  CreateNetwork::WifiDeviceInstallation (NetworkConfig::DeviceData deviceData, Ptr<Node> node)
   {
-    NS_LOG_DEBUG ("Ch ID: " << deviceData.chId << " MAC type: " << deviceData.macType);
+    NS_LOG_DEBUG ("Ch ID: " << deviceData.chId << " MAC type: " << deviceData.wifiMacType);
 
     uint16_t index = deviceData.chId - 1;
 
@@ -253,24 +253,24 @@ namespace ns3 {
     address = m_vectorAddresser.at (index);
 
 
-    std::string mode = m_vectorChannelData.at (index).mode;
+    std::string mode = m_vWifiChData.at (index).wifiMode;
     wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
             "DataMode", StringValue (mode),
             "RtsCtsThreshold", StringValue ("2200")); // disable
 
     NetDeviceContainer device;
 
-    if (deviceData.macType <= NetworkConfig::ADHOC)
+    if (deviceData.wifiMacType <= NetworkConfig::ADHOC)
     {
-      NqosWifiMacHelper mac = SetNqosMac (deviceData);
+      NqosWifiMacHelper mac = SetWifiNqosMac (deviceData);
       device = wifi.Install (phy, mac, node);
     } else
     {
-      QosWifiMacHelper mac = SetQosMac (deviceData);
+      QosWifiMacHelper mac = SetWifiQosMac (deviceData);
       device = wifi.Install (phy, mac, node);
     }
 
-    Adaptation4LongDistances (device, deviceData.distance);
+    WifiLongDistances (device, deviceData.distance);
 
     if (deviceData.ipAddress.IsEqual (""))
     {
@@ -286,7 +286,7 @@ namespace ns3 {
   }
 
   void
-  CreateNetwork::Adaptation4LongDistances (NetDeviceContainer device, double distance)
+  CreateNetwork::WifiLongDistances (NetDeviceContainer device, double distance)
   {
 
     double c0 = 3e8; // speed of light [m/sec]
@@ -306,19 +306,19 @@ namespace ns3 {
     mac->SetMaxPropagationDelay (Seconds (maxPropagationDelay));
 
     //ACK Timeout
-    NS_LOG_DEBUG ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds () << "s");
+    NS_LOG_DEBUG ("ACKTimeout: " << mac->GetAckTimeout ().GetMicroSeconds () << "us");
     Time ackTimeout = Seconds (mac->GetEifsNoDifs ().GetSeconds ()
             + mac->GetSlot ().GetSeconds ()
             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
-    NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
+    NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetMicroSeconds () << "us");
     ackTimeout = Time (NanoSeconds (int(ackTimeout.GetNanoSeconds ()))); // reconvertion
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
 
     mac->SetAckTimeout (ackTimeout);
     // CTS Timeout
-    NS_LOG_DEBUG ("CTSTimeout: " << mac->GetCtsTimeout ().GetSeconds () << "s");
+    NS_LOG_DEBUG ("CTSTimeout: " << mac->GetCtsTimeout ().GetMicroSeconds () << "us");
     mac->SetCtsTimeout (ackTimeout);
-    NS_LOG_DEBUG ("New CTSTimeout: " << mac->GetCtsTimeout ().GetSeconds () << "s");
+    NS_LOG_DEBUG ("New CTSTimeout: " << mac->GetCtsTimeout ().GetMicroSeconds () << "us");
 
     // Slot Time
     NS_LOG_DEBUG ("Slot Time: " << mac->GetSlot ().GetMicroSeconds () << "us");
@@ -337,7 +337,10 @@ namespace ns3 {
     m_networkData = networkData;
     m_vectorNodeData = m_networkData.vectorNodeData;
     m_vectorChannelData = m_networkData.vectorChannelData;
+    m_vWifiChData = m_vectorChannelData.vWifiChData;
+    m_vWimaxChData = m_vectorChannelData.vWimaxChData;
     m_nNodes = m_vectorNodeData.size (); //number of nodes
+    
     m_nodes.Create (m_nNodes);
 
     NS_LOG_INFO ("Creating " << m_nNodes << " nodes.");
@@ -347,19 +350,19 @@ namespace ns3 {
     internet.Install (m_nodes);
 
     NS_LOG_INFO ("Create channels.");
-    SetPhy ();
+    SetWifiPhy ();
 
     SetIpAddresser ();
 
     //Node Configuration
     NetworkBuilding ();
 
-
     /*
      * Traces: pcap
      */
     NS_LOG_INFO ("Enabling pcap traces");
     m_vectorWifiPhy.at (0).EnablePcapAll ("cusco"); //We only need a YansWifiPhyHelper
+///< enable pcap for wimax
 
     // mobility traces: no movements => empty file
     //  std::ofstream os;
