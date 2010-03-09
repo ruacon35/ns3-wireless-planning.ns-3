@@ -21,30 +21,30 @@ Mode: wimax
 
 Node	Role	Distance to AP	Modulation
 Josjojauarina 1	BS	0.00	All
-Josjojauarina 2	SS	22480	BPSK 1/2 
+Josjojauarina 2	SS	22480	BPSK 1/2
 
 == Josjo2
 
 Mode: wimax
 
 Node	Role	Distance to AP	Modulation
-Josjojauarina 2	AP	0.00	All
-Ccatcca	STA	15620	64QAM 2/3
-Kcauri	STA	15670	64QAM 3/4
+Josjojauarina 2	BS	0.00	All
+Ccatcca	SS	15620	64QAM 2/3
+Kcauri	SS	15670	64QAM 3/4
 
 == Josjo1
 
 Mode: wimax
 
 Node	Role	Distance to AP	Modulation
-Josjojauarina 1	AP	0.00	All
-Urpay	STA	16370	QPSK 1/2
-Huiracochan	STA	14180	QPSK 3/4
+Josjojauarina 1	BS	0.00	All
+Urpay	SS	16370	QPSK 1/2
+Huiracochan	SS	14180	QPSK 3/4
 
 == Huiracochan
 
 Mode: wimax
 
 Node	Role	Distance to AP	Modulation
-Huiracochan	AP	0.00	All
-Urcos	STA	12890	16QAM 3/4
+Huiracochan	BS	0.00	All
+Urcos	SS	12890	16QAM 3/4

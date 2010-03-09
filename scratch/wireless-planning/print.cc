@@ -102,14 +102,16 @@ namespace ns3
   for (uint8_t i = 0; i < vSubnetData.size (); i++)
    {
     subnetData = vSubnetData.at (i);
-    NS_LOG_INFO ("  -- subnet name --");
-    NS_LOG_INFO (1 + i << "- " << subnetData.name);
-    NS_LOG_INFO ("    -- node --       -- role --       -- distance --       -- mode --       -- system --");
+    NS_LOG_INFO ("-- subnet name --       -- standard --");
+    NS_LOG_INFO (1 + i << ") " << subnetData.name << "    " << subnetData.standard);
+    NS_LOG_INFO ("  -- node --       -- role --       -- distance --       -- system --");
     for (uint8_t j = 0; j < subnetData.nodes.size (); j++)
      {
-      NS_LOG_INFO ("    " << 1 + j << "- " << subnetData.nodes.at (j) << "    "
-              << subnetData.roles.at (j) << "    " << subnetData.distances.at (j)
-              << "    " << subnetData.standard.at (j) << "    " << subnetData.systems.at (j));
+      NS_LOG_INFO ("    " << 1 + j << ")  "
+              << subnetData.nodes.at (j) << "    "
+              << subnetData.roles.at (j) << "    "
+              << subnetData.distances.at (j) << "    "
+              << subnetData.systems.at (j));
      }
    }
  }

@@ -66,9 +66,7 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
  cmd.Parse (argc, argv);
-
-
-
+ 
  
  NetworkConfig::NetworkData networkData = SetNetworkConfiguration (netInfoFile);
  Print::NetworkData (networkData);
@@ -84,18 +82,17 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
   */
  NetTest netTest;
  // Echos
- netTest.Echo ("Urcos", "Kcauri", 1);
+// netTest.Echo ("Urcos", "Kcauri", 1);
 // netTest.Echo ("Urpay", "Huiracochan", 2);
  
 
  
  // OnOff
  /// Short simulations
-
-// AppState appState1 (AC_BE);
-// netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, &appState1);
-// AppState appState2 (AC_VO);
-// netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, &appState2);
+ AppState appState1 (AC_BE);
+ netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "64kbps", 200, &appState1);
+ AppState appState2 (AC_VO);
+ netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);
 
 
  /*
@@ -116,8 +113,6 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
  /*
   * After simulation
   */
-
-
  NS_LOG_INFO ("Done.");
 
  return 0;
@@ -125,8 +120,7 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
 
 /**
  * @brief Inside this method all the information of the network is hand written 
- * 
- * 
+ *  
  * @return NetworkData All the needed information in order to build a network.
  * 
  * @see CreateNetwork::Create

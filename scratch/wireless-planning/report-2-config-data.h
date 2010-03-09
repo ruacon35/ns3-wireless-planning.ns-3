@@ -13,6 +13,7 @@
 #include "ns3/type-id.h"
 #include "ns3/object.h"
 
+using namespace std;
 
 namespace ns3 {
 
@@ -32,6 +33,15 @@ namespace ns3 {
         void AddDevice2Node(NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId);
 
         /**
+         * @brief Translates communication standard from string to enum
+         *
+         * @param communicationStandard
+         *
+         * @return NetworkConfig::CommunicationStandard WIFI or WIMAX
+         */
+        NetworkConfig::CommunicationStandard ReadStandard(string communicationStandard);
+
+        /**
          * @brief Translates role from Radio Mobile to MAC Type
          *
          * e.g. Role = Terminal, Node => MAC = STA, AP
@@ -42,14 +52,23 @@ namespace ns3 {
          */
         NetworkConfig::MacType Role2MacType(string role);
 
-                /**
-         * @brief Translates communication standard from string to enum
+        /**
+         * @brief Translates role to wimax net device
+         *
+         * @param role
+         *
+         * @return WimaxHelper::NetDeviceType BB / SS
+         */
+        WimaxHelper::NetDeviceType Role2WimaxDeviceType(string role);
+
+        /**
+         * @brief Translates modulation from string to enum
          *
          * @param communicationStandard
          *
          * @return NetworkConfig::CommunicationStandard WIFI or WIMAX
          */
-        NetworkConfig::CommunicationStandard ReadStandard (string communicationStandard);
+        enum WimaxPhy::ModulationType ReadModulation(string modulation);
 
 
         NetworkConfig m_config;

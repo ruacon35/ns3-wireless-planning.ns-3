@@ -43,8 +43,12 @@ namespace ns3 {
     deviceData.ipAddress = "";
     deviceData.chId = chId;
     deviceData.distance = distance;
-    deviceData.comStandard = NetworkConfig::WIFI;
+    deviceData.commStandard = NetworkConfig::WIFI;
     deviceData.wifiMacType = macType;
+    //wimax
+//        deviceData.wimaxDeviceType = 0;
+//    deviceData.scherdulerType = 0;
+//    deviceData.modulationType = 0;
 
     return deviceData;
   }
@@ -60,10 +64,12 @@ namespace ns3 {
     deviceData.ipAddress = "";
     deviceData.chId = chId;
     deviceData.distance = distance;
-    deviceData.comStandard = NetworkConfig::WIMAX;
+    deviceData.commStandard = NetworkConfig::WIMAX;
     deviceData.wimaxDeviceType = wimaxDeviceType;
     deviceData.scherdulerType = scherdulerType;
     deviceData.modulationType = modulationType;
+    //wifi
+//    deviceData.wifiMacType = 0;
 
     return deviceData;
   }

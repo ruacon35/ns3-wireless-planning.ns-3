@@ -65,10 +65,10 @@ namespace ns3 {
     {
       YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
       YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
-      
+
       channel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
-      channel.AddPropagationLoss ("ns3::FixedRssLossModel","Rss",DoubleValue (0));
-      
+      channel.AddPropagationLoss ("ns3::FixedRssLossModel", "Rss", DoubleValue (0));
+
       phy.SetChannel (channel.Create ());
       m_vectorWifiPhy.push_back (phy);
     }
@@ -230,7 +230,7 @@ namespace ns3 {
         NS_LOG_INFO ("  Device " << j);
         NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData.at (j);
         NetDeviceContainer device;
-        switch (deviceData.comStandard)
+        switch (deviceData.commStandard)
         {
           case NetworkConfig::WIFI :
           {
@@ -240,10 +240,15 @@ namespace ns3 {
           case NetworkConfig::WIMAX :
           {
             NS_LOG_DEBUG (" wimax");
+            // wimax device installation
+
+//            ssDevs = wimax.Install (ssNodes, WimaxHelper::DEVICE_TYPE_SUBSCRIBER_STATION, WimaxHelper::SIMPLE_PHY_TYPE_OFDM, scheduler);
+//            bsDevs = wimax.Install (bsNodes, WimaxHelper::DEVICE_TYPE_BASE_STATION, WimaxHelper::SIMPLE_PHY_TYPE_OFDM, scheduler);
+
             break;
           }
           default:
-            NS_ASSERT_MSG (0, "No correct communication standard selected");
+            NS_ASSERT_MSG (0, "The communication standard selected is not correct.");
         }
         devices.Add (device);
       }
@@ -329,7 +334,7 @@ namespace ns3 {
             + mac->GetSlot ().GetSeconds ()
             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetMicroSeconds () << "us");
-    ackTimeout = Time (NanoSeconds (int(3.2*ackTimeout.GetNanoSeconds ()))); // reconvertion
+    ackTimeout = Time (NanoSeconds (int(3.2 * ackTimeout.GetNanoSeconds ()))); // reconvertion
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
 
     mac->SetAckTimeout (ackTimeout);

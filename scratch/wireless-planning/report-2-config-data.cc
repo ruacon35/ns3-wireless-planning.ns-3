@@ -50,8 +50,10 @@ namespace ns3 {
   {
     NetworkConfig::NetworkData network;
 
+    /*
+     * Nodes
+     */
     NetworkConfig::VectorNodeData vectorNodeData;
-
     NetDataStruct::NodesInfo nodesInfo = net.nodesInfo;
     vector<string> nodeNames = nodesInfo.names;
 
@@ -79,17 +81,39 @@ namespace ns3 {
     }
     network.vectorNodeData = vectorNodeData;
 
+    /*
+     * Channels
+     */
     NetworkConfig config;
     NetworkConfig::VectorChannelData vectorChannelData;
 
     for (uint16_t i = 0; i < net.vSubnetData.size (); i++)
     {
-      //Wifi
-      string mode = net.vSubnetData.at (i).systems.at (0); //All the nodes of a wifi ch have the same mode.
-      config.SetWifiChannelData (i, mode, vectorChannelData.vWifiChData);
-      //Wimax
+      NetDataStruct::SubnetData subNetData = net.vSubnetData.at (i);
+      string system = subNetData.systems.at (0); // all nodes of the same net have the same wifi mode
+
+      enum NetworkConfig::CommunicationStandard standard = ReadStandard (subNetData.standard);
+      switch (standard)
+      {
+        case NetworkConfig::WIFI :
+        {
+          string mode = system;
+          config.SetWifiChannelData (i, mode, vectorChannelData.vWifiChData);
+          break;
+        }
+        case NetworkConfig::WIMAX :
+        {
+          //          enum WimaxPhy::ModulationType mod = ReadModulation (modulation);
+          //          NS_LOG_INFO (mod);
+          // wimax ch
+
+          break;
+        }
+        default:
+          NS_ASSERT_MSG (0, "No correct communication standard selected");
+      }
     }
-    network.vectorChannelData.vWifiChData = vectorChannelData.vWifiChData;
+    network.vectorChannelData = vectorChannelData;
 
     return network;
   }
@@ -97,9 +121,8 @@ namespace ns3 {
   void
   Report2ConfigData::AddDevice2Node (NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId)
   {
-    string commStandard = subnet.standard;
-    enum NetworkConfig::CommunicationStandard standard;
-    standard = ReadStandard (commStandard);
+    enum NetworkConfig::CommunicationStandard standard = ReadStandard (subnet.standard);
+    string role = subnet.roles.at (index);
 
     double distance = subnet.distances.at (index);
     NetworkConfig::DeviceData deviceData;
@@ -109,21 +132,24 @@ namespace ns3 {
       case NetworkConfig::WIFI :
       {
         NS_LOG_DEBUG ("  adding Wi-Fi device in ch " << chId);
-        NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
+        NetworkConfig::MacType macType = Role2MacType (role);
         deviceData = m_config.SetWifiDeviceData (chId, macType, distance);
         break;
       }
       case NetworkConfig::WIMAX :
       {
         NS_LOG_DEBUG ("  adding WiMAX device in ch " << chId);
+        WimaxHelper::NetDeviceType deviceType = Role2WimaxDeviceType (role);
+        string modulation = subnet.systems.at (index);
+        WimaxPhy::ModulationType mod = ReadModulation (modulation);
+
+        deviceData = m_config.SetWimaxDeviceData (chId, distance, deviceType,
+                WimaxHelper::SCHED_TYPE_RTPS, mod);
         break;
       }
       default:
-        NS_ASSERT_MSG (0,
-                "  No correct communication standard selected");
+        NS_ASSERT_MSG (0, "The communication standard selected is not correct.");
     }
-
-
     node.vectorDeviceData.push_back (deviceData);
   }
 
@@ -167,6 +193,62 @@ namespace ns3 {
     }
     NS_LOG_INFO ("role: " << role << " MAC type: " << macType);
     return macType;
+  }
+
+  WimaxHelper::NetDeviceType
+  Report2ConfigData::Role2WimaxDeviceType (string role)
+  {
+    WimaxHelper::NetDeviceType deviceType;
+    vector<string> roles;
+
+    roles.push_back ("SS"); //0
+    roles.push_back ("BS"); //1
+
+    int match;
+    for (uint16_t i = 0; i < roles.size (); i++)
+    {
+      match = roles.at (i).compare (role);
+      if (match == 0)
+      {
+        deviceType = WimaxHelper::NetDeviceType (i);
+        break;
+      }
+    }
+    NS_LOG_INFO ("role: " << role << " wimax device type: " << deviceType);
+    return deviceType;
+  }
+
+  WimaxPhy::ModulationType
+  Report2ConfigData::ReadModulation (string modulation)
+  {
+    WimaxPhy::ModulationType mod;
+    vector<string> mods;
+    // MODULATION_TYPE_BPSK_12, MODULATION_TYPE_QPSK_12, MODULATION_TYPE_QPSK_34, MODULATION_TYPE_QAM16_12,
+    // MODULATION_TYPE_QAM16_34, MODULATION_TYPE_QAM64_23, MODULATION_TYPE_QAM64_34
+
+    mods.push_back ("BPSK 1/2"); // 0
+    mods.push_back ("QPSK 1/2"); // 1
+    mods.push_back ("QPSK 3/4"); // 2
+    mods.push_back ("16QAM 1/2"); // 3
+    mods.push_back ("16QAM 3/4"); // 4
+    mods.push_back ("64QAM 2/3"); // 5
+    mods.push_back ("64QAM 3/4"); // 6
+
+    int match;
+    for (uint16_t i = 0; i < mods.size (); i++)
+    {
+      match = mods.at (i).compare (modulation);
+      if (match == 0)
+      {
+        mod = WimaxPhy::ModulationType (i);
+        break;
+      } else if (modulation.compare ("All") == 0)
+      {
+        mod = WimaxPhy::ModulationType (6);
+      }
+    }
+    NS_LOG_INFO ("modulation: " << modulation << " modulation enum: " << mod);
+    return mod;
   }
 
 } // namespace ns3

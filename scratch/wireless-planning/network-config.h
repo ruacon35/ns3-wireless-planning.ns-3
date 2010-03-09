@@ -49,8 +49,7 @@ namespace ns3 {
             QAP, ///< QoS Access Point       .   3
             QSTA, ///< QoS Station           .   4
             QADHOC, ///< QoS Ad hoc          .   5
-            BS, ///< Base Station  WIMAX     .   6
-            SS, ///< Suscriber Station       .   7
+            UNDEF
         };
 
         /**
@@ -62,7 +61,7 @@ namespace ns3 {
             //Separte chs for wifi and wimax?
             uint16_t chId; ///< Unique Ch ID to wich the device is connected to.
             double distance; ///< km
-            enum CommunicationStandard comStandard;
+            enum CommunicationStandard commStandard;
             //WIFI
             enum MacType wifiMacType; // AP / STA / ADHOC + QoS / non-QoS
             //WIMAX
@@ -139,7 +138,7 @@ namespace ns3 {
          * @param mode @see WifiPhy 
          * @param vectorWifiChannelData stores all the information of all the channels of the network. When we set a channel it is automatically added.
          */
-        void SetWifiChannelData(uint16_t id,  string mode, NetworkConfig::VectorWifiChannelData& vectorWifiChannelData);
+        void SetWifiChannelData(uint16_t id, string mode, NetworkConfig::VectorWifiChannelData& vectorWifiChannelData);
 
         NetworkConfig::DeviceData SetWimaxDeviceData(uint16_t chId, double distance,
                 enum WimaxHelper::NetDeviceType wimaxDeviceType,
