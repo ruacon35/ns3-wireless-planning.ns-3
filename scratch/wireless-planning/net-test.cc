@@ -40,138 +40,151 @@
 
 NS_LOG_COMPONENT_DEFINE ("net-test");
 
-namespace ns3
-{
+namespace ns3 {
 
-  AppState::AppState(enum AccessClass ac)
+  AppState::AppState (enum AccessClass ac)
   : m_ac (ac)
   {
     m_tid = Util::QosUtilsMapAcToTid (ac);
   }
+
   void
   AppState::OnOffTxPacketCallback (std::string context, Ptr<const Packet> packet)
-    {
-      NS_LOG_FUNCTION ("Packet tagged" << context << " AC: " << m_ac << " Tid:" << (uint16_t)m_tid);
-      QosTag qosTag;
-      qosTag.SetTid (m_tid);
-      packet->AddPacketTag (qosTag); 
-    }
+  {
+    NS_LOG_FUNCTION ("Packet tagged" << context << " AC: " << m_ac << " Tid:" << (uint16_t) m_tid);
+    QosTag qosTag;
+    qosTag.SetTid (m_tid);
+    packet->AddPacketTag (qosTag);
+  }
 
- NetTest::NetTest () { }
+  NetTest::NetTest ()
+  {
+  }
 
- NetTest::~NetTest () { }
+  NetTest::~NetTest ()
+  {
+  }
 
- TypeId
- NetTest::GetTypeId (void)
- {
-  static TypeId tid = TypeId ("ns3::NetTest")
-          .SetParent<Object > ()
-          ;
-  return tid;
- }
+  TypeId
+  NetTest::GetTypeId (void)
+  {
+    static TypeId tid = TypeId ("ns3::NetTest")
+            .SetParent<Object > ()
+            ;
+    return tid;
+  }
 
- void
- NetTest::ApplicationSetup (std::string server, uint8_t port, std::string client,
-                            double start, double stop, std::string rate,
-                            uint32_t packetSize, AppState *appState)
- {
-  // Obtain server node pointer from server name
-  Ptr<Node> serverNode = Names::Find<Node > (server);
-  Ptr<Node> clientNode = Names::Find<Node > (client);
+  void
+  NetTest::ApplicationSetup (std::string server, uint8_t port, std::string client,
+          double start, double stop, std::string rate,
+          uint32_t packetSize, AppState *appState)
+  {
+    // Obtain server node pointer from server name
+    Ptr<Node> serverNode = GetNodeFromName (server);
+    Ptr<Node> clientNode = GetNodeFromName (client);
 
-  Ipv4Address serverIpAddr = Util::GetIpAddrFromName (server);
+    Ipv4Address serverIpAddr = Util::GetIpAddrFromName (server);
 
-  // Create a packet sink to receive these packets
-  ///Address sinkLocalAddress(InetSocketAddress (ipAddr, port));
-  Address sinkLocalAddress (InetSocketAddress (Ipv4Address::GetAny (), port));
-  PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", sinkLocalAddress);
+    // Create a packet sink to receive these packets
+    ///Address sinkLocalAddress(InetSocketAddress (ipAddr, port));
+    Address sinkLocalAddress (InetSocketAddress (Ipv4Address::GetAny (), port));
+    PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", sinkLocalAddress);
 
-  ApplicationContainer sinkApp = sinkHelper.Install (server);
-  sinkApp.Start (Seconds (start));
-  sinkApp.Stop (Seconds (stop));
+    ApplicationContainer sinkApp = sinkHelper.Install (server);
+    sinkApp.Start (Seconds (start));
+    sinkApp.Stop (Seconds (stop));
 
-  /*
-   * On Off Application
-   */
-  NS_LOG_INFO ("Setup application: OnOff");
-  NS_LOG_DEBUG (" Server: " << server << " Client: " << client << " Start: " << start << " Stop: " << stop << " Rate: " << rate << " Packet size: " << packetSize);
+    /*
+     * On Off Application
+     */
+    NS_LOG_INFO ("Setup application: OnOff");
+    NS_LOG_DEBUG (" Server: " << server << " Client: " << client << " Start: " << start << " Stop: " << stop << " Rate: " << rate << " Packet size: " << packetSize);
 
-  // Create the OnOff applications to send UDP to the server
-  OnOffHelper onOff ("ns3::UdpSocketFactory", Address ());
-  onOff.SetAttribute ("OnTime", RandomVariableValue (ConstantVariable (1)));
-  onOff.SetAttribute ("OffTime", RandomVariableValue (ConstantVariable (0)));
-  onOff.SetAttribute ("DataRate", DataRateValue (DataRate (rate)));
-  onOff.SetAttribute ("PacketSize", UintegerValue (packetSize));
+    // Create the OnOff applications to send UDP to the server
+    OnOffHelper onOff ("ns3::UdpSocketFactory", Address ());
+    onOff.SetAttribute ("OnTime", RandomVariableValue (ConstantVariable (1)));
+    onOff.SetAttribute ("OffTime", RandomVariableValue (ConstantVariable (0)));
+    onOff.SetAttribute ("DataRate", DataRateValue (DataRate (rate)));
+    onOff.SetAttribute ("PacketSize", UintegerValue (packetSize));
 
-  ApplicationContainer clientApps;
+    ApplicationContainer clientApps;
 
-  AddressValue remoteAddress (InetSocketAddress (serverIpAddr, port));
+    AddressValue remoteAddress (InetSocketAddress (serverIpAddr, port));
 
-  onOff.SetAttribute ("Remote", remoteAddress);
-  clientApps.Add (onOff.Install (client));
+    onOff.SetAttribute ("Remote", remoteAddress);
+    clientApps.Add (onOff.Install (client));
 
-  std::ostringstream oss;
-  oss << "/NodeList/" << clientNode->GetId () <<
-          "/ApplicationList/0/$ns3::OnOffApplication/Tx";
-   Config::Connect (oss.str (), MakeCallback (&AppState::OnOffTxPacketCallback, appState));
-  NS_LOG_UNCOND ("set callback: " << oss.str () << " AC: " << appState->m_ac << " Tid:" << (uint16_t)appState->m_tid);
+    std::ostringstream oss;
+    oss << "/NodeList/" << clientNode->GetId () <<
+            "/ApplicationList/0/$ns3::OnOffApplication/Tx";
+    Config::Connect (oss.str (), MakeCallback (&AppState::OnOffTxPacketCallback, appState));
+    NS_LOG_UNCOND ("set callback: " << oss.str () << " AC: " << appState->m_ac << " Tid:" << (uint16_t) appState->m_tid);
 
-  clientApps.Start (Seconds (start));
-  clientApps.Stop (Seconds (stop));
+    clientApps.Start (Seconds (start));
+    clientApps.Stop (Seconds (stop));
 
-  uint32_t nApp = serverNode->GetNApplications ();
-  NS_LOG_DEBUG ("nApp of server node " << serverNode->GetId () << " : " << nApp);
+    uint32_t nApp = serverNode->GetNApplications ();
+    NS_LOG_DEBUG ("nApp of server node " << serverNode->GetId () << " : " << nApp);
 
-  nApp = clientNode->GetNApplications ();
-  NS_LOG_DEBUG ("nApp of client node " << clientNode->GetId () << " : " << nApp);
- }
+    nApp = clientNode->GetNApplications ();
+    NS_LOG_DEBUG ("nApp of client node " << clientNode->GetId () << " : " << nApp);
+  }
 
- void
- NetTest::Echo (std::string server, std::string client, double start)
- {
-  NetTest::Echo (server, 9, client, start);
- }
+  void
+  NetTest::Echo (std::string server, std::string client, double start)
+  {
+    NetTest::Echo (server, 9, client, start);
+  }
 
- void
- NetTest::Echo (std::string server, uint8_t port, std::string client, double start)
- {
-  NS_LOG_INFO ("UDP echo server/client application:");
-  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  void
+  NetTest::Echo (std::string server, uint8_t port, std::string client, double start)
+  {
+    NS_LOG_INFO ("UDP echo server/client application: " << server << " / " << client);
+    LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+    LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
 
-  // Get node from name
-  Ptr<Node> serverNode = Names::Find<Node > (server);
-  Ptr<Node> clientNode = Names::Find<Node > (client);
+    Ptr<Node> serverNode = GetNodeFromName (server);
+    Ptr<Node> clientNode = GetNodeFromName (client);
 
-  UdpEchoServerHelper echoServer (port); //Port
-  ApplicationContainer serverAppCont = echoServer.Install (server); //Node
-  serverAppCont.Start (Seconds (start));
-  serverAppCont.Stop (Seconds (start + 1)); // does it really stops?
+    UdpEchoServerHelper echoServer (port); //Port
+    ApplicationContainer serverAppCont = echoServer.Install (server); //Node
+    serverAppCont.Start (Seconds (start));
+    serverAppCont.Stop (Seconds (start + 1)); // does it really stops?
 
-  //Ptr<Application> serverApp = serverAppCont.Get (0);
-  //Simulator::Schedule (start+1,serverApp->Stop(Seconds(start+1)),this);
+    //Ptr<Application> serverApp = serverAppCont.Get (0);
+    //Simulator::Schedule (start+1,serverApp->Stop(Seconds(start+1)),this);
 
-  Ipv4Address serverIpAddr = Util::GetIpAddrFromName (server);
+    Ipv4Address serverIpAddr = Util::GetIpAddrFromName (server);
 
-  NS_LOG_DEBUG ("server: " << server << " IP Address: " << serverIpAddr << " Client: " << client);
+    NS_LOG_DEBUG ("server: " << server << " IP Address: " << serverIpAddr << " Client: " << client);
 
-  UdpEchoClientHelper echoClient (serverIpAddr, port); // server IP and Port
-  echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
-  echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.)));
-  echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
+    UdpEchoClientHelper echoClient (serverIpAddr, port); // server IP and Port
+    echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
+    echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.)));
+    echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
 
-  ApplicationContainer clientAppCont =
-          echoClient.Install (client); //node
-  clientAppCont.Start (Seconds (start));
-  clientAppCont.Stop (Seconds (start + 1));
+    ApplicationContainer clientAppCont =
+            echoClient.Install (client); //node
+    clientAppCont.Start (Seconds (start));
+    clientAppCont.Stop (Seconds (start + 1));
 
-  //Ptr< Application > 	GetApplication (uint32_t index) const
-  uint32_t nApp = serverNode->GetNApplications ();
-  NS_LOG_DEBUG ("nApp of server node " << serverNode->GetId () << " : " << "nApp " << nApp);
+    //Ptr< Application > 	GetApplication (uint32_t index) const
+    uint32_t nApp = serverNode->GetNApplications ();
+    NS_LOG_DEBUG ("nApp of server node " << serverNode->GetId () << " : " << "nApp " << nApp);
 
-  nApp = clientNode->GetNApplications ();
-  NS_LOG_DEBUG ("nApp of client node " << clientNode->GetId () << " : " << "nApp " << nApp);
- }
+    nApp = clientNode->GetNApplications ();
+    NS_LOG_DEBUG ("nApp of client node " << clientNode->GetId () << " : " << "nApp " << nApp);
+  }
+
+  Ptr<Node>
+  NetTest::GetNodeFromName (string name)
+  {
+    Ptr<Node> node = Names::Find<Node > (name);
+    NS_ASSERT_MSG (node != 0,
+            "NetTest::GetNodeFromName "
+            " '" << name << "' node not found");
+    return node;
+  }
 
 } // namespace ns3
 
