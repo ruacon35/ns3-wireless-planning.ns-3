@@ -110,7 +110,7 @@ namespace ns3 {
       {
         NS_LOG_DEBUG ("  adding Wi-Fi device in ch " << chId);
         NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
-        m_config.SetWifiDeviceData (chId, macType, distance);
+        deviceData = m_config.SetWifiDeviceData (chId, macType, distance);
         break;
       }
       case NetworkConfig::WIMAX :
@@ -119,8 +119,8 @@ namespace ns3 {
         break;
       }
       default:
-        NS_LOG_ERROR ("  No correct communication standard selected");
-        exit (-1);
+        NS_ASSERT_MSG (0,
+                "  No correct communication standard selected");
     }
 
 

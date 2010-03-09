@@ -84,9 +84,9 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
   */
  NetTest netTest;
  // Echos
- netTest.Echo ("URCOS", "KCAURI", 1);
- netTest.Echo ("URPAY", "HUIRACOCHAN", 2);
- netTest.Echo ("ACOMAYO", "RED SUR CUSCO", 3);
+ netTest.Echo ("Urcos", "Kcauri", 1);
+// netTest.Echo ("Urpay", "Huiracochan", 2);
+ 
 
  
  // OnOff
@@ -96,12 +96,6 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
 // netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, &appState1);
 // AppState appState2 (AC_VO);
 // netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, &appState2);
-
-//netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);
-//netTest.ApplicationSetup ("URPAY", 9, "CCATCCA", 6, 8, "15Mbps", 200, AC_VO);
-
-// netTest.ApplicationSetup ("URCOS", 9, "URPAY", 4, 10, "15Mbps", 200, AC_VO);
-// netTest.ApplicationSetup ("CCATCCA", 9, "KCAURI", 6, 8, "15Mbps", 200, AC_VO);
 
 
  /*

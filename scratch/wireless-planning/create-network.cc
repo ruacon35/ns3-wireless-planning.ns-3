@@ -194,7 +194,7 @@ namespace ns3 {
   CreateNetwork::NetworkBuilding (void)
   {
     NetDeviceContainer devices;
-    for (uint32_t i = 0; i < m_nNodes; i++)
+    for (uint32_t i = 0; i < m_nNodes; i++)// loop  throw NODES
     {
       /*
        * Node installation
@@ -213,28 +213,42 @@ namespace ns3 {
       mobility.SetPositionAllocator (positionAlloc);
       mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
-//          mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel",
-//                                     "Position", VectorValue (nodeData.position)); /// It doesn't work!!!
+      //          mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel",
+      //                                     "Position", VectorValue (nodeData.position)); /// It doesn't work!!!
       mobility.Install (m_nodes.Get (i));
 
+      /*
+       * Device installation
+       */
       NS_LOG_INFO ("  Device Installation");
-      for (uint32_t j = 0; j < nodeData.vectorDeviceData.size (); j++)
+      for (uint32_t j = 0; j < nodeData.vectorDeviceData.size (); j++)// loop  throw DEVICES
       {
-
-        /*
-         * Device installation
-         */
         NS_LOG_INFO ("  Device " << j);
-        NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData[j];
-        NetDeviceContainer device = WifiDeviceInstallation (deviceData, m_nodes.Get (i));
+        NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData.at (j);
+        NetDeviceContainer device;
+        switch (deviceData.comStandard)
+        {
+          case NetworkConfig::WIFI :
+          {
+            device = WifiDeviceInstallation (deviceData, m_nodes.Get (i));
+            break;
+          }
+          case NetworkConfig::WIMAX :
+          {
+            NS_LOG_DEBUG (" wimax");
+            break;
+          }
+          default:
+            NS_ASSERT_MSG (0, "No correct communication standard selected");
+        }
         devices.Add (device);
-        //Names::Add (deviceData.name, device.Get (0)); Doesn't work but It's not important: for improvements
-
       }
     }
+    /*
+     * Routing
+     */
     //Turn on global static routing
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-
   }
 
   NetDeviceContainer
@@ -340,7 +354,7 @@ namespace ns3 {
     m_vWifiChData = m_vectorChannelData.vWifiChData;
     m_vWimaxChData = m_vectorChannelData.vWimaxChData;
     m_nNodes = m_vectorNodeData.size (); //number of nodes
-    
+
     m_nodes.Create (m_nNodes);
 
     NS_LOG_INFO ("Creating " << m_nNodes << " nodes.");
@@ -362,7 +376,7 @@ namespace ns3 {
      */
     NS_LOG_INFO ("Enabling pcap traces");
     m_vectorWifiPhy.at (0).EnablePcapAll ("cusco"); //We only need a YansWifiPhyHelper
-///< enable pcap for wimax
+    ///< enable pcap for wimax
 
     // mobility traces: no movements => empty file
     //  std::ofstream os;
