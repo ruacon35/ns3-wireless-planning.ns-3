@@ -65,6 +65,10 @@ namespace ns3 {
     {
       YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
       YansWifiChannelHelper channel = YansWifiChannelHelper::Default ();
+      
+      channel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+      channel.AddPropagationLoss ("ns3::FixedRssLossModel","Rss",DoubleValue (0));
+      
       phy.SetChannel (channel.Create ());
       m_vectorWifiPhy.push_back (phy);
     }
@@ -325,7 +329,7 @@ namespace ns3 {
             + mac->GetSlot ().GetSeconds ()
             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetMicroSeconds () << "us");
-    ackTimeout = Time (NanoSeconds (int(ackTimeout.GetNanoSeconds ()))); // reconvertion
+    ackTimeout = Time (NanoSeconds (int(3.2*ackTimeout.GetNanoSeconds ()))); // reconvertion
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
 
     mac->SetAckTimeout (ackTimeout);
