@@ -29,113 +29,123 @@ using namespace std;
 
 namespace ns3 {
 
-vector<string> 
-NetinfoReader::split (const string &s, char delim) 
-{
-  vector<string> elems;
-  stringstream ss(s);
-  string item;
-  while(getline(ss, item, delim)) 
+  vector<string>
+  NetinfoReader::split (const string &s, char delim)
+  {
+    vector<string> elems;
+    stringstream ss (s);
+    string item;
+    while (getline (ss, item, delim))
     {
-      elems.push_back(item);
+      elems.push_back (item);
     }
-  return elems;
-}
+    return elems;
+  }
 
-vector<string>
-NetinfoReader::GetSection (vector<string> &lines, string start, string end)
-{
-  vector<string> output_lines;
-  string line;
-  bool inSection = false;
+  vector<string>
+  NetinfoReader::GetSection (vector<string> &lines, string start, string end)
+  {
+    vector<string> output_lines;
+    string line;
+    bool inSection = false;
 
-  for (uint32_t i = 0; i < lines.size(); i++) 
-   {
-     line = lines[i];
-     if (!inSection && line == start) { inSection = true; }                
-     else if (inSection && line.find (end) == 0) { break; }
-     else if (inSection && line != "") { output_lines.push_back (line); }
-   }
-  return output_lines;
-}
+    for (uint32_t i = 0; i < lines.size (); i++)
+    {
+      line = lines[i];
+      if (!inSection && line == start)
+      {
+        inSection = true;
+      }
+      else if (inSection && line.find (end) == 0)
+      {
+        break;
+      } else if (inSection && line != "")
+      {
+        output_lines.push_back (line);
+      }
+    }
+    return output_lines;
+  }
 
-vector<string>
-NetinfoReader::GetSubSectionNames (vector<string> &lines, string header)
-{
-  vector<string> names;
-  for (uint32_t i = 0; i < lines.size(); i++)
+  vector<string>
+  NetinfoReader::GetSubSectionNames (vector<string> &lines, string header)
+  {
+    vector<string> names;
+    for (uint32_t i = 0; i < lines.size (); i++)
     {
       string line = lines[i];
       if (line.find (header) == 0)
-        {
-          string current_net = string (line, header.size(), line.size() - header.size());
-          names.push_back (current_net);
-        }
-    } 
-  return (names);
-}
+      {
+        string current_net = string (line, header.size (), line.size () - header.size ());
+        names.push_back (current_net);
+      }
+    }
+    return (names);
+  }
 
-NetDataStruct::NetData
-NetinfoReader::Read (ifstream &file)
-{ 
-  NetDataStruct::NetData netData;
-  vector<string> netinfo_lines, lines;
-  string line;
-    
-  while (getline(file, line))
-     netinfo_lines.push_back (line);
-     
-  // General information
-  netData.generalInfo = GetSection (netinfo_lines, string("= General information"), string("= "));
+  NetDataStruct::NetData
+  NetinfoReader::Read (ifstream &file)
+  {
+    NetDataStruct::NetData netData;
+    vector<string> netinfo_lines, lines;
+    string line;
 
-  // Nodes
-  lines = GetSection (netinfo_lines, string("= Nodes"), string("= "));
-  for (uint32_t i = 0; i < lines.size(); i++)
+    while (getline (file, line))
+      netinfo_lines.push_back (line);
+
+    // General information
+    netData.generalInfo = GetSection (netinfo_lines, string ("= General information"), string ("= "));
+
+    // Nodes
+    lines = GetSection (netinfo_lines, string ("= Nodes"), string ("= "));
+    for (uint32_t i = 0; i < lines.size (); i++)
     {
-      vector<string> fields = split(lines[i], '\t');
-      netData.nodesInfo.names.push_back(fields[0]);
+      vector<string> fields = split (lines[i], '\t');
+      netData.nodesInfo.names.push_back (fields[0]);
       NetDataStruct::Position position;
-      vector<string> positions = split(fields[3], ',');
-      std::istringstream x(positions[0]);
+      vector<string> positions = split (fields[3], ',');
+      std::istringstream x (positions[0]);
       x >> position.x;
-      std::istringstream y(positions[1]);
+      std::istringstream y (positions[1]);
       y >> position.y;
-      std::istringstream z(fields[1]);
+      std::istringstream z (fields[1]);
       z >> position.z;
       NS_LOG_DEBUG ("Position (x y z) " << position.x << " " << position.y << " " << position.z);
-      netData.nodesInfo.positions.push_back(position);
+      netData.nodesInfo.positions.push_back (position);
     }
 
-  // Nets
-  string net_header ("== ");
-  lines = GetSection (netinfo_lines, string("= Nets"), string("= "));
-  vector<string> net_names = GetSubSectionNames (lines, net_header);
+    // Nets
+    string net_header ("== ");
+    lines = GetSection (netinfo_lines, string ("= Nets"), string ("= "));
+    vector<string> net_names = GetSubSectionNames (lines, net_header);
 
-  for (uint32_t i = 0; i < net_names.size(); i++)
+    //  netData.vSubnetData.clear (); SIZE = 614133570 !?!
+    for (uint32_t i = 0; i < net_names.size (); i++)
     {
       NetDataStruct::SubnetData subnetData;
       double distance;
-      
+
       string net_name = net_names[i];
-      vector<string> net_lines = GetSection (lines, net_header+net_name, net_header);
       subnetData.name = net_name;
-      vector<string> node_info = split(net_lines[0], ' ');
+      vector<string> net_lines = GetSection (lines, net_header + net_name, net_header);
+
+      vector<string> node_info = split (net_lines[0], ' ');
       subnetData.standard = node_info[1];
-      for (uint32_t j = 2; j < net_lines.size(); j++) 
-        {
+      for (uint32_t j = 2; j < net_lines.size (); j++)
+      {
         string net_line = net_lines[j];
-        vector<string> fields = split(net_line, '\t');
+        vector<string> fields = split (net_line, '\t');
         subnetData.nodes.push_back (fields[0]);
         subnetData.roles.push_back (fields[1]);
-        std::istringstream sdistance(fields[2]);
+        std::istringstream sdistance (fields[2]);
         sdistance >> distance;
         subnetData.distances.push_back (distance);
         // If system has Name + Mode must remove the name.
-        subnetData.systems.push_back (fields[3]);// system = mode
-        }
-      netData.vSubnetData.push_back (subnetData); 
-    }    
-  return netData;
-}
+        subnetData.systems.push_back (fields[3]); // system = mode or modulation
+      }
+      netData.vSubnetData.push_back (subnetData);
+    }
+    return netData;
+  }
 
 } // namespace ns3
