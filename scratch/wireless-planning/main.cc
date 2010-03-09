@@ -61,7 +61,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   * Network Creation
   */
 
-string netInfoFile = "cusco-ne.netinfo.txt";
+string netInfoFile = "cusco-wifi-netinfo.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -84,18 +84,18 @@ string netInfoFile = "cusco-ne.netinfo.txt";
   */
  NetTest netTest;
  // Echos
- //netTest.Echo ("URCOS", "KCAURI", 1);
- //netTest.Echo ("URPAY", "HUIRACOCHAN", 2);
- //netTest.Echo ("ACOMAYO", "RED SUR CUSCO", 3);
+ netTest.Echo ("URCOS", "KCAURI", 1);
+ netTest.Echo ("URPAY", "HUIRACOCHAN", 2);
+ netTest.Echo ("ACOMAYO", "RED SUR CUSCO", 3);
 
  
  // OnOff
  /// Short simulations
 
- AppState appState1 (AC_BE);
- netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, &appState1);
- AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, &appState2);
+// AppState appState1 (AC_BE);
+// netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "15Mbps", 200, &appState1);
+// AppState appState2 (AC_VO);
+// netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "15Mbps", 200, &appState2);
 
 //netTest.ApplicationSetup ("URCOS", 9 , "KCAURI", 4, 10, "15Mbps", 200, AC_VO);
 //netTest.ApplicationSetup ("URPAY", 9, "CCATCCA", 6, 8, "15Mbps", 200, AC_VO);

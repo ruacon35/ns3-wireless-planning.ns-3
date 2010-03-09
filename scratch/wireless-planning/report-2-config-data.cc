@@ -55,7 +55,7 @@ namespace ns3 {
     NetDataStruct::NodesInfo nodesInfo = net.nodesInfo;
     vector<string> nodeNames = nodesInfo.names;
 
-    for (uint16_t i = 0; i < nodeNames.size (); i++) // loop throw nodes
+    for (uint16_t i = 0; i < nodeNames.size (); i++) // loop throw NODES
     {
       NetworkConfig::NodeData node;
       node.name = nodeNames.at (i);
@@ -63,11 +63,10 @@ namespace ns3 {
       NetDataStruct::Position pos = nodesInfo.positions.at (i);
       Vector position (pos.x, pos.y, pos.z);
       node.position = position;
-      
+
       NS_LOG_INFO ("Node: " << i << " " << node.name);
-      for (uint16_t j = 0; j < net.vSubnetData.size (); j++) // loop throw subnets
+      for (uint16_t j = 0; j < net.vSubnetData.size (); j++) // inner loop throw SUBNETS
       {
-        NS_LOG_INFO ("  subnet: " << j);
         NetDataStruct::SubnetData subnet = net.vSubnetData.at (j);
         // Search if the node has a device in each subnet
         int16_t index = Util::FindStrInVectorStr (node.name, subnet.nodes);
@@ -86,7 +85,8 @@ namespace ns3 {
     for (uint16_t i = 0; i < net.vSubnetData.size (); i++)
     {
       //Wifi
-      config.SetWifiChannelData (i, net.vSubnetData.at (i).mode ,vectorChannelData.vWifiChData);
+      string mode = net.vSubnetData.at (i).systems.at (0); //All the nodes of a wifi ch have the same mode.
+      config.SetWifiChannelData (i, mode, vectorChannelData.vWifiChData);
       //Wimax
     }
     network.vectorChannelData.vWifiChData = vectorChannelData.vWifiChData;
@@ -97,11 +97,48 @@ namespace ns3 {
   void
   Report2ConfigData::AddDevice2Node (NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId)
   {
-    NS_LOG_INFO ("index: " << index << " " << subnet.roles.at (index));
-    NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
+    string commStandard = subnet.standard;
+    enum NetworkConfig::CommunicationStandard standard;
+    standard = ReadStandard (commStandard);
+
     double distance = subnet.distances.at (index);
-    NetworkConfig::DeviceData deviceData = m_config.SetWifiDeviceData (chId, macType, distance);
+    NetworkConfig::DeviceData deviceData;
+
+    switch (standard)
+    {
+      case NetworkConfig::WIFI :
+      {
+        NS_LOG_DEBUG ("  adding Wi-Fi device in ch " << chId);
+        NetworkConfig::MacType macType = Role2MacType (subnet.roles.at (index));
+        m_config.SetWifiDeviceData (chId, macType, distance);
+        break;
+      }
+      case NetworkConfig::WIMAX :
+      {
+        NS_LOG_DEBUG ("  adding WiMAX device in ch " << chId);
+        break;
+      }
+      default:
+        NS_LOG_ERROR ("  No correct communication standard selected");
+        exit (-1);
+    }
+
+
     node.vectorDeviceData.push_back (deviceData);
+  }
+
+  NetworkConfig::CommunicationStandard
+  Report2ConfigData::ReadStandard (string communicationStandard)
+  {
+    enum NetworkConfig::CommunicationStandard retval;
+    if (communicationStandard.compare ("wifi") == 0)
+    {
+      retval = NetworkConfig::WIFI;
+    } else if (communicationStandard.compare ("wimax") == 0)
+    {
+      retval = NetworkConfig::WIMAX;
+    }
+    return retval;
   }
 
   NetworkConfig::MacType

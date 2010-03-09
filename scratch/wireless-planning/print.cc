@@ -103,11 +103,13 @@ namespace ns3
    {
     subnetData = vSubnetData.at (i);
     NS_LOG_INFO ("  -- subnet name --");
-    NS_LOG_INFO (1 + i << " " << subnetData.name);
-    NS_LOG_INFO ("    -- nodes --       -- roles --");//       -- distance --");
+    NS_LOG_INFO (1 + i << "- " << subnetData.name);
+    NS_LOG_INFO ("    -- node --       -- role --       -- distance --       -- mode --       -- system --");
     for (uint8_t j = 0; j < subnetData.nodes.size (); j++)
      {
-      NS_LOG_INFO ("    " << 1 + j << " " << subnetData.nodes.at (j) << "    " << subnetData.roles.at (j));
+      NS_LOG_INFO ("    " << 1 + j << "- " << subnetData.nodes.at (j) << "    "
+              << subnetData.roles.at (j) << "    " << subnetData.distances.at (j)
+              << "    " << subnetData.standard.at (j) << "    " << subnetData.systems.at (j));
      }
    }
  }
@@ -145,9 +147,9 @@ namespace ns3
       NetworkConfig::DeviceData deviceData = nodeData.vectorDeviceData.at (j);
       NS_LOG_DEBUG ("   Device: " << j << " in total " << i_if);
       i_if++;
+      NS_LOG_DEBUG ("    Channel ID: " << deviceData.chId);
       NS_LOG_DEBUG ("    IP address: " << deviceData.ipAddress);
       NS_LOG_DEBUG ("    Name: " << deviceData.name);
-      NS_LOG_DEBUG ("    Channel ID: " << deviceData.chId);
       NS_LOG_DEBUG ("    MAC type: " << deviceData.wifiMacType);
       NS_LOG_DEBUG ("    Distance to AP: " << deviceData.distance);
      }

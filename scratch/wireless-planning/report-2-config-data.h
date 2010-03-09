@@ -42,6 +42,15 @@ namespace ns3 {
          */
         NetworkConfig::MacType Role2MacType(string role);
 
+                /**
+         * @brief Translates communication standard from string to enum
+         *
+         * @param communicationStandard
+         *
+         * @return NetworkConfig::CommunicationStandard WIFI or WIMAX
+         */
+        NetworkConfig::CommunicationStandard ReadStandard (string communicationStandard);
+
 
         NetworkConfig m_config;
 
