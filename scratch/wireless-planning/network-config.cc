@@ -30,7 +30,6 @@ namespace ns3 {
     //WIFI
     deviceData.wifiMacType = macType;
     deviceData.distance = 1;
-    deviceData.distance = 1;
 
     return deviceData;
   }

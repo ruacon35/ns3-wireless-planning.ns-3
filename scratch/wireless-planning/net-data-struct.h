@@ -49,7 +49,7 @@ namespace ns3 {
          */
         typedef struct {
             string name;
-            string mode;
+            string standard;
             vector<string> nodes;
             vector<string> roles;
             vector<string> systems;

@@ -120,7 +120,7 @@ NetinfoReader::Read (ifstream &file)
       vector<string> net_lines = GetSection (lines, net_header+net_name, net_header);
       subnetData.name = net_name;
       vector<string> node_info = split(net_lines[0], ' ');
-      subnetData.mode = node_info[1];      
+      subnetData.standard = node_info[1];
       for (uint32_t j = 2; j < net_lines.size(); j++) 
         {
         string net_line = net_lines[j];
@@ -130,7 +130,8 @@ NetinfoReader::Read (ifstream &file)
         std::istringstream sdistance(fields[2]);
         sdistance >> distance;
         subnetData.distances.push_back (distance);
-        subnetData.systems.push_back (fields[3]);
+        // If system has Name + Mode must remove the name.
+        subnetData.systems.push_back (fields[3]);// system = mode
         }
       netData.vSubnetData.push_back (subnetData); 
     }    
