@@ -5,41 +5,12 @@ Generated: 2010-02-23T12:13:46
 
 = Nodes
 
-Josjojauarina 1	280	-9.31972,-75.14583	0,0
-Josjojauarina 2	217	-9.26694,-74.94806	21728,5837
-Ccatcca	367	-9.20917,-74.81833	35979,12228
-Kcauri	839	-9.31278,-74.81306	36559,768
-Urpay	247	-9.32917,-75.29472	-16357,-1045
 Huiracochan	254	-9.42694,-75.21583	-7690,-11859
 Urcos	274	-9.49778,-75.12278	2533,-19694
+Urpay	247	-9.32917,-75.29472	-16357,-1045
+
 
 = Nets
-
-== Josjo1-Josjo2
-
-Mode: wimax
-
-Node	Role	Distance to AP	Modulation
-Josjojauarina 1	BS	0.00	All
-Josjojauarina 2	SS	22480	BPSK 1/2
-
-== Josjo2
-
-Mode: wimax
-
-Node	Role	Distance to AP	Modulation
-Josjojauarina 2	BS	0.00	All
-Ccatcca	SS	15620	64QAM 2/3
-Kcauri	SS	15670	64QAM 3/4
-
-== Josjo1
-
-Mode: wimax
-
-Node	Role	Distance to AP	Modulation
-Josjojauarina 1	BS	0.00	All
-Urpay	SS	16370	QPSK 1/2
-Huiracochan	SS	14180	QPSK 3/4
 
 == Huiracochan
 
@@ -48,3 +19,4 @@ Mode: wimax
 Node	Role	Distance to AP	Modulation
 Huiracochan	BS	0.00	All
 Urcos	SS	12890	16QAM 3/4
+Urpay	SS	8000	QPSK 1/2

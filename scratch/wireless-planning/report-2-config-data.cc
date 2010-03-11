@@ -103,10 +103,9 @@ namespace ns3 {
         }
         case NetworkConfig::WIMAX :
         {
-          //          enum WimaxPhy::ModulationType mod = ReadModulation (modulation);
-          //          NS_LOG_INFO (mod);
-          // wimax ch
-
+          NetworkConfig::WimaxChannelData channel;
+          channel.id = i;
+          vectorChannelData.vWimaxChData.push_back (channel);
           break;
         }
         default:
@@ -244,7 +243,7 @@ namespace ns3 {
         break;
       } else if (modulation.compare ("All") == 0)
       {
-        mod = WimaxPhy::ModulationType (6);
+        mod = WimaxPhy::ModulationType (6); // 6?
       }
     }
     NS_LOG_INFO ("modulation: " << modulation << " modulation enum: " << mod);

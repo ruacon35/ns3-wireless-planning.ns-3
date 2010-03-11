@@ -61,7 +61,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   * Network Creation
   */
 
-string netInfoFile = "cusco-wifi-netinfo.txt";
+string netInfoFile = "cusco-wimax-netinfo.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -74,26 +74,22 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
  NS_LOG_INFO ("Creating the network...");
  CreateNetwork createNetwork;
  NodeContainer nodes = createNetwork.Create (networkData);
-
  Print::NodeList (nodes); //must enable ns_log print
 
  /*
   * Applications
   */
- NetTest netTest;
- // Echos
+  NetTest netTest;
 // netTest.Echo ("Urcos", "Kcauri", 1);
-// netTest.Echo ("Urpay", "Huiracochan", 2);
- 
+  netTest.Echo ("Urpay",  "Urcos", 1);
+  //netTest.Echo ("Huiracochan", "Urcos", 1);
 
- 
  // OnOff
  /// Short simulations
- AppState appState1 (AC_BE);
+ /*AppState appState1 (AC_BE);
  netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "64kbps", 200, &appState1);
  AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);
-
+ netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);*/
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...

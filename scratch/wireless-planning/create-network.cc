@@ -78,13 +78,23 @@ namespace ns3 {
   CreateNetwork::SetIpAddresser (void)
   {
     std::ostringstream network;
-    for (uint32_t i = 0; i < m_vWifiChData.size (); i++)
+    uint32_t i = 0;
+    for (uint32_t j = 0; j < m_vWifiChData.size (); j++, i++)
     {
       Ipv4AddressHelper addressHelper;
       network.str ("");
       network << "10.1." << i + 1 << ".0";
       std::string net = network.str ();
-      NS_LOG_DEBUG ("Network: " << network.str ());
+      NS_LOG_DEBUG ("Wifi Network: " << network.str ());
+      addressHelper.SetBase (net.c_str (), "255.255.255.0");
+      m_vectorAddresser.push_back (addressHelper);
+    }
+    for (uint32_t j = 0; j < m_vWimaxChData.size (); j++, i++)
+    {
+      Ipv4AddressHelper addressHelper;
+      network.str ("");
+      network << "10.1." << i + 1 << ".0";
+      std::string net = network.str ();
       addressHelper.SetBase (net.c_str (), "255.255.255.0");
       m_vectorAddresser.push_back (addressHelper);
     }
@@ -203,8 +213,8 @@ namespace ns3 {
       /*
        * Node installation
        */
-      NS_LOG_INFO ("Node installation " << i << " of " << m_nNodes);
       NetworkConfig::NodeData nodeData = m_vectorNodeData[i];
+      NS_LOG_INFO ("Node installation: " << nodeData.name << " - " << i << " of " << m_nNodes);
       Names::Add (nodeData.name, m_nodes.Get (i));
 
       /*
@@ -239,17 +249,14 @@ namespace ns3 {
           }
           case NetworkConfig::WIMAX :
           {
-            NS_LOG_DEBUG (" wimax");
-            // wimax device installation
-
-            //            ssDevs = wimax.Install (ssNodes, WimaxHelper::DEVICE_TYPE_SUBSCRIBER_STATION, WimaxHelper::SIMPLE_PHY_TYPE_OFDM, scheduler);
-            //            bsDevs = wimax.Install (bsNodes, WimaxHelper::DEVICE_TYPE_BASE_STATION, WimaxHelper::SIMPLE_PHY_TYPE_OFDM, scheduler);
+            NS_LOG_DEBUG ("wimax");
+            device = WimaxDeviceInstallation (deviceData, m_nodes.Get (i));
             break;
           }
           default:
             NS_ASSERT_MSG (0, "The communication standard selected is not correct.");
         }
-        devices.Add (device);
+        //devices.Add (device);
       }
     }
     /*
@@ -269,6 +276,8 @@ namespace ns3 {
     WifiHelper wifi = WifiHelper::Default ();
 
     YansWifiPhyHelper phy;
+    NS_LOG_UNCOND("assert: " << index << "-" << m_vectorWifiPhy.size()); 
+    NS_ASSERT(index < m_vectorWifiPhy.size()); 
     phy = m_vectorWifiPhy.at (index);
 
     Ipv4AddressHelper address;
@@ -303,6 +312,50 @@ namespace ns3 {
       SetIpAddress (*device.Get (0), Ipv4Address (deviceData.ipAddress));
     }
     m_vectorAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
+
+    return device;
+  }
+
+  NetDeviceContainer
+  CreateNetwork::WimaxDeviceInstallation (NetworkConfig::DeviceData deviceData, Ptr<Node> node)
+  {
+    NS_LOG_DEBUG ("Ch ID: " << deviceData.chId << " Wimax device type: " << deviceData.wimaxDeviceType);
+
+    uint16_t index = deviceData.chId - 1;
+
+    WimaxHelper wimax = m_vWimaxChData.at (index).wimax;
+    Ipv4AddressHelper address;
+    address = m_vectorAddresser.at (index);
+    NetDeviceContainer device;
+
+    WimaxHelper::SchedulerType scheduler = WimaxHelper::SCHED_TYPE_RTPS;
+    
+    device = wimax.Install (node,
+                            deviceData.wimaxDeviceType,
+                            WimaxHelper::SIMPLE_PHY_TYPE_OFDM,
+                            scheduler);
+
+    if (deviceData.wimaxDeviceType == WimaxHelper::DEVICE_TYPE_SUBSCRIBER_STATION)
+      {
+        Ptr<NetDevice> device2 = device.Get(0);
+        Ptr<SubscriberStationNetDevice> wimaxDevice;
+        wimaxDevice = device2->GetObject<SubscriberStationNetDevice> ();
+        wimaxDevice->SetModulationType (WimaxPhy::MODULATION_TYPE_QAM16_12);
+        //wimaxDevice->SetModulationType (deviceData.modulationType);
+      }
+
+    Ipv4InterfaceContainer interfaces;
+    if (deviceData.ipAddress.IsEqual (""))
+    {
+      interfaces = address.Assign (device);      
+    } 
+    else
+    {
+      SetIpAddress (*device.Get (1), Ipv4Address (deviceData.ipAddress));
+    }
+    m_vectorAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
+    // Wimax helper must be re-used, otherwise it will segfault at WimaxNetDevice::GetChannel
+    m_vWimaxChData.at (index).wimax = wimax; 
 
     return device;
   }
@@ -383,7 +436,7 @@ namespace ns3 {
      * Traces: pcap
      */
     NS_LOG_INFO ("Enabling pcap traces");
-    m_vectorWifiPhy.at (0).EnablePcapAll ("cusco"); //We only need a YansWifiPhyHelper
+    //m_vectorWifiPhy.at (0).EnablePcapAll ("cusco"); //We only need a YansWifiPhyHelper
     ///< enable pcap for wimax
 
     // mobility traces: no movements => empty file
