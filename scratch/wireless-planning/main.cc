@@ -33,8 +33,6 @@
 #include "netinfo-reader.h"
 #include "report-2-config-data.h"
 
-
-
 #include <map>
 #include <string>
 #include <vector>
@@ -54,68 +52,92 @@ int
 main (int argc, char *argv[])
 {
 
-Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish some methods.
-//g_eos??
+  Time eos = Seconds (15); // End Of Simulation in seconds, necessary to finish some methods.
+  //g_eos??
 
- /*
-  * Network Creation
-  */
+  /*
+   * Network Creation
+   */
 
-string netInfoFile = "cusco-wifi-netinfo.txt";
- NS_LOG_INFO ("Getting data in order to create and configure the network...");
- CommandLine cmd;
- cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
- cmd.Parse (argc, argv);
- 
- 
- NetworkConfig::NetworkData networkData = SetNetworkConfiguration (netInfoFile);
- Print::NetworkData (networkData);
-
- NS_LOG_INFO ("Creating the network...");
- CreateNetwork createNetwork;
- NodeContainer nodes = createNetwork.Create (networkData);
-
- Print::NodeList (nodes); //must enable ns_log print
-
- /*
-  * Applications
-  */
- NetTest netTest;
- // Echos
-// netTest.Echo ("Urcos", "Kcauri", 1);
-// netTest.Echo ("Urpay", "Huiracochan", 2);
- 
-
- 
- // OnOff
- /// Short simulations
- AppState appState1 (AC_BE);
- netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "64kbps", 200, &appState1);
- AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);
+  string netInfoFile = "cusco-wifi-qos-validation-netinfo.txt";
+  NS_LOG_INFO ("Getting data in order to create and configure the network...");
+  CommandLine cmd;
+  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
+  cmd.Parse (argc, argv);
 
 
- /*
-  * Setup all the plot system: throughput measurement, gnuplot issues...
-  */
- NetMeasure netMeasure (eos, Seconds (0.1));
- netMeasure.SetupPlot ();
+  NetworkConfig::NetworkData networkData = SetNetworkConfiguration (netInfoFile);
+  Print::NetworkData (networkData);
 
- netMeasure.SetFlowMonitor (nodes);
- netMeasure.GetFlowStats ();
+  NS_LOG_INFO ("Creating the network...");
+  CreateNetwork createNetwork;
+  NodeContainer nodes = createNetwork.Create (networkData);
 
- Simulator::Stop (eos);
- NS_LOG_INFO ("Starting simulation...");
+  Print::NodeList (nodes); //must enable ns_log print
+  
+   // Config::Connect ("/NodeList/0/DeviceList/0/$ns3::WifiNetDevice/Phy/$ns3::YansWifiPhy/", M));
+  std::string phyPath = "/NodeList/0/DeviceList/0";
+//  std::string ackTimeoutPath = "/NodeList/0/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::WifiMac/AckTimeout";
+  std::string ackTimeoutPath = "/NodeList/*/DeviceList/*/Mac/$ns3::WifiMac/";
+   //Config::Set (ackTimeoutPath, TimeValue (MilliSeconds (40)));
 
- Simulator::Run ();
- Simulator::Destroy ();
+   Config::MatchContainer matchCont = Config::LookupMatches (ackTimeoutPath);
+   NS_LOG_INFO ("match mac n: " << matchCont.GetN());
 
- /*
-  * After simulation
-  */
- NS_LOG_INFO ("Done.");
+   matchCont = Config::LookupMatches (phyPath);
+   NS_LOG_INFO ("match phy n: " << matchCont.GetN());
 
- return 0;
+
+//  Names::Add ("//eth0", d.Get (0));
+//
+//  NodeContainer n1 = nodes->Get (0);
+   
+//  Ptr< WifiNetDevice > wifiNetDev;
+//  Ptr< NetDevice > netDev;
+//  netDev = n1->Get (0);
+//
+//  wifiNetDev = netDev->GetObject<WifiNetDevice > ();
+//
+//  Ptr< WifiMac > mac;
+//  mac = wifiNetDev->GetMac ();
+
+
+  /*
+   * Applications
+   */
+  NetTest netTest;
+  // Echos
+   netTest.Echo ("Josjojauarina 1", "Josjojauarina 2", 1);
+   netTest.Echo ("Josjojauarina 2", "Josjojauarina 1", 2);
+
+  // OnOff
+//  AppState appState1 (AC_VO);
+//  netTest.ApplicationSetup ("Josjojauarina 1", 9, "Josjojauarina 2", 4, 10, "12Mbps", 200, &appState1);
+//  AppState appState2 (AC_VO);
+  //netTest.ApplicationSetup ("Josjojauarina 2", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);
+
+
+  /*
+   * Setup all the plot system: throughput measurement, gnuplot issues...
+   */
+  NetMeasure netMeasure (eos, Seconds (0.1));
+  netMeasure.SetupPlot ();
+
+  netMeasure.SetFlowMonitor (nodes);
+  netMeasure.GetFlowStats ();
+
+  Simulator::Stop (eos);
+  NS_LOG_INFO ("Starting simulation...");
+
+  Simulator::Run ();
+  Simulator::Destroy ();
+
+  /*
+   * After simulation
+   */
+  NS_LOG_INFO ("Done.");
+
+  return 0;
 }
 
 /**
@@ -128,15 +150,15 @@ string netInfoFile = "cusco-wifi-netinfo.txt";
 NetworkConfig::NetworkData
 SetNetworkConfiguration (string netInfoFile)
 {
- NetworkConfig::NetworkData networkData;
- 
- ifstream file (netInfoFile.c_str());
- NS_LOG_INFO ("Reading simplified netinfo: " << netInfoFile);
- NetDataStruct::NetData netData = NetinfoReader::Read (file);
- Print::Netinfo (netData);
+  NetworkConfig::NetworkData networkData;
 
- Report2ConfigData r2c;
- networkData = r2c.NetData2NetworkData (netData);
+  ifstream file (netInfoFile.c_str ());
+  NS_LOG_INFO ("Reading simplified netinfo: " << netInfoFile);
+  NetDataStruct::NetData netData = NetinfoReader::Read (file);
+  Print::Netinfo (netData);
 
- return networkData;
+  Report2ConfigData r2c;
+  networkData = r2c.NetData2NetworkData (netData);
+
+  return networkData;
 }
