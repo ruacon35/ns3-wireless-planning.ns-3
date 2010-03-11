@@ -33,6 +33,10 @@
 #include "ns3/qos-utils.h"
 #include "ns3/qos-tag.h"
 #include "ns3/config.h"
+#include "ns3/wimax-module.h"
+#include "ns3/ipcs-classifier-record.h"
+#include "ns3/service-flow.h"
+#include "ns3/helper-module.h"
 
 #include "net-measure.h"
 #include "net-test.h"
@@ -118,7 +122,7 @@ namespace ns3 {
     oss << "/NodeList/" << clientNode->GetId () <<
             "/ApplicationList/0/$ns3::OnOffApplication/Tx";
     Config::Connect (oss.str (), MakeCallback (&AppState::OnOffTxPacketCallback, appState));
-    NS_LOG_UNCOND ("set callback: " << oss.str () << " AC: " << appState->m_ac << " Tid:" << (uint16_t) appState->m_tid);
+    NS_LOG_DEBUG ("set callback: " << oss.str () << " AC: " << appState->m_ac << " Tid:" << (uint16_t) appState->m_tid);
 
     clientApps.Start (Seconds (start));
     clientApps.Stop (Seconds (stop));
@@ -133,7 +137,7 @@ namespace ns3 {
   void
   NetTest::Echo (std::string server, std::string client, double start)
   {
-    NetTest::Echo (server, 9, client, start);
+    NetTest::Echo (server, 9, client,  start);
   }
 
   void
@@ -142,29 +146,29 @@ namespace ns3 {
     NS_LOG_INFO ("UDP echo server/client application: " << server << " / " << client);
     LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
     LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-
+    
     Ptr<Node> serverNode = GetNodeFromName (server);
     Ptr<Node> clientNode = GetNodeFromName (client);
 
     UdpEchoServerHelper echoServer (port); //Port
     ApplicationContainer serverAppCont = echoServer.Install (server); //Node
     serverAppCont.Start (Seconds (start));
-    serverAppCont.Stop (Seconds (start + 1)); // does it really stops?
+    serverAppCont.Stop (Seconds (start + 1)); // does it really stop?
 
     //Ptr<Application> serverApp = serverAppCont.Get (0);
     //Simulator::Schedule (start+1,serverApp->Stop(Seconds(start+1)),this);
 
     Ipv4Address serverIpAddr = Util::GetIpAddrFromName (server);
+    Ipv4Address clientIpAddr = Util::GetIpAddrFromName (client);
 
-    NS_LOG_DEBUG ("server: " << server << " IP Address: " << serverIpAddr << " Client: " << client);
+    NS_LOG_INFO ("server: " << server << " address: " << serverIpAddr 
+      << " Client: " << client << " address: " << clientIpAddr);
 
     UdpEchoClientHelper echoClient (serverIpAddr, port); // server IP and Port
     echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
     echoClient.SetAttribute ("Interval", TimeValue (Seconds (1.)));
     echoClient.SetAttribute ("PacketSize", UintegerValue (1024));
-
-    ApplicationContainer clientAppCont =
-            echoClient.Install (client); //node
+    ApplicationContainer clientAppCont = echoClient.Install (client); 
     clientAppCont.Start (Seconds (start));
     clientAppCont.Stop (Seconds (start + 1));
 
@@ -174,6 +178,78 @@ namespace ns3 {
 
     nApp = clientNode->GetNApplications ();
     NS_LOG_DEBUG ("nApp of client node " << clientNode->GetId () << " : " << "nApp " << nApp);
+    
+    WimaxHelper wimax;
+
+    Ptr<SubscriberStationNetDevice> clientDevice;
+    Ptr<SubscriberStationNetDevice> serverDevice;
+
+    clientDevice = clientNode->GetDevice (1)->GetObject<SubscriberStationNetDevice> ();
+    if (clientDevice != NULL)
+      {      
+        IpcsClassifierRecord DlClassifierUgs (Ipv4Address ("0.0.0.0"),
+                                              Ipv4Mask ("0.0.0.0"),
+                                              clientIpAddr,
+                                              Ipv4Mask ("255.255.255.255"),
+                                              0,
+                                              65000,
+                                              1,
+                                              65000,
+                                              17,
+                                              1);
+        ServiceFlow DlServiceFlowUgs = wimax.CreateServiceFlow (ServiceFlow::SF_DIRECTION_DOWN,
+                                                                ServiceFlow::SF_TYPE_RTPS,
+                                                                DlClassifierUgs);
+        IpcsClassifierRecord UlClassifierUgs2 (clientIpAddr,
+                                              Ipv4Mask ("255.255.255.255"),
+                                              Ipv4Address ("0.0.0.0"),
+                                              Ipv4Mask ("0.0.0.0"),
+                                              0,
+                                              65000,
+                                              1,
+                                              65000,
+                                              17,
+                                              1);
+                                                                
+        ServiceFlow UlServiceFlowUgs2 = wimax.CreateServiceFlow (ServiceFlow::SF_DIRECTION_UP,
+                                                                ServiceFlow::SF_TYPE_RTPS,
+                                                                UlClassifierUgs2);
+        clientDevice->AddServiceFlow (DlServiceFlowUgs);
+        clientDevice->AddServiceFlow (UlServiceFlowUgs2);
+      }
+
+    serverDevice = serverNode->GetDevice (1)->GetObject<SubscriberStationNetDevice> ();
+    if (serverDevice != NULL)
+      {
+        IpcsClassifierRecord UlClassifierUgs (serverIpAddr,
+                                              Ipv4Mask ("255.255.255.255"),
+                                              Ipv4Address ("0.0.0.0"),
+                                              Ipv4Mask ("0.0.0.0"),
+                                              0,
+                                              65000,
+                                              1,
+                                              65000,
+                                              17,
+                                              1);
+        ServiceFlow UlServiceFlowUgs = wimax.CreateServiceFlow (ServiceFlow::SF_DIRECTION_UP,
+                                                                ServiceFlow::SF_TYPE_RTPS,
+                                                                UlClassifierUgs);
+        IpcsClassifierRecord DlClassifierUgs2 (Ipv4Address ("0.0.0.0"),
+                                              Ipv4Mask ("0.0.0.0"),
+                                              serverIpAddr,
+                                              Ipv4Mask ("255.255.255.255"),
+                                              0,
+                                              65000,
+                                              1,
+                                              65001,
+                                              17,
+                                              1);
+        ServiceFlow DlServiceFlowUgs2 = wimax.CreateServiceFlow (ServiceFlow::SF_DIRECTION_DOWN,
+                                                                ServiceFlow::SF_TYPE_RTPS,
+                                                                DlClassifierUgs2);
+        serverDevice->AddServiceFlow (UlServiceFlowUgs);
+        serverDevice->AddServiceFlow (DlServiceFlowUgs2);
+      } 
   }
 
   Ptr<Node>

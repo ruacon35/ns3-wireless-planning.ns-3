@@ -9,7 +9,7 @@
 #include "ns3/vector.h"
 #include "ns3/wimax-phy.h"
 #include "ns3/wimax-helper.h"
-
+#include "ns3/wimax-module.h"
 
 using namespace std;
 
@@ -88,6 +88,7 @@ namespace ns3 {
 
         typedef struct {
             uint16_t id; ///< channel number
+            WimaxHelper wimax;
         } WimaxChannelData;
         typedef vector<WimaxChannelData> VectorWimaxChannelData;
 
