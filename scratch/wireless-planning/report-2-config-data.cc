@@ -67,6 +67,8 @@ namespace ns3 {
       node.position = position;
 
       NS_LOG_INFO ("Node: " << i << " " << node.name);
+      uint16_t wifiChId = 1, wimaxChId = 1;
+      
       for (uint16_t j = 0; j < net.vSubnetData.size (); j++) // inner loop throw SUBNETS
       {
         NetDataStruct::SubnetData subnet = net.vSubnetData.at (j);
@@ -74,7 +76,7 @@ namespace ns3 {
         int16_t index = Util::FindStrInVectorStr (node.name, subnet.nodes);
         if (index >= 0)// found
         {
-          AddDevice2Node (node, subnet, index, j + 1);
+          AddDevice2Node (node, subnet, index, &wifiChId, &wimaxChId);
         }
       }
       vectorNodeData.push_back (node); // add node to the tail of the vector.
@@ -118,7 +120,7 @@ namespace ns3 {
   }
 
   void
-  Report2ConfigData::AddDevice2Node (NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId)
+  Report2ConfigData::AddDevice2Node (NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t *wifiChId, uint16_t *wimaxChId)
   {
     enum NetworkConfig::CommunicationStandard standard = ReadStandard (subnet.standard);
     string role = subnet.roles.at (index);
@@ -130,20 +132,22 @@ namespace ns3 {
     {
       case NetworkConfig::WIFI :
       {
-        NS_LOG_DEBUG ("  adding Wi-Fi device in ch " << chId);
+        NS_LOG_DEBUG ("  adding Wi-Fi device in ch " << *wifiChId);
         NetworkConfig::MacType macType = Role2MacType (role);
-        deviceData = m_config.SetWifiDeviceData (chId, macType, distance);
+        deviceData = m_config.SetWifiDeviceData (*wifiChId, macType, distance);
+        *wifiChId++;
         break;
       }
       case NetworkConfig::WIMAX :
       {
-        NS_LOG_DEBUG ("  adding WiMAX device in ch " << chId);
+        NS_LOG_DEBUG ("  adding WiMAX device in ch " << wimaxChId);
         WimaxHelper::NetDeviceType deviceType = Role2WimaxDeviceType (role);
         string modulation = subnet.systems.at (index);
         WimaxPhy::ModulationType mod = ReadModulation (modulation);
 
-        deviceData = m_config.SetWimaxDeviceData (chId, distance, deviceType,
+        deviceData = m_config.SetWimaxDeviceData (*wimaxChId, distance, deviceType,
                 WimaxHelper::SCHED_TYPE_RTPS, mod);
+        *wimaxChId++;                
         break;
       }
       default:

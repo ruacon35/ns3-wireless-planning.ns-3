@@ -30,7 +30,7 @@ namespace ns3 {
         NetworkConfig::NetworkData NetData2NetworkData(NetDataStruct::NetData net);
 
     private:
-        void AddDevice2Node(NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId);
+        void AddDevice2Node(NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t *wifiChId, uint16_t *wimaxChId);
 
         /**
          * @brief Translates communication standard from string to enum

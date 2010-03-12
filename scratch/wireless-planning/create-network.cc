@@ -78,8 +78,7 @@ namespace ns3 {
   CreateNetwork::SetIpAddresser (void)
   {
     std::ostringstream network;
-    uint32_t i = 0;
-    for (uint32_t j = 0; j < m_vWifiChData.size (); j++, i++)
+    for (uint32_t i = 0; i < m_vWifiChData.size (); i++)
     {
       Ipv4AddressHelper addressHelper;
       network.str ("");
@@ -87,16 +86,16 @@ namespace ns3 {
       std::string net = network.str ();
       NS_LOG_DEBUG ("Wifi Network: " << network.str ());
       addressHelper.SetBase (net.c_str (), "255.255.255.0");
-      m_vectorAddresser.push_back (addressHelper);
+      m_vectorWifiAddresser.push_back (addressHelper);
     }
-    for (uint32_t j = 0; j < m_vWimaxChData.size (); j++, i++)
+    for (uint32_t i = 0; i < m_vWimaxChData.size (); i++)
     {
       Ipv4AddressHelper addressHelper;
       network.str ("");
-      network << "10.1." << i + 1 << ".0";
+      network << "10.2." << i + 1 << ".0";
       std::string net = network.str ();
       addressHelper.SetBase (net.c_str (), "255.255.255.0");
-      m_vectorAddresser.push_back (addressHelper);
+      m_vectorWimaxAddresser.push_back (addressHelper);
     }
   }
 
@@ -276,12 +275,10 @@ namespace ns3 {
     WifiHelper wifi = WifiHelper::Default ();
 
     YansWifiPhyHelper phy;
-    NS_LOG_UNCOND("assert: " << index << "-" << m_vectorWifiPhy.size()); 
-    NS_ASSERT(index < m_vectorWifiPhy.size()); 
     phy = m_vectorWifiPhy.at (index);
 
     Ipv4AddressHelper address;
-    address = m_vectorAddresser.at (index);
+    address = m_vectorWifiAddresser.at (index);
 
 
     std::string mode = m_vWifiChData.at (index).wifiMode;
@@ -311,7 +308,7 @@ namespace ns3 {
 
       SetIpAddress (*device.Get (0), Ipv4Address (deviceData.ipAddress));
     }
-    m_vectorAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
+    m_vectorWifiAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
 
     return device;
   }
@@ -325,7 +322,7 @@ namespace ns3 {
 
     WimaxHelper wimax = m_vWimaxChData.at (index).wimax;
     Ipv4AddressHelper address;
-    address = m_vectorAddresser.at (index);
+    address = m_vectorWimaxAddresser.at (index);
     NetDeviceContainer device;
 
     WimaxHelper::SchedulerType scheduler = WimaxHelper::SCHED_TYPE_RTPS;
@@ -342,6 +339,22 @@ namespace ns3 {
         wimaxDevice = device2->GetObject<SubscriberStationNetDevice> ();
         wimaxDevice->SetModulationType (WimaxPhy::MODULATION_TYPE_QAM16_12);
         //wimaxDevice->SetModulationType (deviceData.modulationType);
+        
+        IpcsClassifierRecord FakeDlClassifierUgs (Ipv4Address ("0.0.0.0"),
+                                              Ipv4Mask ("0.0.0.0"),
+                                              Ipv4Address ("0.0.0.0"),
+                                              Ipv4Mask ("0.0.0.0"),
+                                              0,
+                                              65000,
+                                              0,
+                                              65000,
+                                              1,
+                                              1);
+        ServiceFlow FakeDlServiceFlowUgs = wimax.CreateServiceFlow (ServiceFlow::SF_DIRECTION_DOWN,
+                                                                ServiceFlow::SF_TYPE_BE,
+                                                                FakeDlClassifierUgs);
+        //wimaxDevice->AddServiceFlow (FakeDlServiceFlowUgs);
+        
       }
 
     Ipv4InterfaceContainer interfaces;
@@ -353,7 +366,7 @@ namespace ns3 {
     {
       SetIpAddress (*device.Get (1), Ipv4Address (deviceData.ipAddress));
     }
-    m_vectorAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
+    m_vectorWimaxAddresser.at (index) = address; ///< Need to update the object!?, const reference vs reference
     // Wimax helper must be re-used, otherwise it will segfault at WimaxNetDevice::GetChannel
     m_vWimaxChData.at (index).wimax = wimax; 
 
