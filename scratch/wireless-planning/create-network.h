@@ -143,7 +143,8 @@ namespace ns3 {
         uint32_t m_nNodes;
 
         std::vector<YansWifiPhyHelper> m_vectorWifiPhy;
-        std::vector<Ipv4AddressHelper> m_vectorAddresser;
+        std::vector<Ipv4AddressHelper> m_vectorWifiAddresser;
+        std::vector<Ipv4AddressHelper> m_vectorWimaxAddresser;
     };
 
 } // namespace ns3

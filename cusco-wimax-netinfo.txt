@@ -5,12 +5,22 @@ Generated: 2010-02-23T12:13:46
 
 = Nodes
 
+Josjojauarina 1	280	-9.31972,-75.14583	0,0
+Josjojauarina 2	217	-9.26694,-74.94806	21728,5837
 Huiracochan	254	-9.42694,-75.21583	-7690,-11859
 Urcos	274	-9.49778,-75.12278	2533,-19694
 Urpay	247	-9.32917,-75.29472	-16357,-1045
 
-
 = Nets
+
+== Josjo1-Josjo2
+
+Mode: wifi
+
+Node	Role	Distance to AP	Mode
+Josjojauarina 1	AP	0	wifib-5.5mbs
+Josjojauarina 2	STA	22482	wifib-5.5mbs
+Huiracochan	STA	12482	wifib-5.5mbs
 
 == Huiracochan
 
