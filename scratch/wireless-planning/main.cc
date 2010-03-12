@@ -74,32 +74,49 @@ main (int argc, char *argv[])
   NodeContainer nodes = createNetwork.Create (networkData);
 
   Print::NodeList (nodes); //must enable ns_log print
-  
-   // Config::Connect ("/NodeList/0/DeviceList/0/$ns3::WifiNetDevice/Phy/$ns3::YansWifiPhy/", M));
-  std::string phyPath = "/NodeList/0/DeviceList/0";
-//  std::string ackTimeoutPath = "/NodeList/0/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::WifiMac/AckTimeout";
-  std::string ackTimeoutPath = "/NodeList/*/DeviceList/*/Mac/$ns3::WifiMac/";
-   //Config::Set (ackTimeoutPath, TimeValue (MilliSeconds (40)));
 
-   Config::MatchContainer matchCont = Config::LookupMatches (ackTimeoutPath);
-   NS_LOG_INFO ("match mac n: " << matchCont.GetN());
+  /*
+   * Validation Scenario for 802.11e - QoS
+   */
 
-   matchCont = Config::LookupMatches (phyPath);
-   NS_LOG_INFO ("match phy n: " << matchCont.GetN());
+  Ptr<Node> n1 = nodes.Get (0);
+
+  Ptr< WifiNetDevice > wifiNetDev;
+  wifiNetDev = n1->GetDevice (1)->GetObject<WifiNetDevice > ();
+
+  Ptr< WifiMac > mac;
+  mac = wifiNetDev->GetMac ();
+
+  //pre
+  NS_LOG_INFO ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds () << "s");
+  NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetSeconds () << "s");
+  NS_LOG_INFO ("SlotTime: " << mac->GetSlot ().GetSeconds () << "s");
+
+  Time prop = mac->GetMaxPropagationDelay ();
+
+   std::string macPath = "/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Mac/";
+  Config::MatchContainer matchCont;
+
+  matchCont = Config::LookupMatches (macPath);
+  NS_LOG_INFO ("match mac n: " << matchCont.GetN ());
+
+  Config::Set (macPath + "AckTimeout", TimeValue (NanoSeconds (prop.GetNanoSeconds () * 2)));
+  Config::Set (macPath + "CtsTimeout", TimeValue (NanoSeconds (prop.GetNanoSeconds () * 2)));
+  Config::Set (macPath + "Slot", TimeValue (NanoSeconds (prop.GetNanoSeconds () * 2)));
+
+  NS_LOG_INFO ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds () << "s");
+  NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetSeconds () << "s");
+  NS_LOG_INFO ("SlotTime: " << mac->GetSlot ().GetSeconds () << "s");
 
 
-//  Names::Add ("//eth0", d.Get (0));
-//
-//  NodeContainer n1 = nodes->Get (0);
-   
-//  Ptr< WifiNetDevice > wifiNetDev;
-//  Ptr< NetDevice > netDev;
-//  netDev = n1->Get (0);
-//
-//  wifiNetDev = netDev->GetObject<WifiNetDevice > ();
-//
-//  Ptr< WifiMac > mac;
-//  mac = wifiNetDev->GetMac ();
+  std::string qos = "/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/$ns3::WifiMacQueue";
+    matchCont = Config::LookupMatches (qos);
+  NS_LOG_INFO ("match qos n: " << matchCont.GetN ());
+
+  //Config::Set (qos, TimeValue (NanoSeconds (prop.GetNanoSeconds () * 2)));
+
+ std::string allPath = matchCont.GetPath ();
+  NS_LOG_INFO ("all path: " << allPath);
 
 
   /*
@@ -107,14 +124,14 @@ main (int argc, char *argv[])
    */
   NetTest netTest;
   // Echos
-   netTest.Echo ("Josjojauarina 1", "Josjojauarina 2", 1);
-   netTest.Echo ("Josjojauarina 2", "Josjojauarina 1", 2);
+//  netTest.Echo ("Josjojauarina 1", "Josjojauarina 2", 1);
+//  netTest.Echo ("Josjojauarina 2", "Josjojauarina 1", 2);
 
   // OnOff
-//  AppState appState1 (AC_VO);
-//  netTest.ApplicationSetup ("Josjojauarina 1", 9, "Josjojauarina 2", 4, 10, "12Mbps", 200, &appState1);
-//  AppState appState2 (AC_VO);
-  //netTest.ApplicationSetup ("Josjojauarina 2", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);
+    AppState appState1 (AC_VO);
+    netTest.ApplicationSetup ("Josjojauarina 1", 9, "Josjojauarina 2", 4, 10, "2.75Mbps", 1480, &appState1);
+    AppState appState2 (AC_VO);
+  netTest.ApplicationSetup ("Josjojauarina 2", 9, "Josjojauarina 1", 4, 8, "2.75Mbps", 1480, &appState2);
 
 
   /*

@@ -15,6 +15,6 @@ Josjojauarina 2	217	-9.26694,-74.94806	21728,5837
 Mode: wifi
 
 Node	Role	Distance to AP	Mode
-Josjojauarina 1	AP	0	wifib-11mbs
+Josjojauarina 1	AP	22482	wifib-11mbs
 Josjojauarina 2	STA	22482	wifib-11mbs
 
