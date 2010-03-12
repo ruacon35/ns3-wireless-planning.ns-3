@@ -292,7 +292,7 @@ namespace ns3 {
       device = wifi.Install (phy, mac, node);
     }
 
-    WifiLongDistances (device, deviceData.distance);
+    Wifi4LongDistances (device, deviceData.distance);
 
     if (deviceData.ipAddress.IsEqual (""))
     {
@@ -308,9 +308,8 @@ namespace ns3 {
   }
 
   void
-  CreateNetwork::WifiLongDistances (NetDeviceContainer device, double distance)
+  CreateNetwork::Wifi4LongDistances (NetDeviceContainer device, double distance)
   {
-
     double c0 = 3e8; // speed of light [m/sec]
     double maxPropagationDelay = distance / c0; // sec
 
@@ -335,8 +334,8 @@ namespace ns3 {
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetMicroSeconds () << "us");
     ackTimeout = Time (NanoSeconds (int(3.2 * ackTimeout.GetNanoSeconds ()))); // reconvertion
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
-
     mac->SetAckTimeout (ackTimeout);
+    
     // CTS Timeout
     NS_LOG_DEBUG ("CTSTimeout: " << mac->GetCtsTimeout ().GetMicroSeconds () << "us");
     mac->SetCtsTimeout (ackTimeout);
