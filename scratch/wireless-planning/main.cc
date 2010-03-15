@@ -93,6 +93,11 @@ string netInfoFile = "cusco-wimax-netinfo.txt";
   //netTest.Echo ("Urpay",  "Urcos", 1);
   //netTest.Echo ("Josjojauarina 1",  "Josjojauarina 2", 1);
   netTest.Echo ("Kcauri", "Urcos", 1);
+  
+  netTest.EnablePcap("Josjojauarina 2", 1);
+  netTest.EnablePcap("Josjojauarina 2", 2);
+  netTest.EnablePcap("Kcauri", 1); 
+  //netTest.EnablePcap("Huiracochan", 1);
 
  // OnOff
  /// Short simulations

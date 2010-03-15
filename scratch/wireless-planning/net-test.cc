@@ -34,6 +34,7 @@
 #include "ns3/qos-tag.h"
 #include "ns3/config.h"
 #include "ns3/wimax-module.h"
+#include "ns3/wifi-module.h"
 #include "ns3/ipcs-classifier-record.h"
 #include "ns3/service-flow.h"
 #include "ns3/helper-module.h"
@@ -240,6 +241,30 @@ namespace ns3 {
   
   } 
   
+  void
+  NetTest::EnablePcap(string nodeName, uint8_t deviceNum) {
+    Ptr<Node> node = Names::Find<Node>(nodeName);
+    int position = nodeName.find(" ");
+    while (position != -1) 
+     {      
+        nodeName.replace(position, 1, "_");
+        position = nodeName.find(" ", position + 1);
+     } 
+   
+    Ptr<NetDevice> netDevice = node->GetDevice(deviceNum);
+    Ptr<WifiNetDevice> wifiDevice;
+    wifiDevice  = netDevice->GetObject<WifiNetDevice> ();
+    if (wifiDevice != NULL) 
+      {
+        YansWifiPhyHelper wifi;
+        wifi.EnablePcap(nodeName, node->GetId(), netDevice->GetIfIndex ());
+      }
+    else 
+      {
+        WimaxHelper wimax;
+        wimax.EnablePcap(nodeName, node->GetId(), netDevice->GetIfIndex ());
+    }
+  }
 
   Ptr<Node>
   NetTest::GetNodeFromName (string name)
