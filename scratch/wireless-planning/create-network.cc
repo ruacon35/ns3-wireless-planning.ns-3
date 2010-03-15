@@ -93,6 +93,7 @@ namespace ns3 {
       Ipv4AddressHelper addressHelper;
       network.str ("");
       network << "10.2." << i + 1 << ".0";
+      NS_LOG_DEBUG ("Wimax Network: " << network.str ());
       std::string net = network.str ();
       addressHelper.SetBase (net.c_str (), "255.255.255.0");
       m_vectorWimaxAddresser.push_back (addressHelper);
