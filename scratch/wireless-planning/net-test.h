@@ -126,6 +126,7 @@ namespace ns3 {
          * @param start The instant to be sent packet.
          */
         void Echo(std::string server, uint8_t port, std::string client, double start);
+        void EnablePcap(string nodeName, uint8_t deviceNum);
 
         /*
          * @brief Returns the node pointer if there exists a node with that name.
