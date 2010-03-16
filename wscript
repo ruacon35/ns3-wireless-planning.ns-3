@@ -485,11 +485,16 @@ def add_scratch_programs(bld):
         if filename.startswith('.') or filename == 'CVS':
 	    continue
         if os.path.isdir(os.path.join("scratch", filename)):
-            obj = bld.create_ns3_program(filename, all_modules)
-            obj.path = obj.path.find_dir('scratch').find_dir(filename)
-            obj.find_sources_in_dirs('.')
-            obj.target = filename
-            obj.name = obj.target
+            # Allow projects in scratch/name. Use main*.cc for simulation code. 
+            for filename2 in os.listdir(os.path.join("scratch", filename)):
+                if not filename2.startswith("main") or not filename2.endswith(".cc"):
+                    continue
+                name = os.path.join("scratch", filename, filename2[:-len(".cc")])
+                obj = bld.create_ns3_program(name, all_modules)
+                obj.path = obj.path.find_dir('scratch').find_dir(filename)
+                obj.find_sources_in_dirs('.')
+                obj.target = os.path.basename(name)
+                obj.name = obj.target
         elif filename.endswith(".cc"):
             name = filename[:-len(".cc")]
             obj = bld.create_ns3_program(name, all_modules)
