@@ -338,8 +338,7 @@ namespace ns3 {
         Ptr<NetDevice> device2 = device.Get(0);
         Ptr<SubscriberStationNetDevice> wimaxDevice;
         wimaxDevice = device2->GetObject<SubscriberStationNetDevice> ();
-        wimaxDevice->SetModulationType (WimaxPhy::MODULATION_TYPE_QAM16_12);
-        //wimaxDevice->SetModulationType (deviceData.modulationType);
+        wimaxDevice->SetModulationType (deviceData.modulationType);
         
         IpcsClassifierRecord FakeDlClassifierUgs (Ipv4Address ("0.0.0.0"),
                                               Ipv4Mask ("0.0.0.0"),
