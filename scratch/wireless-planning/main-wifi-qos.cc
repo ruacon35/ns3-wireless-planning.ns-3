@@ -33,8 +33,6 @@
 #include "netinfo-reader.h"
 #include "report-2-config-data.h"
 
-
-
 #include <map>
 #include <string>
 #include <vector>
@@ -54,57 +52,91 @@ int
 main (int argc, char *argv[])
 {
 
-Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish some methods.
-//g_eos??
+ Time eos = Seconds (15); // End Of Simulation in seconds, necessary to finish some methods.
+ //g_eos??
 
  /*
   * Network Creation
   */
 
-string netInfoFile = "cusco-ne-netinfo.txt";
+ string netInfoFile = "cusco-wifi-qos-validation-netinfo.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
  cmd.Parse (argc, argv);
- 
- 
+
+
  NetworkConfig::NetworkData networkData = SetNetworkConfiguration (netInfoFile);
  Print::NetworkData (networkData);
 
  NS_LOG_INFO ("Creating the network...");
  CreateNetwork createNetwork;
  NodeContainer nodes = createNetwork.Create (networkData);
+
  Print::NodeList (nodes); //must enable ns_log print
+
+ /*
+  * Validation Scenario for 802.11e - QoS
+  */
+
+ Ptr<Node> n1 = nodes.Get (0);
+
+ Ptr< WifiNetDevice > wifiNetDev;
+ wifiNetDev = n1->GetDevice (1)->GetObject<WifiNetDevice > ();
+
+ Ptr< WifiMac > mac;
+ mac = wifiNetDev->GetMac ();
+
+ Time maxPropDelay = mac->GetMaxPropagationDelay ();
+ //pre
+ NS_LOG_INFO ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds () << "s");
+ NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetSeconds () << "s");
+ NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetNanoSeconds () << "ns");
+ maxPropDelay = Time (NanoSeconds (int(maxPropDelay.GetNanoSeconds ()))); // reconvertion
+ NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetSeconds () << "s");
+ NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetNanoSeconds () << "ns");
+ NS_LOG_INFO ("SlotTime: " << mac->GetSlot ().GetSeconds () << "s");
+
+ std::string macPath = "/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Mac/";
+ Config::MatchContainer matchCont;
+
+ matchCont = Config::LookupMatches (macPath);
+ NS_LOG_INFO ("match mac n: " << matchCont.GetN ());
+
+ Time ackTimeout = Time (NanoSeconds (int(maxPropDelay.GetNanoSeconds () * 3)));
+ Config::Set (macPath + "AckTimeout", TimeValue (ackTimeout));
+// Config::Set (macPath + "CtsTimeout", TimeValue (NanoSeconds (maxPropDelay.GetNanoSeconds () * 2)));
+// Config::Set (macPath + "Slot", TimeValue (NanoSeconds (prop.GetNanoSeconds () * 2)));
+
+ NS_LOG_INFO ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds () << "s");
+ NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetSeconds () << "s");
+ NS_LOG_INFO ("SlotTime: " << mac->GetSlot ().GetSeconds () << "s");
+
+
+ std::string qos = "/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/$ns3::WifiMacQueue";
+ matchCont = Config::LookupMatches (qos);
+ NS_LOG_INFO ("match qos n: " << matchCont.GetN ());
+
+ //Config::Set (qos, TimeValue (NanoSeconds (prop.GetNanoSeconds () * 2)));
+
+ std::string allPath = matchCont.GetPath ();
+ NS_LOG_INFO ("all path: " << allPath);
+
 
  /*
   * Applications
   */
-  NetTest netTest;
-  
-  /*netTest.SetWimaxUlServiceFlow ("Urcos", 1);
-  netTest.SetWimaxDlServiceFlow ("Urpay", 1);
-  netTest.Echo ("Urpay",  "Urcos", 1);*/
-  
+ NetTest netTest;
+ // Echos
+ netTest.Echo ("Josjo 1", "Josjo 2", 1);
+ netTest.Echo ("Josjo 2", "Josjo 1", 2);
 
-  netTest.SetWimaxUlServiceFlow ("Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS);
-  netTest.SetWimaxDlServiceFlow ("Kcauri", 1, ServiceFlow::SF_TYPE_RTPS);
-  //netTest.Echo ("Ccatcca",  "Josjojauarina 2", 1);  
-  //netTest.Echo ("Huiracochan",  "Urcos", 1);  
-  //netTest.Echo ("Urpay",  "Urcos", 1);
-  //netTest.Echo ("Josjojauarina 1",  "Josjojauarina 2", 1);
-  netTest.Echo ("Kcauri", "Urcos", 1);
-  
-  netTest.EnablePcap("Josjojauarina 2", 1);
-  netTest.EnablePcap("Josjojauarina 2", 2);
-  netTest.EnablePcap("Kcauri", 1); 
-  //netTest.EnablePcap("Huiracochan", 1);
+ //  // OnOff
+ //    AppState appState1 (AC_VO);
+ //    netTest.ApplicationSetup ("Josjo 1", 9, "Josjo 2", 4, 10, "2.75Mbps", 1480, &appState1);
+ //    AppState appState2 (AC_VO);
+ //  netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 4, 8, "2.75Mbps", 1480, &appState2);
 
- // OnOff
- /// Short simulations
- /*AppState appState1 (AC_BE);
- netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "64kbps", 200, &appState1);
- AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);*/
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...
@@ -140,8 +172,8 @@ NetworkConfig::NetworkData
 SetNetworkConfiguration (string netInfoFile)
 {
  NetworkConfig::NetworkData networkData;
- 
- ifstream file (netInfoFile.c_str());
+
+ ifstream file (netInfoFile.c_str ());
  NS_LOG_INFO ("Reading simplified netinfo: " << netInfoFile);
  NetDataStruct::NetData netData = NetinfoReader::Read (file);
  Print::Netinfo (netData);

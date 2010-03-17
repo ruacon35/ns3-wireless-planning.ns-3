@@ -1,0 +1,19 @@
+= General information
+
+Netfile: CUSCO-NW.NET
+Generated: 2010-02-23T12:13:46
+
+= Nodes
+
+Josjo 1	200	0,0	0,0
+Josjo 2	200	0,48000	0,48000
+
+= Nets
+
+== Josjo1-Josjo2
+
+Mode: wifi
+
+Node	Role	Distance to AP	Mode
+Josjo 1	AP	0	wifib-11mbs
+Josjo 2	STA	48000	wifib-11mbs
