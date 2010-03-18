@@ -347,16 +347,15 @@ namespace ns3 {
                                               Ipv4Address ("0.0.0.0"),
                                               Ipv4Mask ("0.0.0.0"),
                                               0,
-                                              65000,
                                               0,
-                                              65000,
-                                              1,
+                                              0,
+                                              0,
+                                              16,
                                               1);
         ServiceFlow FakeDlServiceFlowUgs = wimax.CreateServiceFlow (ServiceFlow::SF_DIRECTION_DOWN,
                                                                 ServiceFlow::SF_TYPE_BE,
                                                                 FakeDlClassifierUgs);
-        //wimaxDevice->AddServiceFlow (FakeDlServiceFlowUgs);
-        
+        wimaxDevice->AddServiceFlow (FakeDlServiceFlowUgs);        
       }
 
     Ipv4InterfaceContainer interfaces;

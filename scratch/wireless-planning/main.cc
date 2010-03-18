@@ -80,18 +80,9 @@ string netInfoFile = "cusco-ne-netinfo.txt";
   * Applications
   */
   NetTest netTest;
-  
-  /*netTest.SetWimaxUlServiceFlow ("Urcos", 1);
-  netTest.SetWimaxDlServiceFlow ("Urpay", 1);
-  netTest.Echo ("Urpay",  "Urcos", 1);*/
-  
-
-  netTest.SetWimaxUlServiceFlow ("Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS);
+    
+  //netTest.SetWimaxUlServiceFlow ("Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS);
   netTest.SetWimaxDlServiceFlow ("Kcauri", 1, ServiceFlow::SF_TYPE_RTPS);
-  //netTest.Echo ("Ccatcca",  "Josjojauarina 2", 1);  
-  //netTest.Echo ("Huiracochan",  "Urcos", 1);  
-  //netTest.Echo ("Urpay",  "Urcos", 1);
-  //netTest.Echo ("Josjojauarina 1",  "Josjojauarina 2", 1);
   netTest.Echo ("Kcauri", "Urcos", 1);
   
   netTest.EnablePcap("Josjojauarina 2", 1);
