@@ -82,29 +82,17 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   */
   NetTest netTest;
       
-  netTest.Echo ("Urcos", "Kcauri", 1);
-  netTest.Echo ("Urcos", "Ccatcca", 1);
+  //netTest.Echo ("Josjo 1", "Josjo 2", 1);
   
-  netTest.EnablePcap("Josjojauarina 2", 1);
-  netTest.EnablePcap("Josjojauarina 2", 2);
-  netTest.EnablePcap("Kcauri", 1); 
-  //netTest.EnablePcap("Huiracochan", 1);
+  netTest.EnablePcap("Josjo 1", 1);
+  netTest.EnablePcap("Josjo 2", 1);
 
-  //netTest.SetWimaxServiceFlow ("Urpay", "Kcatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-  //netTest.SetWimaxServiceFlow ("Urpay", "Kcatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_UP);
+  AppState appState1 (AC_BE);
+  netTest.ApplicationSetup ("Josjo 1", "Josjo 2", 9 , 3, 6, "8964kbps", 1024, &appState1);
 
-  //AppState appState1 (AC_BE);
-  //netTest.ApplicationSetup ("Urpay", "Kcauri", 9 , 3, 6, "964kbps", 1024, &appState1);
+  AppState appState2 (AC_BE);
+  netTest.ApplicationSetup ("Josjo 1", "Josjo 2", 4, 5, "8964kbps", 1024, &appState2);
 
-  //AppState appState2 (AC_BE);
-  //netTest.ApplicationSetup ("Urpay", "Ccatcca", 9 , 4, 5, "964kbps", 1024, &appState2);
-
- // OnOff
- /// Short simulations
- //AppState appState1 (AC_BE);
- //netTest.ApplicationSetup ("Kcauri", "Urcos", 9 , 4, 10, "64kbps", 200, &appState1);
- //AppState appState2 (AC_VO);
- //netTest.ApplicationSetup ("Ccatcca", "Urpay", 9, 6, 8, "64kbps", 200, &appState2);
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...
