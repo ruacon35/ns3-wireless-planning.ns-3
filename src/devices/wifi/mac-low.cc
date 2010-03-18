@@ -913,7 +913,7 @@ Time
 MacLow::GetAckDuration (Mac48Address to, WifiMode dataTxMode) const
 {
   WifiMode ackMode = GetAckTxModeForData (to, dataTxMode);
-  return m_phy->CalculateTxDuration (GetAckSize (), ackMode, WIFI_PREAMBLE_LONG);
+  return m_phy->CalculateTxDuration (GetAckSize (), ackMode, WIFI_PREAMBLE_SHORT);
 }
 Time
 MacLow::GetBlockAckDuration (Mac48Address to, WifiMode blockAckReqTxMode, enum BlockAckType type) const

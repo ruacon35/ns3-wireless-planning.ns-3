@@ -94,7 +94,6 @@ namespace ns3
   Ipv4Address serverIpAddr = Util::GetIpAddrFromName (server);
 
   // Create a packet sink to receive these packets
-  ///Address sinkLocalAddress(InetSocketAddress (ipAddr, port));
   Address sinkLocalAddress (InetSocketAddress (Ipv4Address::GetAny (), port));
   PacketSinkHelper sinkHelper ("ns3::UdpSocketFactory", sinkLocalAddress);
 
