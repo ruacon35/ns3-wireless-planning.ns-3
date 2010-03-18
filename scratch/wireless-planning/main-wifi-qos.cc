@@ -59,7 +59,7 @@ main (int argc, char *argv[])
   * Network Creation
   */
 
- string netInfoFile = "cusco-wifi-qos-validation-netinfo.txt";
+ string netInfoFile = "cusco-wifi-20.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -103,10 +103,10 @@ main (int argc, char *argv[])
  matchCont = Config::LookupMatches (macPath);
  NS_LOG_INFO ("match mac n: " << matchCont.GetN ());
 
- Time ackTimeout = Time (NanoSeconds (int(maxPropDelay.GetNanoSeconds () * 3)));
+ Time ackTimeout = Time (NanoSeconds (int(maxPropDelay.GetNanoSeconds () * 2)));
  Config::Set (macPath + "AckTimeout", TimeValue (ackTimeout));
-// Config::Set (macPath + "CtsTimeout", TimeValue (NanoSeconds (maxPropDelay.GetNanoSeconds () * 2)));
-// Config::Set (macPath + "Slot", TimeValue (NanoSeconds (prop.GetNanoSeconds () * 2)));
+ Config::Set (macPath + "CtsTimeout", TimeValue (NanoSeconds (maxPropDelay.GetNanoSeconds () * 2)));
+ Config::Set (macPath + "Slot", TimeValue (NanoSeconds (maxPropDelay.GetNanoSeconds () * 2)));
 
  NS_LOG_INFO ("ACKTimeout: " << mac->GetAckTimeout ().GetSeconds () << "s");
  NS_LOG_INFO ("Max Propagation Delay: " << mac->GetMaxPropagationDelay ().GetSeconds () << "s");
@@ -128,14 +128,19 @@ main (int argc, char *argv[])
   */
  NetTest netTest;
  // Echos
- netTest.Echo ("Josjo 1", "Josjo 2", 1);
- netTest.Echo ("Josjo 2", "Josjo 1", 2);
+ // netTest.Echo ("Josjo 1", "Josjo 2", 1);
+ // netTest.Echo ("Josjo 2", "Josjo 1", 2);
 
  //  // OnOff
- //    AppState appState1 (AC_VO);
- //    netTest.ApplicationSetup ("Josjo 1", 9, "Josjo 2", 4, 10, "2.75Mbps", 1480, &appState1);
- //    AppState appState2 (AC_VO);
- //  netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 4, 8, "2.75Mbps", 1480, &appState2);
+ AppState appState1 (AC_VO);
+ netTest.ApplicationSetup ("Josjo 1", 9, "Josjo 2", 4, 10, "2.75Mbps", 1480, &appState1);
+ AppState appState3 (AC_VI);
+ netTest.ApplicationSetup ("Josjo 1", 9, "Josjo 2", 5, 10, "2.75Mbps", 1480, &appState3);
+
+ AppState appState2 (AC_VO);
+ netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 6, 10, "2.75Mbps", 1480, &appState2);
+ AppState appState4 (AC_VI);
+ netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 7, 10, "2.75Mbps", 1480, &appState4);
 
 
  /*
