@@ -82,7 +82,8 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   */
   NetTest netTest;
       
-  //netTest.Echo ("Urcos", "Kcauri", 1);
+  netTest.Echo ("Urcos", "Kcauri", 1);
+  netTest.Echo ("Urcos", "Ccatcca", 1);
   
   netTest.EnablePcap("Josjojauarina 2", 1);
   netTest.EnablePcap("Josjojauarina 2", 2);
@@ -95,8 +96,8 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   //AppState appState1 (AC_BE);
   //netTest.ApplicationSetup ("Urpay", "Kcauri", 9 , 3, 6, "964kbps", 1024, &appState1);
 
-  AppState appState2 (AC_BE);
-  netTest.ApplicationSetup ("Urpay", "Ccatcca", 9 , 4, 5, "964kbps", 1024, &appState2);
+  //AppState appState2 (AC_BE);
+  //netTest.ApplicationSetup ("Urpay", "Ccatcca", 9 , 4, 5, "964kbps", 1024, &appState2);
 
  // OnOff
  /// Short simulations

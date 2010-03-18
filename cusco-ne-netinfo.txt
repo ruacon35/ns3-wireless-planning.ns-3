@@ -29,7 +29,7 @@ Mode: wimax
 
 Node	Role	Distance to AP	Mode
 Josjojauarina 2	BS	0.00	All
-Ccatcca	SS	1620	BPSK 1/2
+Ccatcca	SS	1620	16QAM 1/2
 Kcauri	SS	15670	16QAM 1/2
 
 == Josjo1
