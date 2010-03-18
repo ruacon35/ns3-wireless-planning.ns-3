@@ -84,11 +84,12 @@ namespace ns3 {
   }
 
   NetDataStruct::NetData
-  NetinfoReader::Read (ifstream &file)
+  NetinfoReader::Read (string filepath)
   {
+    ifstream file (filepath.c_str());
     NetDataStruct::NetData netData;
     vector<string> netinfo_lines, lines;
-    string line;
+    string line;    
 
     while (getline (file, line))
       netinfo_lines.push_back (line);

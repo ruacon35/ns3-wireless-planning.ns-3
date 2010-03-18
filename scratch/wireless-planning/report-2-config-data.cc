@@ -130,6 +130,7 @@ namespace ns3 {
   void
   Report2ConfigData::AddDevice2Node (NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId)
   {
+    NetworkConfig config;
     enum NetworkConfig::CommunicationStandard standard = ReadStandard (subnet.standard);
     string role = subnet.roles.at (index);
 
@@ -143,7 +144,7 @@ namespace ns3 {
       {
         NS_LOG_DEBUG ("  adding Wi-Fi device in ch " << chId);
         NetworkConfig::MacType macType = Role2MacType (role);
-        deviceData = m_config.SetWifiDeviceData (chId, macType, distance, max_distance);
+        deviceData = config.SetWifiDeviceData (chId, macType, distance, max_distance);
         break;
       }
       case NetworkConfig::WIMAX :
@@ -153,7 +154,7 @@ namespace ns3 {
         string modulation = subnet.systems.at (index);
         WimaxPhy::ModulationType mod = ReadModulation (modulation);
 
-        deviceData = m_config.SetWimaxDeviceData (chId, distance, max_distance, 
+        deviceData = config.SetWimaxDeviceData (chId, distance, max_distance, 
                 deviceType, WimaxHelper::SCHED_TYPE_RTPS, mod);
         break;
       }
