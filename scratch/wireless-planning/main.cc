@@ -61,7 +61,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   * Network Creation
   */
 
- string netInfoFile = "cusco-ne-netinfo.txt";
+ string netInfoFile = "cusco-wifi-24.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -87,11 +87,15 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   netTest.EnablePcap("Josjo 1", 1);
   netTest.EnablePcap("Josjo 2", 1);
 
-  AppState appState1 (AC_BE);
-  netTest.ApplicationSetup ("Josjo 1", "Josjo 2", 9 , 3, 6, "8964kbps", 1024, &appState1);
+  AppState appState1 (AC_VO);
+  netTest.ApplicationSetup ("Josjo 1", "Josjo 2", 3, 10, "2.75Mbps", 1024, &appState1);
+  AppState appState2 (AC_VI);
+  netTest.ApplicationSetup ("Josjo 1", "Josjo 2", 4, 10, "2.75Mbps", 1024, &appState2);
 
-  AppState appState2 (AC_BE);
-  netTest.ApplicationSetup ("Josjo 1", "Josjo 2", 4, 5, "8964kbps", 1024, &appState2);
+  AppState appState3 (AC_VO);
+  netTest.ApplicationSetup ("Josjo 2", "Josjo 1", 5, 10, "2.75Mbps", 1024, &appState3);
+  AppState appState4 (AC_VI);
+  netTest.ApplicationSetup ("Josjo 2", "Josjo 1", 6, 10, "2.75Mbps", 1024, &appState4);
 
 
  /*
