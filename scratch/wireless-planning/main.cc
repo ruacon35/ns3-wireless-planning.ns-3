@@ -82,7 +82,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   */
   NetTest netTest;
       
-  netTest.Echo ("Kcauri", "Urcos", 1);
+  netTest.Echo ("Urcos", "Kcauri", 1);
   
   netTest.EnablePcap("Josjojauarina 2", 1);
   netTest.EnablePcap("Josjojauarina 2", 2);
