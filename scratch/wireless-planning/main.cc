@@ -81,9 +81,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   * Applications
   */
   NetTest netTest;
-    
-  //netTest.SetWimaxUlServiceFlow ("Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS);
-  netTest.SetWimaxDlServiceFlow ("Kcauri", 1, ServiceFlow::SF_TYPE_RTPS);
+      
   netTest.Echo ("Kcauri", "Urcos", 1);
   
   netTest.EnablePcap("Josjojauarina 2", 1);

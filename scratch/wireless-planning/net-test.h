@@ -137,7 +137,7 @@ namespace ns3 {
          */
         Ptr<Node> GetNodeFromName(string name);
         
-        void SetWimaxDlServiceFlow (std::string nodeName, uint8_t device_index, ServiceFlow::SchedulingType schedulinType);
+        void SetWimaxServiceFlow (std::string sourceNodeName, std::string destNodeName, uint8_t device_index, ServiceFlow::SchedulingType schedulinType, uint8_t protocol, ServiceFlow::Direction direction);
         void SetWimaxUlServiceFlow (std::string nodeName, uint8_t device_index, ServiceFlow::SchedulingType schedulinType);
 
     private:
