@@ -1135,7 +1135,8 @@ MacLow::ForwardDown (Ptr<const Packet> packet, const WifiMacHeader* hdr,
             ", mode=" << txMode <<
             ", duration=" << hdr->GetDuration () <<
             ", seq=0x"<< std::hex << m_currentHdr.GetSequenceControl () << std::dec);
-  m_phy->SendPacket (packet, txMode, WIFI_PREAMBLE_LONG, 0);
+  //m_phy->SendPacket (packet, txMode, WIFI_PREAMBLE_LONG, 0);
+  m_phy->SendPacket (packet, txMode, WIFI_PREAMBLE_SHORT, 0);
 }
 
 void
