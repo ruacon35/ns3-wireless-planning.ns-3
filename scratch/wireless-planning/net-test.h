@@ -79,9 +79,23 @@ namespace ns3 {
         /**
          * @brief It setups an OnOff application with QoS.
          *
-         * @param Server node name.
-         * @param server port
          * @param Client node name.
+         * @param Server node name.
+         * @param Start time in seconds.
+         * @param Stop time in seconds.
+         * @param Rate in string mode.
+         * @param PacketSize in bytes.
+         * @param AccessClass for QoS.
+         */
+        void ApplicationSetup(std::string client, std::string server,
+                double start, double stop, std::string rate,
+                uint32_t packetSize, AppState *appState);
+        /**
+         * @brief It setups an OnOff application with QoS.
+         *
+         * @param Client node name.
+         * @param server port
+         * @param Server node name.
          * @param Start time in seconds.
          * @param Stop time in seconds.
          * @param Rate in string mode.
@@ -126,6 +140,13 @@ namespace ns3 {
          * @param start The instant to be sent packet.
          */
         void Echo(std::string client, uint8_t port, std::string server, double start);
+
+        /**
+         * @brief Enables Pcap trace capture.
+         *
+         * @param nodeName
+         * @param deviceNum
+         */
         void EnablePcap(string nodeName, uint8_t deviceNum);
 
         /*
@@ -136,9 +157,9 @@ namespace ns3 {
          * @retun node Node pointer.
          */
         Ptr<Node> GetNodeFromName(string name);
-        
-        void SetWimaxServiceFlow (std::string sourceNodeName, std::string destNodeName, uint8_t device_index, ServiceFlow::SchedulingType schedulinType, uint8_t protocol, ServiceFlow::Direction direction);
-        void SetWimaxUlServiceFlow (std::string nodeName, uint8_t device_index, ServiceFlow::SchedulingType schedulinType);
+
+        void SetWimaxServiceFlow(std::string sourceNodeName, std::string destNodeName, uint8_t device_index, ServiceFlow::SchedulingType schedulinType, uint8_t protocol, ServiceFlow::Direction direction);
+        void SetWimaxUlServiceFlow(std::string nodeName, uint8_t device_index, ServiceFlow::SchedulingType schedulinType);
 
     private:
 
