@@ -113,7 +113,7 @@ namespace ns3 {
          * @param client node name.
          * @param start The instant to be sent packet.
          */
-        void Echo(std::string server, std::string client, double start);
+        void Echo(std::string client, std::string server, double start);
 
         /**
          * @brief UcpEcho application: Just to test connectivity
@@ -125,7 +125,7 @@ namespace ns3 {
          * @param client node name.
          * @param start The instant to be sent packet.
          */
-        void Echo(std::string server, uint8_t port, std::string client, double start);
+        void Echo(std::string client, uint8_t port, std::string server, double start);
         void EnablePcap(string nodeName, uint8_t deviceNum);
 
         /*

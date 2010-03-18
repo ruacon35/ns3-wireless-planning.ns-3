@@ -136,13 +136,13 @@ namespace ns3 {
   }
 
   void
-  NetTest::Echo (std::string server, std::string client, double start)
+  NetTest::Echo (std::string client, std::string server, double start)
   {
-    NetTest::Echo (server, 9, client,  start);
+    NetTest::Echo (client, 9, server,  start);
   }
 
   void
-  NetTest::Echo (std::string server, uint8_t port, std::string client, double start)
+  NetTest::Echo (std::string client, uint8_t port, std::string server, double start)
   {
     NS_LOG_INFO ("UDP echo server/client application: " << server << " / " << client);
     LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
