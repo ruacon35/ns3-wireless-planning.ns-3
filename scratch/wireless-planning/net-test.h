@@ -88,7 +88,7 @@ namespace ns3 {
          * @param PacketSize in bytes.
          * @param AccessClass for QoS.
          */
-        void ApplicationSetup(std::string server, uint8_t port, std::string client,
+        void ApplicationSetup(std::string client, std::string server, uint8_t port,
                 double start, double stop, std::string rate,
                 uint32_t packetSize, AppState *appState);
 

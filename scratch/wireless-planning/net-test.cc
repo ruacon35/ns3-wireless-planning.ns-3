@@ -80,7 +80,7 @@ namespace ns3 {
   }
 
   void
-  NetTest::ApplicationSetup (std::string server, uint8_t port, std::string client,
+  NetTest::ApplicationSetup (std::string client, std::string server, uint8_t port,
           double start, double stop, std::string rate,
           uint32_t packetSize, AppState *appState)
   {
