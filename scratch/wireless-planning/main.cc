@@ -91,10 +91,10 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
 
  // OnOff
  /// Short simulations
- /*AppState appState1 (AC_BE);
- netTest.ApplicationSetup ("Urcos", 9 , "Kcauri", 4, 10, "64kbps", 200, &appState1);
- AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("Urpay", 9, "Ccatcca", 6, 8, "64kbps", 200, &appState2);*/
+ //AppState appState1 (AC_BE);
+ //netTest.ApplicationSetup ("Kcauri", "Urcos", 9 , 4, 10, "64kbps", 200, &appState1);
+ //AppState appState2 (AC_VO);
+ //netTest.ApplicationSetup ("Ccatcca", "Urpay", 9, 6, 8, "64kbps", 200, &appState2);
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...
