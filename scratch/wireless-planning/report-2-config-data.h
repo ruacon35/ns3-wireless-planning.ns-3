@@ -27,10 +27,10 @@ namespace ns3 {
 
         static TypeId GetTypeId(void);
 
-        NetworkConfig::NetworkData NetData2NetworkData(NetDataStruct::NetData net);
+        static NetworkConfig::NetworkData NetData2NetworkData(NetDataStruct::NetData net);
 
     private:
-        void AddDevice2Node(NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId);
+        static void AddDevice2Node(NetworkConfig::NodeData &node, NetDataStruct::SubnetData subnet, uint16_t index, uint16_t chId);
 
         /**
          * @brief Translates communication standard from string to enum
@@ -39,7 +39,7 @@ namespace ns3 {
          *
          * @return NetworkConfig::CommunicationStandard WIFI or WIMAX
          */
-        NetworkConfig::CommunicationStandard ReadStandard(string communicationStandard);
+        static NetworkConfig::CommunicationStandard ReadStandard(string communicationStandard);
 
         /**
          * @brief Translates role from Radio Mobile to MAC Type
@@ -50,7 +50,7 @@ namespace ns3 {
          * 
          * @return NetworkConfig::MacType
          */
-        NetworkConfig::MacType Role2MacType(string role);
+        static NetworkConfig::MacType Role2MacType(string role);
 
         /**
          * @brief Translates role to wimax net device
@@ -59,7 +59,7 @@ namespace ns3 {
          *
          * @return WimaxHelper::NetDeviceType BB / SS
          */
-        WimaxHelper::NetDeviceType Role2WimaxDeviceType(string role);
+        static WimaxHelper::NetDeviceType Role2WimaxDeviceType(string role);
 
         /**
          * @brief Translates modulation from string to enum
@@ -68,11 +68,7 @@ namespace ns3 {
          *
          * @return NetworkConfig::CommunicationStandard WIFI or WIMAX
          */
-        enum WimaxPhy::ModulationType ReadModulation(string modulation);
-
-
-        NetworkConfig m_config;
-
+        static enum WimaxPhy::ModulationType ReadModulation(string modulation);
     };
 
 } // namespace ns3

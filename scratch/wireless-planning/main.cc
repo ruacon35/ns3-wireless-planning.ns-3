@@ -61,20 +61,21 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   * Network Creation
   */
 
-string netInfoFile = "cusco-ne-netinfo.txt";
+ string netInfoFile = "cusco-ne-netinfo.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
  cmd.Parse (argc, argv);
  
- 
- NetworkConfig::NetworkData networkData = SetNetworkConfiguration (netInfoFile);
+ NetDataStruct::NetData netData = NetinfoReader::Read ((netInfoFile));
+ Print::Netinfo (netData);
+ NetworkConfig::NetworkData networkData = Report2ConfigData::NetData2NetworkData (netData);
  Print::NetworkData (networkData);
 
  NS_LOG_INFO ("Creating the network...");
  CreateNetwork createNetwork;
  NodeContainer nodes = createNetwork.Create (networkData);
- Print::NodeList (nodes); //must enable ns_log print
+ Print::NodeList (nodes);
 
  /*
   * Applications
@@ -118,27 +119,4 @@ string netInfoFile = "cusco-ne-netinfo.txt";
  NS_LOG_INFO ("Done.");
 
  return 0;
-}
-
-/**
- * @brief Inside this method all the information of the network is hand written 
- *  
- * @return NetworkData All the needed information in order to build a network.
- * 
- * @see CreateNetwork::Create
- */
-NetworkConfig::NetworkData
-SetNetworkConfiguration (string netInfoFile)
-{
- NetworkConfig::NetworkData networkData;
- 
- ifstream file (netInfoFile.c_str());
- NS_LOG_INFO ("Reading simplified netinfo: " << netInfoFile);
- NetDataStruct::NetData netData = NetinfoReader::Read (file);
- Print::Netinfo (netData);
-
- Report2ConfigData r2c;
- networkData = r2c.NetData2NetworkData (netData);
-
- return networkData;
 }

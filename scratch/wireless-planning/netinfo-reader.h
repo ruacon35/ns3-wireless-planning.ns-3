@@ -37,7 +37,7 @@ public:
    * @param file netinfo.txt
    *
    */
-  static NetDataStruct::NetData Read(ifstream &file);
+  static NetDataStruct::NetData Read(string filepath);
 private:  
   static vector<string> GetSection (vector<string> &input_lines, string start, string end);
   static vector<string> GetSubSectionNames (vector<string> &input_lines, string header);
