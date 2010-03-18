@@ -134,13 +134,13 @@ main (int argc, char *argv[])
  //  // OnOff
  AppState appState1 (AC_VO);
  netTest.ApplicationSetup ("Josjo 1", 9, "Josjo 2", 4, 10, "2.75Mbps", 1480, &appState1);
- AppState appState3 (AC_VI);
+ AppState appState3 (AC_VO);
  netTest.ApplicationSetup ("Josjo 1", 9, "Josjo 2", 5, 10, "2.75Mbps", 1480, &appState3);
 
- AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 6, 10, "2.75Mbps", 1480, &appState2);
- AppState appState4 (AC_VI);
- netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 7, 10, "2.75Mbps", 1480, &appState4);
+// AppState appState2 (AC_VO);
+// netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 6, 10, "2.75Mbps", 1480, &appState2);
+// AppState appState4 (AC_VI);
+// netTest.ApplicationSetup ("Josjo 2", 9, "Josjo 1", 7, 10, "2.75Mbps", 1480, &appState4);
 
 
  /*
