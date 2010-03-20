@@ -82,19 +82,19 @@ Time eos = Seconds (3);// End Of Simulation in seconds, necessary to finish some
   */
   NetTest netTest;
       
-  //netTest.Echo ("Urcos", "Kcauri", 1);
-  //netTest.Echo ("Urcos", "Ccatcca", 1);
+  netTest.Echo ("Urcos", "Urpay", 1);
+  netTest.Echo ("Urpay", "Huiracochan", 1.5);
   
   netTest.EnablePcap("Josjojauarina 2", 1);
   netTest.EnablePcap("Josjojauarina 2", 2);
   netTest.EnablePcap("Kcauri", 1); 
   //netTest.EnablePcap("Huiracochan", 1);
   
-  netTest.SetWimaxServiceFlow ("Urcos", "Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-  netTest.ApplicationSetup ("Urcos", "Ccatcca", 9 , 1.0, 3.0, "1024kbps", 256, NULL);
-
-  netTest.SetWimaxServiceFlow ("Urcos", "Kcauri", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-  netTest.ApplicationSetup ("Urcos", "Kcauri", 9 , 2.0, 4.0, "4096kbps", 256, NULL);
+//  netTest.SetWimaxServiceFlow ("Urcos", "Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
+//  netTest.ApplicationSetup ("Urcos", "Ccatcca", 9 , 1.0, 3.0, "1024kbps", 256, NULL);
+//
+//  netTest.SetWimaxServiceFlow ("Urcos", "Kcauri", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
+//  netTest.ApplicationSetup ("Urcos", "Kcauri", 9 , 2.0, 4.0, "4096kbps", 256, NULL);
 
  // OnOff
  /// Short simulations

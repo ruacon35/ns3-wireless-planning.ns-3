@@ -43,11 +43,7 @@ namespace ns3 {
      */
 
     /**
-     * @brief A class to test a net.
-     *
-     * -Calculates the throughput and plots it.
-     * -Sends echos.
-     * -Runs OnOff application.
+     * @brief A class to take masurementes from the network.
      */
     class NetMeasure {
     public:
@@ -61,17 +57,32 @@ namespace ns3 {
 
         typedef map< FlowId, FlowMonitor::FlowStats > MonStats;
         typedef string Measurement;
-        typedef map < Measurement, vector< Gnuplot2dDataset > > MeasurementDataset;
 
-        struct PlotData {
+        typedef struct {
             string title;
             string x;
             string y;
-            enum PlotType plotType;
-        };
-        typedef struct PlotData PlotData;
+        } PlotData;
 
-        typedef map < Measurement, PlotData> MeasPlotData;
+        typedef struct {
+            double width;
+            vector < double > data;
+            vector < double > freq;
+        } HistData;
+
+        typedef struct {
+            double initTime;
+            vector < double > data;
+        } TimeData;
+
+        typedef struct {
+            enum PlotType plotType;
+            vector < TimeData > flowsTimeData; // for TIMEDOMAIN
+            vector < HistData > flowsHistData; // for HISTOGRAM
+            PlotData plotData;
+        } MeasurementData;
+        typedef map < Measurement, MeasurementData > MeasDataSet;
+
 
         /**
          * Constructor:
@@ -119,6 +130,21 @@ namespace ns3 {
          * @return MonStats
          */
         void GetFlowStats();
+
+        /**
+         * @brief Gets FlowNames
+         *
+         * @return flow names
+         */
+        vector < string > GetFlowNames();
+
+        /**
+         * @brief Sets FlowNames
+         *
+         * @param flow names
+         */
+        void SetFlowNames(vector < string > flowNames);
+
 
     private:
 
@@ -180,20 +206,15 @@ namespace ns3 {
          * @param stats EOS statistics
          * @param data Gnuplot data set
          */
-        void CalcDelayHist(FlowMonitor::FlowStats stas, Gnuplot2dDataset &plotDataSet);
-
-
+        HistData CalcDelayHist(FlowMonitor::FlowStats stas);
 
 
         Time m_eos;
         Time m_interval;
         Ptr < FlowMonitor > m_flowMon;
+        vector < string > m_flowNames;
 
-        vector < Measurement > m_measurements; ///< List of measurements
-        map < Measurement, PlotData> m_MeasPlotData;
-
-        MeasurementDataset m_mMeasurementDataset; ///< One data set vector per measurement
-        //map < string, vector<Gnuplot2dDataset>  > m_mvPlotDataSetFlow; ///< One data set vector per measurement
+        MeasDataSet m_measDataSet;
         vector< FlowMonitor::FlowStats > m_vOldFlowStats; ///< One flow stats per flow
     };
 

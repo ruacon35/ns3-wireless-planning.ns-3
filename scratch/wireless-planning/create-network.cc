@@ -377,13 +377,12 @@ namespace ns3 {
   void
   CreateNetwork::WifiLongDistances (NetDeviceContainer device, double distance)
   {
-
     double c0 = 3e8; // speed of light [m/sec]
     double maxPropagationDelay = distance / c0; // sec
 
     Ptr< WifiNetDevice > wifiNetDev;
     Ptr< NetDevice > netDev;
-    netDev = device.Get (0);
+    netDev = device.Get (0);// NetDeviceContainer has only 1 device when is passed to this method.
 
     wifiNetDev = netDev->GetObject<WifiNetDevice > ();
 
@@ -400,7 +399,7 @@ namespace ns3 {
             + mac->GetSlot ().GetSeconds ()
             + mac->GetMaxPropagationDelay ().GetSeconds () * 2);
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetMicroSeconds () << "us");
-    ackTimeout = Time (NanoSeconds (int(ackTimeout.GetNanoSeconds ()))); // reconvertion
+    ackTimeout = Time (NanoSeconds (int(ackTimeout.GetNanoSeconds ()))); // reconvertion, uint64_t
     NS_LOG_DEBUG ("New ACKTimeout: " << ackTimeout.GetSeconds () << "s");
 
     mac->SetAckTimeout (ackTimeout);
@@ -413,8 +412,6 @@ namespace ns3 {
     NS_LOG_DEBUG ("Slot Time: " << mac->GetSlot ().GetMicroSeconds () << "us");
     Time slotTime = NanoSeconds (mac->GetSlot ().GetNanoSeconds ()
             + mac->GetMaxPropagationDelay ().GetNanoSeconds () * 2);
-    NS_LOG_DEBUG ("2x Max prop delay: " << Seconds (mac->GetMaxPropagationDelay ().GetSeconds () * 2));
-
     mac->SetSlot (slotTime);
     NS_LOG_DEBUG ("New Slot Time: " << mac->GetSlot ().GetMicroSeconds () << "us");
   }
