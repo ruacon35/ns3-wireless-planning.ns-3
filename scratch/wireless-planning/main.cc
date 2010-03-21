@@ -33,8 +33,6 @@
 #include "netinfo-reader.h"
 #include "report-2-config-data.h"
 
-
-
 #include <map>
 #include <string>
 #include <vector>
@@ -48,8 +46,6 @@ NS_LOG_COMPONENT_DEFINE ("main");
  * @brief network main Script (read from netinfo text file)
  */
 
-NetworkConfig::NetworkData SetNetworkConfiguration (string netInfoFile);
-
 int
 main (int argc, char *argv[])
 {
@@ -60,7 +56,6 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
  /*
   * Network Creation
   */
-
  string netInfoFile = "cusco-ne-netinfo.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
@@ -81,13 +76,16 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   * Applications
   */
   NetTest netTest;
-      
-  netTest.Echo ("Urcos", "Urpay", 1);
-  netTest.Echo ("Urpay", "Huiracochan", 1.5);
-  
-  netTest.EnablePcap("Josjojauarina 2", 1);
-  netTest.EnablePcap("Josjojauarina 2", 2);
-  netTest.EnablePcap("Kcauri", 1); 
+
+  netTest.Echo ("Urcos", "Huiracochan", 1);
+  netTest.Echo ("Huiracochan", "Urcos", 1.5);
+
+  /*
+   * WiMAX part
+   */
+//  netTest.EnablePcap("Josjojauarina 2", 1);
+//  netTest.EnablePcap("Josjojauarina 2", 2);
+//  netTest.EnablePcap("Kcauri", 1);
   //netTest.EnablePcap("Huiracochan", 1);
   
 //  netTest.SetWimaxServiceFlow ("Urcos", "Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
@@ -98,11 +96,11 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
 
  // OnOff
  /// Short simulations
- AppState appState1 (AC_VI);
+ AppState appState1 (AC_VO);
  netTest.ApplicationSetup ("Urcos", "Huiracochan", 4, 10, "2.75Mbps", 1490, &appState1);
  AppState appState2 (AC_VO);
  netTest.ApplicationSetup ("Urcos", "Huiracochan", 6, 8, "2.75Mbps", 1490, &appState2);
- AppState appState3 (AC_VI);
+ AppState appState3 (AC_VO);
  netTest.ApplicationSetup ("Huiracochan", "Urcos", 4, 10, "2.75Mbps", 1490, &appState3);
  AppState appState4 (AC_VO);
  netTest.ApplicationSetup ("Huiracochan", "Urcos", 6, 8, "2.75Mbps", 1490, &appState4);
