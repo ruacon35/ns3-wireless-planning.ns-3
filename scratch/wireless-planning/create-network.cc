@@ -301,7 +301,7 @@ namespace ns3 {
       device = wifi.Install (phy, mac, node);
     }
 
-    WifiLongDistances (device, deviceData.max_distance);
+    Wifi4LongDistances (device, deviceData.max_distance);
 
     if (deviceData.ipAddress.IsEqual (""))
     {
@@ -375,7 +375,7 @@ namespace ns3 {
   }
 
   void
-  CreateNetwork::WifiLongDistances (NetDeviceContainer device, double distance)
+  CreateNetwork::Wifi4LongDistances (NetDeviceContainer device, double distance)
   {
     double c0 = 3e8; // speed of light [m/sec]
     double maxPropagationDelay = distance / c0; // sec

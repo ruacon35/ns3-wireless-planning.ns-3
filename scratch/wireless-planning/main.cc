@@ -54,7 +54,7 @@ int
 main (int argc, char *argv[])
 {
 
-Time eos = Seconds (3);// End Of Simulation in seconds, necessary to finish some methods.
+Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish some methods.
 //g_eos??
 
  /*
@@ -98,10 +98,14 @@ Time eos = Seconds (3);// End Of Simulation in seconds, necessary to finish some
 
  // OnOff
  /// Short simulations
- //AppState appState1 (AC_BE);
- //netTest.ApplicationSetup ("Kcauri", "Urcos", 9 , 4, 10, "64kbps", 200, &appState1);
- //AppState appState2 (AC_VO);
- //netTest.ApplicationSetup ("Ccatcca", "Urpay", 9, 6, 8, "64kbps", 200, &appState2);
+ AppState appState1 (AC_VI);
+ netTest.ApplicationSetup ("Urcos", "Huiracochan", 4, 10, "2.75Mbps", 1490, &appState1);
+ AppState appState2 (AC_VO);
+ netTest.ApplicationSetup ("Urcos", "Huiracochan", 6, 8, "2.75Mbps", 1490, &appState2);
+ AppState appState3 (AC_VI);
+ netTest.ApplicationSetup ("Huiracochan", "Urcos", 4, 10, "2.75Mbps", 1490, &appState3);
+ AppState appState4 (AC_VO);
+ netTest.ApplicationSetup ("Huiracochan", "Urcos", 6, 8, "2.75Mbps", 1490, &appState4);
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...
