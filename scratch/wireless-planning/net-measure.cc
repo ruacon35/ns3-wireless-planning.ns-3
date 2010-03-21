@@ -103,6 +103,17 @@ namespace ns3
  {
   NS_LOG_INFO ("End Plot");
 
+  // check flow names
+  for (uint16_t i = 0; i < m_measDataSet["Throughput"].flowsTimeData.size (); i++)
+   {
+    ostringstream flowName;
+    flowName << "Flow " << i;
+    NS_LOG_INFO ("Flow name: " << flowName.str ());
+    m_flowNames.push_back (flowName.str ());
+   }
+
+  DataPostProcess ();
+
   for (MeasDataSet::const_iterator it = m_measDataSet.begin (); it != m_measDataSet.end (); ++it)
    {
     string measurement = it->first;
@@ -126,12 +137,6 @@ namespace ns3
          vector < double > data = timeData.data;
          Gnuplot2dDataset plotDataSet;
 
-         if (m_flowNames.size () != measData.flowsTimeData.size ())
-          {
-           ostringstream flowName;
-           flowName << "Flow " << i;
-           m_flowNames.push_back (flowName.str ());
-          }
          plotDataSet.SetTitle (m_flowNames.at (i));
 
          plotDataSet.Add (time - m_interval.GetSeconds (), 0); // decoration
@@ -155,18 +160,12 @@ namespace ns3
          Gnuplot2dDataset plotDataSet;
          plotDataSet.SetStyle (style);
 
-         if (m_flowNames.size () != measData.flowsHistData.size ())
-          {
-           ostringstream flowName;
-           flowName << "Flow " << i;
-           m_flowNames.push_back (flowName.str ());
-          }
          plotDataSet.SetTitle (m_flowNames.at (i));
          for (uint32_t j = 0; j < hist.data.size (); j++)
           {
            plotDataSet.Add (hist.data.at (j), hist.freq.at (j));
           }
-                 plotDataSet.Add (hist.data.back ()  + hist.width, 0); // decoration
+         plotDataSet.Add (hist.data.back () + hist.width, 0); // decoration
          gnuplot.AddDataset (plotDataSet);
         }
        break;
@@ -296,7 +295,7 @@ namespace ns3
 
   for (uint32_t index = 0; index < hist.GetNBins (); index++)
    {
-    delay = index * width * 10e3;// ms
+    delay = index * width * 10e3; // ms
     double count = hist.GetBinCount (index);
     freq = count / rxPackets * 100; // Normalize to 100
 
@@ -393,4 +392,65 @@ namespace ns3
   Simulator::Schedule (m_interval, &NetMeasure::GetFlowStats, this);
  }
 
+ void
+ NetMeasure::DataPostProcess ()
+ {
+  // Measurements
+  for (MeasDataSet::const_iterator ite = m_measDataSet.begin (); ite != m_measDataSet.end (); ++ite)
+   {
+    Measurement measurement = ite->first;
+    MeasurementData measData = ite->second;
+    switch (measData.plotType)
+     {
+     case TIMEDOMAIN:
+      {
+       // Padding
+       vector< TimeData > flowsTimeData = measData.flowsTimeData;
+
+       for (uint16_t i = 1; i < flowsTimeData.size (); i++)
+        {
+         vector<double> flowData = flowsTimeData.at (i).data;
+
+         uint16_t lenDiff = flowsTimeData.at (0).data.size () - flowData.size ();
+         vector<double> pad;
+         NS_LOG_DEBUG ("length diff: " << lenDiff);
+         pad.resize (lenDiff, 0);
+         NS_LOG_DEBUG ("length before: " << flowData.size ());
+         flowData.insert (flowData.begin (), pad.begin (), pad.end ());
+         NS_LOG_DEBUG ("length after: " << flowData.size ());
+         measData.flowsTimeData.at (i).initTime = flowsTimeData.at (0).initTime;
+         measData.flowsTimeData.at (i).data = flowData;
+
+         m_measDataSet [measurement] = measData; //update
+        }
+
+       // Total
+       m_flowNames.push_back ("Total");
+       flowsTimeData = measData.flowsTimeData; //reload
+       TimeData total;
+       total.initTime = flowsTimeData.at (0).initTime; // the have the same length
+       total.data.resize (flowsTimeData.at (0).data.size (), 0);
+
+       for (uint16_t i = 0; i < flowsTimeData.size (); i++)
+        {
+         vector<double> flowData = flowsTimeData.at (i).data;
+         for (uint16_t j = 0; j < flowData.size (); j++)
+          {
+           NS_LOG_DEBUG ("flow / time: " << i << "/" << j);
+           total.data.at (j) += flowData.at (j);
+          }
+        }
+       measData.flowsTimeData.push_back (total);
+       m_measDataSet [measurement] = measData;
+      }
+      break;
+     case HISTOGRAM:
+      break;
+
+     default:
+      NS_LOG_ERROR ("  No correct plot type selected");
+      exit (-1);
+     }
+   }
+ }
 } // namespace ns3

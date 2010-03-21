@@ -109,7 +109,7 @@ namespace ns3 {
          *
          * The modifyed values are: ACKTimeout, CTSTimeout and SlotTime
          */
-        void WifiLongDistances (NetDeviceContainer device, double distance);
+        void Wifi4LongDistances (NetDeviceContainer device, double distance);
 
         /**
          * @brief Builds the network installing all the devices to all the nodes

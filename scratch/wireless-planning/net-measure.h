@@ -145,6 +145,12 @@ namespace ns3 {
          */
         void SetFlowNames(vector < string > flowNames);
 
+        /**
+         * @brief Data Post Proccessing
+         * Works over m_measDataSet
+         */
+        void DataPostProcess();
+
 
     private:
 
