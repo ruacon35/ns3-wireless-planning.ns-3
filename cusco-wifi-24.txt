@@ -5,15 +5,15 @@ Generated: 2010-02-23T12:13:46
 
 = Nodes
 
-Josjo 1	200	0,0	0,0
-Josjo 2	200	0,24000	0,24000
+Huiracochan	200	0,0	0,0
+Urcos	200	0,106000	0,106000
 
 = Nets
 
-== Josjo1-Josjo2
+== Urcos-Huiracochan
 
 Mode: wifi
 
 Node	Role	Distance to AP	Mode
-Josjo 1	AP	0	wifib-11mbs
-Josjo 2	STA	24000	wifib-11mbs
+Huiracochan	AP	0	wifib-11mbs
+Urcos	STA	106000	wifib-11mbs
