@@ -1,0 +1,19 @@
+= General information
+
+Netfile: CUSCO-NW.NET
+Generated: 2010-02-23T12:13:46
+
+= Nodes
+
+Huiracochan	200	0,0	0,0
+Urcos	200	0,106000	0,106000
+
+= Nets
+
+== Urcos-Huiracochan
+
+Mode: wifi
+
+Node	Role	Distance to AP	Mode
+Huiracochan	AP	0	wifib-11mbs
+Urcos	STA	106000	wifib-11mbs
