@@ -374,22 +374,22 @@ WifiMac::ConfigureDcf (Ptr<Dcf> dcf, uint32_t cwmin, uint32_t cwmax, enum Access
   case AC_VO:
     dcf->SetMinCw ((cwmin+1)/4-1);
     dcf->SetMaxCw ((cwmin+1)/2-1);
-    dcf->SetAifsn (2);
+    dcf->SetAifsn (2);// 2
     break;
   case AC_VI:
     dcf->SetMinCw ((cwmin+1)/2-1);
     dcf->SetMaxCw (cwmin);
-    dcf->SetAifsn (2);
+    dcf->SetAifsn (2);// 3
     break;
   case AC_BE:
     dcf->SetMinCw (cwmin);
     dcf->SetMaxCw (cwmax);
-    dcf->SetAifsn (3);
+    dcf->SetAifsn (3);// 4
     break;
   case AC_BK:
     dcf->SetMinCw (cwmin);
     dcf->SetMaxCw (cwmax);
-    dcf->SetAifsn (7);
+    dcf->SetAifsn (7);// 5
     break;
   case AC_BE_NQOS:
     dcf->SetMinCw (cwmin);

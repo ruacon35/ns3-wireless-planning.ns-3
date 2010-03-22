@@ -87,7 +87,23 @@ namespace ns3
   measData.plotData = plotData;
   m_measDataSet [measurement] = measData;
 
-  measurement = "Delay";
+  measurement = "DelayMean";
+  measData.plotType = TIMEDOMAIN;
+  plotData.title = "Mean Delay";
+  plotData.y = "Delay [ms]";
+  plotData.x = "Time [sec]";
+  measData.plotData = plotData;
+  m_measDataSet [measurement] = measData;
+
+  measurement = "LostPackets";
+  measData.plotType = TIMEDOMAIN;
+  plotData.title = "Lost Packets";
+  plotData.y = "Packets";
+  plotData.x = "Time [sec]";
+  measData.plotData = plotData;
+  m_measDataSet [measurement] = measData;
+
+  measurement = "DelayHist";
   measData.plotType = HISTOGRAM;
   plotData.title = "Delay Histogram";
   plotData.x = "Delay [ms]";
@@ -165,7 +181,7 @@ namespace ns3
           {
            plotDataSet.Add (hist.data.at (j), hist.freq.at (j));
           }
-         plotDataSet.Add (hist.data.back () + hist.width, 0); // decoration
+         //plotDataSet.Add (hist.data.back () + hist.width, 0); // decoration
          gnuplot.AddDataset (plotDataSet);
         }
        break;
@@ -265,7 +281,7 @@ namespace ns3
  NetMeasure::CalcThroughput (FlowMonitor::FlowStats news, FlowMonitor::FlowStats olds)
  {
   //Throughput at MAC level: Data + UDP header 8 bytes + IP header 20 bytes
-  double rate = ((((news.rxBytes - olds.rxBytes) * 8.0) / 1000000) / m_interval.GetSeconds ());
+  double rate = ((((news.rxBytes - olds.rxBytes) * 8.0) / 1e6) / m_interval.GetSeconds ());
   NS_LOG_DEBUG (" Throughput " << rate << " Mbps ");
 
   return rate;
@@ -274,8 +290,8 @@ namespace ns3
  double
  NetMeasure::CalcMeanDelay (FlowMonitor::FlowStats news)
  {
-  double meanDelay = news.delaySum.GetSeconds () / news.rxPackets;
-  NS_LOG_DEBUG (" mean delay " << meanDelay << " sec");
+  double meanDelay = (news.delaySum.GetSeconds () / news.rxPackets) * 1e3;// mse
+  NS_LOG_DEBUG (" mean delay " << meanDelay << "ms");
 
   return meanDelay;
  }
@@ -351,11 +367,11 @@ namespace ns3
          {
           data = CalcThroughput (newStats, oldStats);
          }
-        else if (measurement.compare ("delaySum") == 0)
+        else if (measurement.compare ("DelayMean") == 0)
          {
           data = CalcMeanDelay (newStats);
          }
-        else if (measurement.compare ("lostPackets") == 0)
+        else if (measurement.compare ("LostPackets") == 0)
          {
           data = newStats.lostPackets;
          }
@@ -370,7 +386,7 @@ namespace ns3
           {
            HistData histData;
            NS_LOG_INFO ("last iteration:  " << timeD);
-           if (measurement.compare ("Delay") == 0)
+           if (measurement.compare ("DelayHist") == 0)
             {
              histData = CalcDelayHist (newStats);
             }

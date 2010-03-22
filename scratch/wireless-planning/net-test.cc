@@ -126,7 +126,7 @@ namespace ns3
 
   std::ostringstream oss;
   oss << "/NodeList/" << clientNode->GetId () <<
-          "/ApplicationList/0/$ns3::OnOffApplication/Tx";
+          "/ApplicationList/" << clientNode->GetNApplications () << "/$ns3::OnOffApplication/Tx";
   if (appState != NULL)
    {
     Config::Connect (oss.str (), MakeCallback (&AppState::OnOffTxPacketCallback, appState));
