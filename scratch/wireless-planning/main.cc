@@ -50,13 +50,13 @@ int
 main (int argc, char *argv[])
 {
 
-Time eos = Seconds (4.5);// End Of Simulation in seconds, necessary to finish some methods.
+Time eos = Seconds (12);// End Of Simulation in seconds, necessary to finish some methods.
 //g_eos??
 
  /*
   * Network Creation
   */
- string netInfoFile = "cusco-ne-netinfo.txt";
+ string netInfoFile = "cusco-wifi-106.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -77,8 +77,8 @@ Time eos = Seconds (4.5);// End Of Simulation in seconds, necessary to finish so
   */
   NetTest netTest;
 
-  netTest.Echo ("Urcos", "Huiracochan", 1);
-  netTest.Echo ("Huiracochan", "Urcos", 1.5);
+//  netTest.Echo ("Urcos", "Huiracochan", 1);
+//  netTest.Echo ("Huiracochan", "Urcos", 1.5);
 
   /*
    * WiMAX part
@@ -88,22 +88,22 @@ Time eos = Seconds (4.5);// End Of Simulation in seconds, necessary to finish so
 //  netTest.EnablePcap("Kcauri", 1);
   //netTest.EnablePcap("Huiracochan", 1);
   
-  netTest.SetWimaxServiceFlow ("Urcos", "Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-  netTest.ApplicationSetup ("Urcos", "Ccatcca", 9 , 1.0, 3.0, "1024kbps", 256, NULL);
-//
-  netTest.SetWimaxServiceFlow ("Urcos", "Kcauri", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-  netTest.ApplicationSetup ("Urcos", "Kcauri", 9 , 2.0, 4.0, "4096kbps", 256, NULL);
+//  netTest.SetWimaxServiceFlow ("Urcos", "Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
+//  netTest.ApplicationSetup ("Urcos", "Ccatcca", 9 , 1.0, 3.0, "1024kbps", 256, NULL);
+////
+//  netTest.SetWimaxServiceFlow ("Urcos", "Kcauri", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
+//  netTest.ApplicationSetup ("Urcos", "Kcauri", 9 , 2.0, 4.0, "4096kbps", 256, NULL);
 
  // OnOff
  /// Short simulations
- /*AppState appState1 (AC_VO);
- netTest.ApplicationSetup ("Urcos", "Huiracochan", 4, 10, "2.75Mbps", 1490, &appState1);
- AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("Urcos", "Huiracochan", 6, 8, "2.75Mbps", 1490, &appState2);
+ AppState appState1 (AC_VO);
+ netTest.ApplicationSetup ("Urcos", "Huiracochan", 2, 10, "2.75Mbps", 1490, &appState1);
+ AppState appState2 (AC_VI);
+ netTest.ApplicationSetup ("Urcos", "Huiracochan", 3, 10, "2.75Mbps", 1490, &appState2);
  AppState appState3 (AC_VO);
  netTest.ApplicationSetup ("Huiracochan", "Urcos", 4, 10, "2.75Mbps", 1490, &appState3);
- AppState appState4 (AC_VO);
- netTest.ApplicationSetup ("Huiracochan", "Urcos", 6, 8, "2.75Mbps", 1490, &appState4);*/
+ AppState appState4 (AC_VI);
+ netTest.ApplicationSetup ("Huiracochan", "Urcos", 5, 10, "2.75Mbps", 1490, &appState4);
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...
