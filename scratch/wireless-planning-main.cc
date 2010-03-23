@@ -56,7 +56,7 @@ Time eos = Seconds (12);// End Of Simulation in seconds, necessary to finish som
  /*
   * Network Creation
   */
- string netInfoFile = "cusco-wifi-106.txt";
+ string netInfoFile = "cusco-wifi-24.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -96,14 +96,15 @@ Time eos = Seconds (12);// End Of Simulation in seconds, necessary to finish som
 
  // OnOff
  /// Short simulations
+  string rate = "2Mbps";
  AppState appState1 (AC_VO);
- netTest.ApplicationSetup ("Urcos", "Huiracochan", 2, 10, "2.75Mbps", 1490, &appState1);
+ netTest.ApplicationSetup ("Urcos", "Huiracochan", 1, 10, rate, 1452, &appState1);
  AppState appState2 (AC_VI);
- netTest.ApplicationSetup ("Urcos", "Huiracochan", 3, 10, "2.75Mbps", 1490, &appState2);
+ netTest.ApplicationSetup ("Urcos", "Huiracochan", 2, 10, rate, 1452, &appState2);
  AppState appState3 (AC_VO);
- netTest.ApplicationSetup ("Huiracochan", "Urcos", 4, 10, "2.75Mbps", 1490, &appState3);
- AppState appState4 (AC_VI);
- netTest.ApplicationSetup ("Huiracochan", "Urcos", 5, 10, "2.75Mbps", 1490, &appState4);
+ netTest.ApplicationSetup ("Huiracochan", "Urcos", 3, 10, rate, 1452, &appState3);
+ AppState appState4 (AC_BE);
+ netTest.ApplicationSetup ("Huiracochan", "Urcos", 4, 10, rate, 1452, &appState4);
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...

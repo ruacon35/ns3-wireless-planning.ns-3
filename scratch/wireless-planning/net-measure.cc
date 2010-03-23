@@ -439,33 +439,53 @@ namespace ns3
 
          m_measDataSet [measurement] = measData; //update
         }
-
-       // Total
-       m_flowNames.push_back ("Total");
        flowsTimeData = measData.flowsTimeData; //reload
-       TimeData total;
-       total.initTime = flowsTimeData.at (0).initTime; // the have the same length
-       total.data.resize (flowsTimeData.at (0).data.size (), 0);
 
-
-       m_flowNames.push_back ("Mean");
-       TimeData mean;
-       mean.initTime = flowsTimeData.at (0).initTime; // the have the same length
-       mean.data.resize (flowsTimeData.at (0).data.size (), 0);
-
-       for (uint16_t i = 0; i < flowsTimeData.size (); i++)
+       if (measurement.compare ("Throughput") == 0)
         {
-         vector<double> flowData = flowsTimeData.at (i).data;
-         for (uint16_t j = 0; j < flowData.size (); j++)
+         m_flowNames.push_back ("Total");
+         TimeData total;
+         total.initTime = flowsTimeData.at (0).initTime; // the have the same length
+         total.data.resize (flowsTimeData.at (0).data.size (), 0);
+
+         // Processing
+         // flows
+         for (uint16_t i = 0; i < flowsTimeData.size (); i++)
           {
-           NS_LOG_DEBUG ("flow / time: " << i << "/" << j);
-           total.data.at (j) += flowData.at (j);
-           mean.data.at (j) = total.data.at (j) / flowData.size ();
+           vector<double> flowData = flowsTimeData.at (i).data;
+           // data in time
+           for (uint16_t j = 0; j < flowData.size (); j++)
+            {
+             NS_LOG_DEBUG ("total: flow / time: " << i << "/" << j);
+             total.data.at (j) += flowData.at (j);
+            }
           }
+         measData.flowsTimeData.push_back (total);
         }
-       measData.flowsTimeData.push_back (mean);
-       measData.flowsTimeData.push_back (total);
-       m_measDataSet [measurement] = measData;
+       else if (measurement.compare ("DelayMean") == 0)
+        {
+         m_flowNames.push_back ("Mean");
+         TimeData mean;
+         mean.initTime = flowsTimeData.at (0).initTime; // the have the same length
+         mean.data.resize (flowsTimeData.at (0).data.size (), 0);
+
+         // Processing
+         // flows
+         for (uint16_t i = 0; i < flowsTimeData.size (); i++)
+          {
+           // data in time
+           vector<double> flowData = flowsTimeData.at (i).data;
+           for (uint16_t j = 0; j < flowData.size (); j++)
+            {
+             NS_LOG_DEBUG ("mean: flow / time: " << i << "/" << j);
+             mean.data.at (j) += (flowData.at (j) / flowData.size ());
+            }
+          }
+
+         measData.flowsTimeData.push_back (mean);
+        }
+
+       m_measDataSet [measurement] = measData; // update + restore
       }
       break;
      case HISTOGRAM:
