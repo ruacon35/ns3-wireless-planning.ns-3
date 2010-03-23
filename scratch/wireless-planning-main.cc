@@ -26,12 +26,12 @@
 #include "ns3/common-module.h" 
 #include "ns3/contrib-module.h"
 
-#include "net-test.h"
-#include "create-network.h"
-#include "network-config.h" 
-#include "print.h"
-#include "netinfo-reader.h"
-#include "report-2-config-data.h"
+#include "wireless-planning/net-test.h"
+#include "wireless-planning/create-network.h"
+#include "wireless-planning/network-config.h" 
+#include "wireless-planning/print.h"
+#include "wireless-planning/netinfo-reader.h"
+#include "wireless-planning/report-2-config-data.h"
 
 #include <map>
 #include <string>
