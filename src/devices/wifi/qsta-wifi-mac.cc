@@ -794,6 +794,7 @@ QstaWifiMac::SetQueue (enum AccessClass ac)
   edca->SetTxMiddle (m_txMiddle);
   edca->SetAccessClass (ac);
   edca->CompleteConfig ();
+  edca->SetMaxQueueSize (30);// Patxi HARDCODED
   m_queues.insert (std::make_pair(ac, edca));
 }
 void

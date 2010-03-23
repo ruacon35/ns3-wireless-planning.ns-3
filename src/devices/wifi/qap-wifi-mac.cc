@@ -804,6 +804,7 @@ QapWifiMac::SetQueue (enum AccessClass ac)
   edca->SetTxFailedCallback (MakeCallback (&QapWifiMac::TxFailed, this));
   edca->SetAccessClass (ac);
   edca->CompleteConfig ();
+  edca->SetMaxQueueSize (30);// Patxi HARDCODED
   m_queues.insert (std::make_pair(ac, edca));
 }
 

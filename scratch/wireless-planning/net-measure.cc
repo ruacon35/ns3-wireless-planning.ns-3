@@ -181,7 +181,7 @@ namespace ns3
           {
            plotDataSet.Add (hist.data.at (j), hist.freq.at (j));
           }
-         //plotDataSet.Add (hist.data.back () + hist.width, 0); // decoration
+         // plotDataSet.Add (hist.data.back () + hist.width, 0); // decoration
          gnuplot.AddDataset (plotDataSet);
         }
        break;
@@ -290,7 +290,7 @@ namespace ns3
  double
  NetMeasure::CalcMeanDelay (FlowMonitor::FlowStats news)
  {
-  double meanDelay = (news.delaySum.GetSeconds () / news.rxPackets) * 1e3;// mse
+  double meanDelay = (news.delaySum.GetSeconds () / news.rxPackets) * 1e3; // mse
   NS_LOG_DEBUG (" mean delay " << meanDelay << "ms");
 
   return meanDelay;
@@ -447,6 +447,12 @@ namespace ns3
        total.initTime = flowsTimeData.at (0).initTime; // the have the same length
        total.data.resize (flowsTimeData.at (0).data.size (), 0);
 
+
+       m_flowNames.push_back ("Mean");
+       TimeData mean;
+       mean.initTime = flowsTimeData.at (0).initTime; // the have the same length
+       mean.data.resize (flowsTimeData.at (0).data.size (), 0);
+
        for (uint16_t i = 0; i < flowsTimeData.size (); i++)
         {
          vector<double> flowData = flowsTimeData.at (i).data;
@@ -454,8 +460,10 @@ namespace ns3
           {
            NS_LOG_DEBUG ("flow / time: " << i << "/" << j);
            total.data.at (j) += flowData.at (j);
+           mean.data.at (j) = total.data.at (j) / flowData.size ();
           }
         }
+       measData.flowsTimeData.push_back (mean);
        measData.flowsTimeData.push_back (total);
        m_measDataSet [measurement] = measData;
       }
