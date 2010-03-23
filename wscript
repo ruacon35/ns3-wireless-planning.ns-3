@@ -518,28 +518,31 @@ def add_examples_programs(bld):
 
 def add_scratch_programs(bld):
     all_modules = [mod[len("ns3-"):] for mod in bld.env['NS3_MODULES']]
+    directories = [d for d in os.listdir("scratch") if 
+        os.path.isdir(os.path.join("scratch", d)) and not d.startswith('.')]
     for filename in os.listdir("scratch"):
         if filename.startswith('.') or filename == 'CVS':
-	    continue
+	        continue
         if os.path.isdir(os.path.join("scratch", filename)):
-            # Allow projects in scratch/name. Use main*.cc for simulation code. 
-            for filename2 in os.listdir(os.path.join("scratch", filename)):
-                if not filename2.startswith("main") or not filename2.endswith(".cc"):
-                    continue
-                name = os.path.join("scratch", filename, filename2[:-len(".cc")])
-                obj = bld.create_ns3_program(name, all_modules)
-                obj.path = obj.path.find_dir('scratch').find_dir(filename)
-                obj.find_sources_in_dirs('.')
-                obj.target = os.path.basename(name)
-                obj.name = obj.target
+            import glob
+            if not glob.glob(os.path.join("scratch", filename, "main*.cc")):
+                continue
+            obj = bld.create_ns3_program(filename, all_modules)
+            obj.path = obj.path.find_dir('scratch').find_dir(filename)
+            obj.find_sources_in_dirs('.')
+            obj.target = filename
+            obj.name = obj.target
         elif filename.endswith(".cc"):
             name = filename[:-len(".cc")]
             obj = bld.create_ns3_program(name, all_modules)
             obj.path = obj.path.find_dir('scratch')
             obj.source = filename
+            for d in directories:
+                if name.startswith(d):
+                    obj.find_sources_in_dirs(d)
+                    break            
             obj.target = name
             obj.name = obj.target
-
 
 def build(bld):
     wutils.bld = bld
