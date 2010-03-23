@@ -87,6 +87,7 @@ namespace ns3 {
   NetinfoReader::Read (string filepath)
   {
     ifstream file (filepath.c_str());
+    NS_ASSERT_MSG(file.is_open(), "Netinfo file not found: " << filepath);
     NetDataStruct::NetData netData;
     vector<string> netinfo_lines, lines;
     string line;    
