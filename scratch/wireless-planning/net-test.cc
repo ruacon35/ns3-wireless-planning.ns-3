@@ -188,13 +188,14 @@ namespace ns3
   nApp = clientNode->GetNApplications ();
   NS_LOG_DEBUG ("nApp of client node " << clientNode->GetId () << " : " << "nApp " << nApp);
 
-  SetWimaxServiceFlow (client, server, 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-  SetWimaxServiceFlow (server, client, 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
+  SetWimaxServiceFlow (client, 1, client, server, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_UP);
+  SetWimaxServiceFlow (server, 1, client, server, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
  }
 
  void
- NetTest::SetWimaxServiceFlow (std::string sourceNodeName, std::string destNodeName,
-                               uint8_t device_index, ServiceFlow::SchedulingType schedulinType,
+ NetTest::SetWimaxServiceFlow (std::string nodeName, uint8_t deviceIndex,
+                               std::string sourceNodeName, std::string destNodeName,
+                               ServiceFlow::SchedulingType schedulinType,
                                uint8_t protocol, ServiceFlow::Direction direction)
  {
   WimaxHelper wimax;
@@ -213,10 +214,10 @@ namespace ns3
    }
 
   Ipv4Address destIpv4Address = Util::GetIpAddrFromName (destNodeName);
-  Ptr<Node> destNode = Names::Find<Node > (destNodeName);
-  Ptr<NetDevice> destNetDevice = destNode->GetDevice (device_index);
+  Ptr<Node> node = Names::Find<Node > (nodeName);
+  Ptr<NetDevice>netDevice = node->GetDevice (deviceIndex);
   Ptr<SubscriberStationNetDevice> SSDevice;
-  SSDevice = destNetDevice->GetObject<SubscriberStationNetDevice > ();
+  SSDevice = netDevice->GetObject<SubscriberStationNetDevice > ();
   //NS_ASSERT_MSG(SSDevice, "destination node must be a Subscriber Station");
 
   if (SSDevice != NULL)
