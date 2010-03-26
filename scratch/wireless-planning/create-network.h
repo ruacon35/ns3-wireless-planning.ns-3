@@ -127,7 +127,7 @@ namespace ns3 {
          * @param node
          */
         NetDeviceContainer WifiDeviceInstallation(NetworkConfig::DeviceData deviceData, Ptr<Node> node);
-        NetDeviceContainer WimaxDeviceInstallation(NetworkConfig::DeviceData deviceData, Ptr<Node> node);
+        NetDeviceContainer WimaxDeviceInstallation(NetworkConfig::DeviceData deviceData, Ptr<Node> node, NetworkConfig::NodeData nodeData);
 
         NodeContainer m_nodes;// substitude with NodeContainer::GetGlobal()??
         NetworkConfig::NodeData m_nodeData;
