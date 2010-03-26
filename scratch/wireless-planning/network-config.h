@@ -90,6 +90,7 @@ namespace ns3 {
         typedef struct {
             uint16_t id; ///< channel number
             WimaxHelper wimax;
+            Ptr<SimpleOfdmWimaxChannel> channel;
         } WimaxChannelData;
         typedef vector<WimaxChannelData> VectorWimaxChannelData;
 

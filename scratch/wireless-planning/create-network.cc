@@ -29,6 +29,7 @@
 #include "ns3/ipv4.h"
 #include "ns3/ipv4-address-helper.h"
 #include "ns3/mobility-helper.h"
+#include "ns3/constant-position-mobility-model.h"
 #include "ns3/names.h"
 #include "ns3/net-device.h"
 #include "ns3/wifi-net-device.h"
@@ -252,7 +253,7 @@ namespace ns3 {
           case NetworkConfig::WIMAX :
           {
             NS_LOG_DEBUG ("wimax");
-            device = WimaxDeviceInstallation (deviceData, m_nodes.Get (i));
+            device = WimaxDeviceInstallation (deviceData, m_nodes.Get (i), nodeData);
             break;
           }
           default:
@@ -317,23 +318,35 @@ namespace ns3 {
   }
 
   NetDeviceContainer
-  CreateNetwork::WimaxDeviceInstallation (NetworkConfig::DeviceData deviceData, Ptr<Node> node)
+  CreateNetwork::WimaxDeviceInstallation (NetworkConfig::DeviceData deviceData, Ptr<Node> node,
+    NetworkConfig::NodeData nodeData)
   {
     NS_LOG_DEBUG ("Ch ID: " << deviceData.chId << " Wimax device type: " << deviceData.wimaxDeviceType);
 
     uint16_t index = deviceData.chId - 1;
 
     WimaxHelper wimax = m_vWimaxChData.at (index).wimax;
+    
     Ipv4AddressHelper address;
     address = m_vectorWimaxAddresser.at (index);
     NetDeviceContainer device;
 
     WimaxHelper::SchedulerType scheduler = WimaxHelper::SCHED_TYPE_RTPS;
+    NodeContainer nodeContainer;
+    nodeContainer.Add(node);
     
-    device = wimax.Install (node,
+    device = wimax.Install (nodeContainer,
                             deviceData.wimaxDeviceType,
                             WimaxHelper::SIMPLE_PHY_TYPE_OFDM,
+                            m_vWimaxChData.at (index).channel,
                             scheduler);
+
+    Ptr<WimaxNetDevice> wdevice = device.Get(0)->GetObject<WimaxNetDevice>();
+    Ptr<WimaxPhy> phy = wdevice->GetPhy();                      
+    Ptr<ConstantPositionMobilityModel> mobilityPosition;
+    mobilityPosition = CreateObject<ConstantPositionMobilityModel> ();
+    mobilityPosition->SetPosition (nodeData.position);
+    phy->SetMobility (mobilityPosition);
 
     if (deviceData.wimaxDeviceType == WimaxHelper::DEVICE_TYPE_SUBSCRIBER_STATION)
       {
@@ -437,6 +450,13 @@ namespace ns3 {
 
     NS_LOG_INFO ("Create channels.");
     SetWifiPhy ();
+
+    /* Create wimax channels */    
+    for (uint32_t i = 0; i < m_vWimaxChData.size (); i++)
+    {
+      m_vWimaxChData[i].channel = \
+        CreateObject<SimpleOfdmWimaxChannel>(SimpleOfdmWimaxChannel::FRIIS_PROPAGATION);
+    }        
 
     SetIpAddresser ();
 
