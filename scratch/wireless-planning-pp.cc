@@ -50,20 +50,13 @@ int
 main (int argc, char *argv[])
 {
 
-Time eos = Seconds (12);// End Of Simulation in seconds, necessary to finish some methods.
+Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish some methods.
 //g_eos??
 
-double dou = 3;
-int inte = 0;
-
-inte = dou;
-
-NS_LOG_DEBUG ("inte/dou " << inte << "/" << dou );
-
- /*
+/*
   * Network Creation
   */
- string netInfoFile = "cusco-wifi-24.txt";
+ string netInfoFile = "PP-wifib.txt";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -83,41 +76,22 @@ NS_LOG_DEBUG ("inte/dou " << inte << "/" << dou );
   * Applications
   */
   NetTest netTest;
-
-//  netTest.Echo ("Urcos", "Huiracochan", 1);
-//  netTest.Echo ("Huiracochan", "Urcos", 1.5);
-
-  /*
-   * WiMAX part
-   */
-//  netTest.EnablePcap("Josjojauarina 2", 1);
-//  netTest.EnablePcap("Josjojauarina 2", 2);
-//  netTest.EnablePcap("Kcauri", 1);
-  //netTest.EnablePcap("Huiracochan", 1);
-  
-//  netTest.SetWimaxServiceFlow ("Urcos", "Ccatcca", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-//  netTest.ApplicationSetup ("Urcos", "Ccatcca", 9 , 1.0, 3.0, "1024kbps", 256, NULL);
-////
-//  netTest.SetWimaxServiceFlow ("Urcos", "Kcauri", 1, ServiceFlow::SF_TYPE_RTPS, 17, ServiceFlow::SF_DIRECTION_DOWN);
-//  netTest.ApplicationSetup ("Urcos", "Kcauri", 9 , 2.0, 4.0, "4096kbps", 256, NULL);
-
- // OnOff
- /// Short simulations
-  string rate = "6Mbps";
+// Point to Point scenario
+ string rate = "11Mbps";
  AppState appState1 (AC_VO);
- netTest.ApplicationSetup ("Urcos", "Huiracochan", 1, 10, rate, 1452, &appState1);
-// AppState appState2 (AC_VI);
-// netTest.ApplicationSetup ("Urcos", "Huiracochan", 2, 10, rate, 1452, &appState2);
-// AppState appState3 (AC_VO);
-// netTest.ApplicationSetup ("Huiracochan", "Urcos", 3, 10, rate, 1452, &appState3);
+ netTest.ApplicationSetup ("B", "A", 1, 10, rate, 1452, &appState1);
+// AppState appState2 (AC_VO);
+// netTest.ApplicationSetup ("A", "B", 2, 10, rate, 1452, &appState2);
+// AppState appState3 (AC_VI);
+// netTest.ApplicationSetup ("A", "B", 3, 10, rate, 1452, &appState3);
 // AppState appState4 (AC_BE);
-// netTest.ApplicationSetup ("Huiracochan", "Urcos", 4, 10, rate, 1452, &appState4);
+// netTest.ApplicationSetup ("B", "A", 4, 10, rate, 1452, &appState4);
 
  vector < string > flowNames;
- flowNames.push_back ("Urcos-Huiracochan VO 1-10 " + rate);
- flowNames.push_back ("Urcos-Huiracochan VI 2-10 " + rate);
- flowNames.push_back ("Huiracochan-Urcos VO 3-10 " + rate);
- flowNames.push_back ("Huiracochan-Urcos BE 4-10 " + rate);
+ flowNames.push_back ("A-B VO " + rate);
+// flowNames.push_back ("B-A VO " + rate);
+// flowNames.push_back ("A-B VI " + rate);
+// flowNames.push_back ("B-A BE " + rate);
 
  /*
   * Setup all the plot system: throughput measurement, gnuplot issues...
