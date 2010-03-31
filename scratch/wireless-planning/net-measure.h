@@ -62,6 +62,7 @@ namespace ns3 {
             string title;
             string x;
             string y;
+            string extraData;//Mean or Total
         } PlotData;
 
         typedef struct {
