@@ -315,6 +315,44 @@ NetDeviceContainer WimaxHelper::Install (NodeContainer c,
   return devices;
 }
 
+NetDeviceContainer WimaxHelper::Install (NodeContainer c,
+                                         NetDeviceType deviceType,
+                                         Ptr<WimaxPhy> phy,
+                                         Ptr<WimaxChannel> channel,
+                                         SchedulerType schedulerType)
+{
+  NetDeviceContainer devices;
+  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
+    {
+      Ptr<Node> node = *i;
+
+      Ptr<WimaxNetDevice> device;
+      Ptr<UplinkScheduler> uplinkScheduler = CreateUplinkScheduler (schedulerType);
+      Ptr<BSScheduler> bsScheduler = CreateBSScheduler (schedulerType);
+
+      if (deviceType == DEVICE_TYPE_BASE_STATION)
+        {
+          Ptr<BaseStationNetDevice> deviceBS;
+          deviceBS = CreateObject<BaseStationNetDevice> (node, phy, uplinkScheduler, bsScheduler);
+          device = deviceBS;
+          uplinkScheduler->SetBs (deviceBS);
+          bsScheduler->SetBs (deviceBS);
+        }
+      else
+        {
+          device = CreateObject<SubscriberStationNetDevice> (node, phy);
+        }
+      device->SetAddress (Mac48Address::Allocate ());
+      phy->SetDevice (device);
+      device->Start ();
+      device->Attach (channel);
+
+      node->AddDevice (device);
+      devices.Add (device);
+    }
+  return devices;
+}
+
 Ptr<WimaxNetDevice> WimaxHelper::Install (Ptr<Node> node,
                                           NetDeviceType deviceType,
                                           PhyType phyType,

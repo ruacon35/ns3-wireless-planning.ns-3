@@ -157,6 +157,25 @@ public:
                               PhyType phyType,
                               Ptr<WimaxChannel> channel,
                               SchedulerType schedulerType);
+
+  /**
+   * \param c A set of nodes.
+   * \param deviceType Device type to create.
+   * \param phy Wimax PHY to attach to the channel
+   * \param channel A channel to use.
+   * \param schedulerType The scheduling mechanism.
+   *
+   * For each of the input nodes, a new WiMAX net device (either
+   * ns3::SubscriberStationNetDevice or ns3::BaseStationNetDevice
+   * depending on the type parameter) is attached to the shared input channel.
+   */
+  NetDeviceContainer Install (NodeContainer c,
+                              NetDeviceType deviceType,
+                              Ptr<WimaxPhy> phy,
+                              Ptr<WimaxChannel> channel,
+                              SchedulerType schedulerType);
+
+                              
   /**
    * \param c A set of nodes.
    * \param deviceType Device type to create.
@@ -173,6 +192,7 @@ public:
                               PhyType phyType,
                               SchedulerType schedulerType,
                               double frameDuration);
+
 
   /**
    * \param phyType WiMAX Physical layer type
