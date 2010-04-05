@@ -334,15 +334,17 @@ namespace ns3 {
     WimaxHelper::SchedulerType scheduler = WimaxHelper::SCHED_TYPE_RTPS;
     NodeContainer nodeContainer;
     nodeContainer.Add(node);
+
+    Ptr<SimpleOfdmWimaxPhy> phy = CreateObject<SimpleOfdmWimaxPhy>();
+    phy->SetBandwidth((int)10e6); // BW = 10MHz
     
     device = wimax.Install (nodeContainer,
                             deviceData.wimaxDeviceType,
-                            WimaxHelper::SIMPLE_PHY_TYPE_OFDM,
+                            phy,
                             m_vWimaxChData.at (index).channel,
                             scheduler);
 
     Ptr<WimaxNetDevice> wdevice = device.Get(0)->GetObject<WimaxNetDevice>();
-    Ptr<WimaxPhy> phy = wdevice->GetPhy();                      
     Ptr<ConstantPositionMobilityModel> mobilityPosition;
     mobilityPosition = CreateObject<ConstantPositionMobilityModel> ();
     mobilityPosition->SetPosition (nodeData.position);
@@ -454,8 +456,9 @@ namespace ns3 {
     /* Create wimax channels */    
     for (uint32_t i = 0; i < m_vWimaxChData.size (); i++)
     {
-      m_vWimaxChData[i].channel = \
-        CreateObject<SimpleOfdmWimaxChannel>(SimpleOfdmWimaxChannel::FRIIS_PROPAGATION);
+      Ptr<SimpleOfdmWimaxChannel> channel;
+      channel = CreateObject<SimpleOfdmWimaxChannel>(SimpleOfdmWimaxChannel::FRIIS_PROPAGATION);
+      m_vWimaxChData[i].channel = channel;
     }        
 
     SetIpAddresser ();
