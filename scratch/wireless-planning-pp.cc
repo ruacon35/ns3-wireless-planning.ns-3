@@ -77,11 +77,11 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   */
   NetTest netTest;
 // Point to Point scenario
- string rate = "11Mbps";
+ string rate = "4Mbps";
  AppState appState1 (AC_VO);
- netTest.ApplicationSetup ("B", "A", 1, 10, rate, 1452, &appState1);
-// AppState appState2 (AC_VO);
-// netTest.ApplicationSetup ("A", "B", 2, 10, rate, 1452, &appState2);
+ netTest.ApplicationSetup ("A", "B", 1, 10, rate, 1452, &appState1);
+ AppState appState2 (AC_VO);
+ netTest.ApplicationSetup ("A", "B", 1, 10, rate, 1452, &appState2);
 // AppState appState3 (AC_VI);
 // netTest.ApplicationSetup ("A", "B", 3, 10, rate, 1452, &appState3);
 // AppState appState4 (AC_BE);
@@ -89,7 +89,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
 
  vector < string > flowNames;
  flowNames.push_back ("A-B VO " + rate);
-// flowNames.push_back ("B-A VO " + rate);
+ flowNames.push_back ("A-B VO " + rate);
 // flowNames.push_back ("A-B VI " + rate);
 // flowNames.push_back ("B-A BE " + rate);
 
