@@ -6,7 +6,7 @@ Generated: 2010-02-23T12:13:46
 = Nodes
 
 A	200	0,0	0,0
-B	200	0,000	0,000
+B	200	0,20000	0,20000
 
 = Nets
 
@@ -15,5 +15,5 @@ B	200	0,000	0,000
 Mode: wifi
 
 Node	Role	Distance to AP	Mode
-A	AP	0	wifia-6mbs
-B	STA	000	wifia-6mbs
+A	AP	0	wifib-11mbs
+B	STA	20000	wifib-11mbs

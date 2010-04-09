@@ -56,7 +56,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
 /*
   * Network Creation
   */
- string netInfoFile = "wifi-PtP.txt";
+ string netInfoFile = "wifi-PtP.ni";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);

@@ -214,7 +214,7 @@ namespace ns3 {
   void
   NetMeasure::EndFlowMonitor ()
   {
-    m_flowMon->SerializeToXmlFile ("FlowMonitor2.xml", true, true);
+    m_flowMon->SerializeToXmlFile ("FlowMonitor.xml", true, true);
   }
 
   void
@@ -298,7 +298,7 @@ namespace ns3 {
   NetMeasure::CalcThroughput (FlowMonitor::FlowStats news, FlowMonitor::FlowStats olds)
   {
     //Throughput at MAC level: Data + UDP header 8 bytes + IP header 20 bytes
-    double rate = ((((news.rxBytes - olds.rxBytes) * 8.0) / 1e6) / m_interval.GetSeconds ());
+    double rate = ((((news.rxBytes - olds.rxBytes) * 8.0) / 1024 / 1024) / m_interval.GetSeconds ());
     NS_LOG_DEBUG (" Throughput " << rate << " Mbps ");
 
     return rate;
