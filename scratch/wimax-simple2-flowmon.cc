@@ -46,6 +46,7 @@
 #include "ns3/global-route-manager.h"
 #include "ns3/ipcs-classifier-record.h"
 #include "ns3/service-flow.h"
+#include "ns3/flow-monitor-module.h"
 NS_LOG_COMPONENT_DEFINE ("wimax-ptp");
 
 using namespace ns3;
@@ -126,6 +127,12 @@ int main (int argc, char *argv[])
     {
       wimax.EnableLogComponents ();  // Turn on all wimax logging
     }
+    
+  // FlowMonitor example based on examples/wireless/wifi-hidden-terminal.cc 
+  // 8. Install FlowMonitor on all nodes
+  FlowMonitorHelper flowmon;
+  Ptr<FlowMonitor> monitor = flowmon.InstallAll(); 
+    
   /*------------------------------*/
   // Create the OnOff application
   NS_LOG_INFO ("Create Source");
@@ -170,6 +177,21 @@ int main (int argc, char *argv[])
 
   NS_LOG_INFO ("Starting simulation.....");
   Simulator::Run ();
+ 
+  // 10. Print per flow statistics
+  monitor->CheckForLostPackets ();
+  Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier> (flowmon.GetClassifier ());
+  std::map<FlowId, FlowMonitor::FlowStats> stats = monitor->GetFlowStats ();
+  for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator i = stats.begin (); i != stats.end (); ++i)
+    {
+      Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow (i->first);
+      std::cout << "Flow " << i->first << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n";
+      std::cout << "  Tx Bytes:   " << i->second.txBytes << "\n";
+      std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
+      std::cout << "  Throughput: " << i->second.rxBytes * 8.0 / 10.0 / 1024 / 1024  << " Mbps\n";
+    }
+
+  monitor->SerializeToXmlFile ("wimax-ptp-flowmon.xml", true, true);
 
   ss[0] = 0;
   bs = 0;
@@ -179,3 +201,7 @@ int main (int argc, char *argv[])
 
   return 0;
 }
+
+
+    
+        

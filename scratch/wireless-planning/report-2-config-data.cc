@@ -167,7 +167,7 @@ namespace ns3 {
   NetworkConfig::CommunicationStandard
   Report2ConfigData::ReadStandard (string communicationStandard)
   {
-    enum NetworkConfig::CommunicationStandard retval;
+    enum NetworkConfig::CommunicationStandard retval = NetworkConfig::WIFI;
     if (communicationStandard.compare ("wifi") == 0)
     {
       retval = NetworkConfig::WIFI;
@@ -209,7 +209,7 @@ namespace ns3 {
   WimaxHelper::NetDeviceType
   Report2ConfigData::Role2WimaxDeviceType (string role)
   {
-    WimaxHelper::NetDeviceType deviceType;
+    WimaxHelper::NetDeviceType deviceType = WimaxHelper::DEVICE_TYPE_SUBSCRIBER_STATION;
     vector<string> roles;
 
     roles.push_back ("SS"); //0
