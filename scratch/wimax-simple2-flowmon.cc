@@ -56,6 +56,7 @@ int main (int argc, char *argv[])
   bool verbose = false;
 
   double duration = 1.25;
+  double clientStart = 1;
   int schedType = 0;
   WimaxHelper::SchedulerType scheduler = WimaxHelper::SCHED_TYPE_SIMPLE;
 
@@ -145,7 +146,7 @@ int main (int argc, char *argv[])
 
   ApplicationContainer clientApps = onoff.Install (bsNodes.Get (0));
   
-  clientApps.Start (Seconds (1));
+  clientApps.Start (Seconds (clientStart));
   clientApps.Stop (Seconds (duration));
 
   NS_LOG_INFO ("Create Sink.");
@@ -188,7 +189,7 @@ int main (int argc, char *argv[])
       std::cout << "Flow " << i->first << " (" << t.sourceAddress << " -> " << t.destinationAddress << ")\n";
       std::cout << "  Tx Bytes:   " << i->second.txBytes << "\n";
       std::cout << "  Rx Bytes:   " << i->second.rxBytes << "\n";
-      std::cout << "  Throughput: " << i->second.rxBytes * 8.0 / 10.0 / 1024 / 1024  << " Mbps\n";
+      std::cout << "  Throughput: " << i->second.rxBytes * 8.0 / (duration - clientStart) / 1024 / 1024  << " Mbps\n";
     }
 
   monitor->SerializeToXmlFile ("wimax-ptp-flowmon.xml", true, true);
