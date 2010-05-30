@@ -79,7 +79,7 @@ PeerManagementProtocolMac::Receive (Ptr<Packet> const_packet, const WifiMacHeade
           m_protocol->ReceiveBeacon (m_ifIndex, header.GetAddr2 (), MicroSeconds (
               beacon_hdr.GetBeaconIntervalUs ()), beaconTiming);
         }
-      // Beacon shall not be dropeed. May be needed to another plugins
+      // Beacon shall not be dropped. May be needed to another plugins
       return true;
     }
   if (header.IsAction ())
@@ -264,7 +264,7 @@ PeerManagementProtocolMac::GetAddress () const
     }
   else
     {
-      return Mac48Address::Mac48Address ();
+      return Mac48Address ();
     }
 }
 void
@@ -310,7 +310,7 @@ PeerManagementProtocolMac::Report (std::ostream & os) const
 void
 PeerManagementProtocolMac::ResetStats ()
 {
-  m_stats = Statistics::Statistics ();
+  m_stats = Statistics ();
 }
 uint32_t
 PeerManagementProtocolMac::GetLinkMetric (Mac48Address peerAddress)

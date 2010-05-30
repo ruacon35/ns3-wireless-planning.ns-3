@@ -28,8 +28,11 @@ import Configure
 import Scripting
 
 sys.path.insert(0, os.path.abspath('waf-tools'))
+try:
+    import cflags # override the build profiles from waf
+finally:
+    sys.path.pop(0)
 
-import cflags # override the build profiles from waf
 cflags.profiles = {
 	# profile name: [optimization_level, warnings_level, debug_level]
 	'debug':     [0, 2, 3],
@@ -248,12 +251,12 @@ def configure(conf):
     conf.env['NS3_BUILDDIR'] = conf.blddir
     conf.check_tool('compiler_cc')
     conf.check_tool('compiler_cxx')
-    conf.check_tool('cflags')
+    conf.check_tool('cflags', ['waf-tools'])
     try:
-        conf.check_tool('pkgconfig')
+        conf.check_tool('pkgconfig', ['waf-tools'])
     except Configure.ConfigurationError:
         pass
-    conf.check_tool('command')
+    conf.check_tool('command', ['waf-tools'])
 
     # Check for the location of regression reference traces
     if Options.options.regression_traces is not None:
@@ -512,21 +515,18 @@ def add_examples_programs(bld):
     env = bld.env_of_name('default')
     if env['ENABLE_EXAMPLES']:
         for dir in os.listdir('examples'):
+            if dir.startswith('.') or dir == 'CVS':
+                continue
             if os.path.isdir(os.path.join('examples', dir)):
                 bld.add_subdirs(os.path.join('examples', dir))
 
 
 def add_scratch_programs(bld):
     all_modules = [mod[len("ns3-"):] for mod in bld.env['NS3_MODULES']]
-    directories = [d for d in os.listdir("scratch") if 
-        os.path.isdir(os.path.join("scratch", d)) and not d.startswith('.')]
     for filename in os.listdir("scratch"):
         if filename.startswith('.') or filename == 'CVS':
-	        continue
+	    continue
         if os.path.isdir(os.path.join("scratch", filename)):
-            import glob
-            if not glob.glob(os.path.join("scratch", filename, "main*.cc")):
-                continue
             obj = bld.create_ns3_program(filename, all_modules)
             obj.path = obj.path.find_dir('scratch').find_dir(filename)
             obj.find_sources_in_dirs('.')
@@ -537,12 +537,9 @@ def add_scratch_programs(bld):
             obj = bld.create_ns3_program(name, all_modules)
             obj.path = obj.path.find_dir('scratch')
             obj.source = filename
-            for d in directories:
-                if name.startswith(d):
-                    obj.find_sources_in_dirs(d)
-                    break            
             obj.target = name
             obj.name = obj.target
+
 
 def build(bld):
     wutils.bld = bld
@@ -790,6 +787,13 @@ def _doxygen(bld):
         return
 
     prog = program_obj.path.find_or_declare(ccroot.get_target_name(program_obj)).abspath(env)
+
+    if not os.path.exists(prog):
+        Logs.error("print-introspected-doxygen has not been built yet."
+                   " You need to build ns-3 at least once before "
+                   "generating doxygen docs...")
+        raise SystemExit(1)
+
     out = open(os.path.join('doc', 'introspected-doxygen.h'), 'w')
 
     if subprocess.Popen([prog], stdout=out, env=proc_env).wait():

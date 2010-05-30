@@ -439,14 +439,20 @@ void
 QapWifiMac::Enqueue (Ptr<const Packet> packet, Mac48Address to, Mac48Address from)
 {
   NS_LOG_FUNCTION (this << packet << from << to);
-  ForwardDown (packet, from, to);
+  if (to.IsBroadcast () || m_stationManager->IsAssociated (to))
+    {
+      ForwardDown (packet, from, to);
+    }
 }
 
 void 
 QapWifiMac::Enqueue (Ptr<const Packet> packet, Mac48Address to)
 {
   NS_LOG_FUNCTION (this << packet << to);
-  ForwardDown (packet, m_low->GetAddress (), to);
+  if (to.IsBroadcast () || m_stationManager->IsAssociated (to))
+    {
+      ForwardDown (packet, m_low->GetAddress (), to);
+    }
 }
 
 bool 
@@ -804,7 +810,6 @@ QapWifiMac::SetQueue (enum AccessClass ac)
   edca->SetTxFailedCallback (MakeCallback (&QapWifiMac::TxFailed, this));
   edca->SetAccessClass (ac);
   edca->CompleteConfig ();
-  edca->SetMaxQueueSize (30);// Patxi HARDCODED
   m_queues.insert (std::make_pair(ac, edca));
 }
 

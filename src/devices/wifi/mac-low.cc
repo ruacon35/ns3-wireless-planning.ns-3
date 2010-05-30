@@ -913,7 +913,7 @@ Time
 MacLow::GetAckDuration (Mac48Address to, WifiMode dataTxMode) const
 {
   WifiMode ackMode = GetAckTxModeForData (to, dataTxMode);
-  return m_phy->CalculateTxDuration (GetAckSize (), ackMode, WIFI_PREAMBLE_SHORT);
+  return m_phy->CalculateTxDuration (GetAckSize (), ackMode, WIFI_PREAMBLE_LONG);
 }
 Time
 MacLow::GetBlockAckDuration (Mac48Address to, WifiMode blockAckReqTxMode, enum BlockAckType type) const
@@ -926,13 +926,13 @@ MacLow::GetBlockAckDuration (Mac48Address to, WifiMode blockAckReqTxMode, enum B
    * The BlockAck control frame shall be sent at the same rate and modulation class as
    * the BlockAckReq frame if it is sent in response to a BlockAckReq frame.
    */
-  return m_phy->CalculateTxDuration (GetBlockAckSize (type), blockAckReqTxMode, WIFI_PREAMBLE_SHORT);
+  return m_phy->CalculateTxDuration (GetBlockAckSize (type), blockAckReqTxMode, WIFI_PREAMBLE_LONG);
 }
 Time
 MacLow::GetCtsDuration (Mac48Address to, WifiMode rtsTxMode) const
 {
   WifiMode ctsMode = GetCtsTxModeForRts (to, rtsTxMode);
-  return m_phy->CalculateTxDuration (GetCtsSize (), ctsMode, WIFI_PREAMBLE_SHORT);
+  return m_phy->CalculateTxDuration (GetCtsSize (), ctsMode, WIFI_PREAMBLE_LONG);
 }
 uint32_t 
 MacLow::GetCtsSize (void) const
@@ -985,12 +985,12 @@ MacLow::CalculateOverallTxTime (Ptr<const Packet> packet,
   WifiMode dataMode = GetDataTxMode (packet, hdr);
   if (params.MustSendRts ()) 
     {
-      txTime += m_phy->CalculateTxDuration (GetRtsSize (), rtsMode, WIFI_PREAMBLE_SHORT);
+      txTime += m_phy->CalculateTxDuration (GetRtsSize (), rtsMode, WIFI_PREAMBLE_LONG);
       txTime += GetCtsDuration (hdr->GetAddr1 (), rtsMode);
       txTime += GetSifs () * Scalar (2);
     }
   uint32_t dataSize = GetSize (packet, hdr);
-  txTime += m_phy->CalculateTxDuration (dataSize, dataMode, WIFI_PREAMBLE_SHORT);
+  txTime += m_phy->CalculateTxDuration (dataSize, dataMode, WIFI_PREAMBLE_LONG);
   if (params.MustWaitAck ())
     {
       txTime += GetSifs ();
@@ -1009,7 +1009,7 @@ MacLow::CalculateTransmissionTime (Ptr<const Packet> packet,
     {
       WifiMode dataMode = GetDataTxMode (packet, hdr);
       txTime += GetSifs ();
-      txTime += m_phy->CalculateTxDuration (params.GetNextPacketSize (), dataMode, WIFI_PREAMBLE_SHORT);
+      txTime += m_phy->CalculateTxDuration (params.GetNextPacketSize (), dataMode, WIFI_PREAMBLE_LONG);
     }
   return txTime;
 }
@@ -1135,7 +1135,7 @@ MacLow::ForwardDown (Ptr<const Packet> packet, const WifiMacHeader* hdr,
             ", mode=" << txMode <<
             ", duration=" << hdr->GetDuration () <<
             ", seq=0x"<< std::hex << m_currentHdr.GetSequenceControl () << std::dec);
-  m_phy->SendPacket (packet, txMode, WIFI_PREAMBLE_SHORT, 0);
+  m_phy->SendPacket (packet, txMode, WIFI_PREAMBLE_LONG, 0);
 }
 
 void
@@ -1238,13 +1238,13 @@ MacLow::SendRtsForPacket (void)
       duration += GetCtsDuration (m_currentHdr.GetAddr1 (), rtsTxMode);
       duration += GetSifs ();
       duration += m_phy->CalculateTxDuration (GetSize (m_currentPacket, &m_currentHdr), 
-                                              dataTxMode, WIFI_PREAMBLE_SHORT);
+                                              dataTxMode, WIFI_PREAMBLE_LONG);
       duration += GetSifs ();
       duration += GetAckDuration (m_currentHdr.GetAddr1 (), dataTxMode);
     }
   rts.SetDuration (duration);
 
-  Time txDuration = m_phy->CalculateTxDuration (GetRtsSize (), rtsTxMode, WIFI_PREAMBLE_SHORT);
+  Time txDuration = m_phy->CalculateTxDuration (GetRtsSize (), rtsTxMode, WIFI_PREAMBLE_LONG);
   Time timerDelay = txDuration + GetCtsTimeout ();
 
   NS_ASSERT (m_ctsTimeoutEvent.IsExpired ());
@@ -1263,7 +1263,7 @@ void
 MacLow::StartDataTxTimers (void)
 {
   WifiMode dataTxMode = GetDataTxMode (m_currentPacket, &m_currentHdr);
-  Time txDuration = m_phy->CalculateTxDuration (GetSize (m_currentPacket, &m_currentHdr), dataTxMode, WIFI_PREAMBLE_SHORT);
+  Time txDuration = m_phy->CalculateTxDuration (GetSize (m_currentPacket, &m_currentHdr), dataTxMode, WIFI_PREAMBLE_LONG);
   if (m_txParams.MustWaitNormalAck ()) 
     {
       Time timerDelay = txDuration + GetAckTimeout ();
@@ -1345,7 +1345,7 @@ MacLow::SendDataPacket (void)
         {
           duration += GetSifs ();
           duration += m_phy->CalculateTxDuration (m_txParams.GetNextPacketSize (), 
-                                                  dataTxMode, WIFI_PREAMBLE_SHORT);
+                                                  dataTxMode, WIFI_PREAMBLE_LONG);
           if (m_txParams.MustWaitAck ()) 
             {
               duration += GetSifs ();
@@ -1423,7 +1423,7 @@ MacLow::SendDataAfterCts (Mac48Address source, Time duration, WifiMode txMode)
   newDuration += GetSifs ();
   newDuration += GetAckDuration (m_currentHdr.GetAddr1 (), dataTxMode);
   Time txDuration = m_phy->CalculateTxDuration (GetSize (m_currentPacket, &m_currentHdr), 
-                                                dataTxMode, WIFI_PREAMBLE_SHORT);
+                                                dataTxMode, WIFI_PREAMBLE_LONG);
   duration -= txDuration;
   duration -= GetSifs ();
 

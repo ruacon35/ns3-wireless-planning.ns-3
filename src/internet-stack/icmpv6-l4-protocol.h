@@ -202,6 +202,10 @@ public:
 
   /**
    * \brief Do the Duplication Address Detection (DAD).
+   * It consists in sending a NS with our IPv6 as target. If 
+   * we received a NA with matched target address, we could not use 
+   * the address, else the address pass from TENTATIVE to PERMANENT.
+   *
    * \param target target address
    * \param interface interface
    */
@@ -229,7 +233,7 @@ public:
   /**
    * \brief Send a Neighbor Solicitation.
    * \param src source IPv6 address
-   * \param dst destination IPv6 addresss
+   * \param dst destination IPv6 address
    * \param target target IPv6 address
    * \param hardwareAddress our mac address
    */
@@ -281,7 +285,7 @@ public:
   /**
    * \brief Forge a Neighbor Solicitation.
    * \param src source IPv6 address
-   * \param dst destination IPv6 addresss
+   * \param dst destination IPv6 address
    * \param target target IPv6 address
    * \param hardwareAddress our mac address
    * \return NS packet (with IPv6 header)
@@ -291,7 +295,7 @@ public:
   /**
    * \brief Forge a Neighbor Advertisement.
    * \param src source IPv6 address
-   * \param dst destination IPv6 addresss
+   * \param dst destination IPv6 address
    * \param hardwareAddress our mac address
    * \param flags flags (bitfield => R (4), S (2), O (1))
    * \return NA packet (with IPv6 header)
@@ -301,7 +305,7 @@ public:
   /**
    * \brief Forge a Router Solicitation.
    * \param src source IPv6 address
-   * \param dst destination IPv6 addresss
+   * \param dst destination IPv6 address
    * \param hardwareAddress our mac address
    * \return RS packet (with IPv6 header)
    */
@@ -326,16 +330,6 @@ public:
    * \param interface the interface from which the packet is coming
    */
   virtual enum Ipv6L4Protocol::RxStatus_e Receive (Ptr<Packet> p, Ipv6Address const &src, Ipv6Address const &dst, Ptr<Ipv6Interface> interface);
-
-  /**
-   * \brief Do the Duplication Address Detection.
-   * It consists in sending a NS with our IPv6 as target. If 
-   * we received a NA with matched target address, we could not use the address, 
-   * else the address pass from TENTATIVE to PERMANENT.
-   * \param addr IPv6 address to test
-   * \param interface interface
-   */
-  void DoDad (Ipv6Address addr, Ptr<Ipv6Interface> interface);
 
   /**
    * \brief Function called when DAD timeout.

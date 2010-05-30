@@ -175,11 +175,6 @@ WifiMac::GetTypeId (void)
                    TimeValue (GetDefaultMaxPropagationDelay ()),
                    MakeTimeAccessor (&WifiMac::m_maxPropagationDelay),
                    MakeTimeChecker ())
-    .AddAttribute ("MaxMsduSize", "The maximum size of an MSDU accepted by the MAC layer."
-                   "This value conforms to the specification.",
-		   UintegerValue (2304),
-		   MakeUintegerAccessor (&WifiMac::m_maxMsduSize),
-		   MakeUintegerChecker<uint16_t> (1,2304))
     .AddAttribute ("Ssid", "The ssid we want to belong to.",
 		   SsidValue (Ssid ("default")),
 		   MakeSsidAccessor (&WifiMac::GetSsid,
@@ -230,12 +225,6 @@ Time
 WifiMac::GetMaxPropagationDelay (void) const
 {
   return m_maxPropagationDelay;
-}
-
-uint32_t 
-WifiMac::GetMaxMsduSize (void) const
-{
-  return m_maxMsduSize;
 }
 
 void 
@@ -374,22 +363,22 @@ WifiMac::ConfigureDcf (Ptr<Dcf> dcf, uint32_t cwmin, uint32_t cwmax, enum Access
   case AC_VO:
     dcf->SetMinCw ((cwmin+1)/4-1);
     dcf->SetMaxCw ((cwmin+1)/2-1);
-    dcf->SetAifsn (2);// 2 // Patxi HARDCODED
+    dcf->SetAifsn (2);
     break;
   case AC_VI:
     dcf->SetMinCw ((cwmin+1)/2-1);
     dcf->SetMaxCw (cwmin);
-    dcf->SetAifsn (3);// 2
+    dcf->SetAifsn (2);
     break;
   case AC_BE:
     dcf->SetMinCw (cwmin);
     dcf->SetMaxCw (cwmax);
-    dcf->SetAifsn (4);// 3
+    dcf->SetAifsn (3);
     break;
   case AC_BK:
     dcf->SetMinCw (cwmin);
     dcf->SetMaxCw (cwmax);
-    dcf->SetAifsn (5);// 7
+    dcf->SetAifsn (7);
     break;
   case AC_BE_NQOS:
     dcf->SetMinCw (cwmin);

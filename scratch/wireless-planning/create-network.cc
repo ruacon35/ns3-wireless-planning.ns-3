@@ -335,8 +335,8 @@ namespace ns3 {
     NodeContainer nodeContainer;
     nodeContainer.Add(node);
 
-    Ptr<SimpleOfdmWimaxPhy> phy = CreateObject<SimpleOfdmWimaxPhy>();
-    phy->SetBandwidth((int)10e6); // BW = 10MHz
+    WimaxHelper::PhyType phy = WimaxHelper::SIMPLE_PHY_TYPE_OFDM;
+    //phy->SetBandwidth((int)10e6); // BW = 10MHz
     
     device = wimax.Install (nodeContainer,
                             deviceData.wimaxDeviceType,
@@ -344,12 +344,16 @@ namespace ns3 {
                             m_vWimaxChData.at (index).channel,
                             scheduler);
 
-    Ptr<WimaxNetDevice> wdevice = device.Get(0)->GetObject<WimaxNetDevice>();
+    Ptr<WimaxNetDevice> wdevice = device.Get(0)->GetObject<WimaxNetDevice>(); // Is it necessary?
+    
+    
+    // THERE IS A FIXED BUG ABOUT MOBILITY: LOOK IT UP.
+/*
     Ptr<ConstantPositionMobilityModel> mobilityPosition;
     mobilityPosition = CreateObject<ConstantPositionMobilityModel> ();
     mobilityPosition->SetPosition (nodeData.position);
     phy->SetMobility (mobilityPosition);
-
+*/
     if (deviceData.wimaxDeviceType == WimaxHelper::DEVICE_TYPE_SUBSCRIBER_STATION)
       {
         Ptr<NetDevice> device2 = device.Get(0);

@@ -31,6 +31,7 @@
 #include "ns3/deprecated.h"
 #include "ns3/service-flow.h"
 #include "ns3/propagation-loss-model.h"
+#include "ns3/simple-ofdm-wimax-channel.h"
 #include "ns3/bs-uplink-scheduler.h"
 #include "ns3/bs-uplink-scheduler-mbqos.h"
 #include "ns3/bs-uplink-scheduler-simple.h"
@@ -46,9 +47,15 @@ class WimaxChannel;
 class WimaxPhy;
 class UplinkScheduler;
 
+
 /**
- * \brief build a set of WimaxNetDevice objects
+ * \brief helps to manage and create WimaxNetDevice objects
+ *
+ * This class can help to create a large set of similar
+ * WimaxNetDevice objects and to configure their attributes
+ * during creation.
  */
+
 class WimaxHelper :public PcapHelperForDevice, public AsciiTraceHelperForDevice
 {
 public:
@@ -84,7 +91,9 @@ public:
     /**< An migration-based uplink scheduler */
 
   };
-
+  /**
+   * \brief Create a Wimax helper in an empty state.
+   */
   WimaxHelper (void);
   ~WimaxHelper (void);
   /**
@@ -94,7 +103,7 @@ public:
    *  \param deviceid the id of the net device for which you want to enable tracing.
    *  \param netdevice the type of net device for which you want to enable tracing (SubscriberStationNetDevice,
    *   BaseStationNetDevice or WimaxNetDevice)
-   *  \param connection the conection for which you want to enable tracing (InitialRangingConnection,
+   *  \param connection the connection for which you want to enable tracing (InitialRangingConnection,
    *   BroadcastConnection, BasicConnection, PrimaryConnection).
    */
   static void EnableAsciiForConnection (Ptr<OutputStreamWrapper> oss,
@@ -133,7 +142,7 @@ public:
    * \param c a set of nodes
    * \param type device type to create
    * \param phyType a phy to use
-   * \param schedulerType a scheduling mechanism
+   * \param schedulerType the type of the scheduling algorithm to install
    *
    * For each of the input nodes, a new WiMAX net device (either
    * ns3::SubscriberStationNetDevice or ns3::BaseStationNetDevice
@@ -157,25 +166,6 @@ public:
                               PhyType phyType,
                               Ptr<WimaxChannel> channel,
                               SchedulerType schedulerType);
-
-  /**
-   * \param c A set of nodes.
-   * \param deviceType Device type to create.
-   * \param phy Wimax PHY to attach to the channel
-   * \param channel A channel to use.
-   * \param schedulerType The scheduling mechanism.
-   *
-   * For each of the input nodes, a new WiMAX net device (either
-   * ns3::SubscriberStationNetDevice or ns3::BaseStationNetDevice
-   * depending on the type parameter) is attached to the shared input channel.
-   */
-  NetDeviceContainer Install (NodeContainer c,
-                              NetDeviceType deviceType,
-                              Ptr<WimaxPhy> phy,
-                              Ptr<WimaxChannel> channel,
-                              SchedulerType schedulerType);
-
-                              
   /**
    * \param c A set of nodes.
    * \param deviceType Device type to create.
@@ -193,6 +183,12 @@ public:
                               SchedulerType schedulerType,
                               double frameDuration);
 
+  /**
+   * \brief Set the propagation and loss model of the channel. By default the channel
+   *  uses a COST231 propagation and loss model.
+   * \param propagationModel The propagation and loss model to set
+   */
+  void SetPropagationLossModel (SimpleOfdmWimaxChannel::PropModel propagationModel);
 
   /**
    * \param phyType WiMAX Physical layer type
@@ -208,14 +204,14 @@ public:
    * \param activateLoss set to 1 to activate losses 0 otherwise
    * \return WiMAX Phy object
    *
-   * Creates a physical layer without a channel
+   * Creates a physical layer without creating a channel
    */
   Ptr<WimaxPhy> CreatePhyWithoutChannel (PhyType phyType, char * SNRTraceFilePath, bool activateLoss);
 
   /**
    * \param phyType WiMAX Physical layer type
-   * \param SNRTraceFilePath of the repository containing the SNR traces files
-   * \param activateLoss set to 1 to activate losses 0 otherwise
+   * \param SNRTraceFilePath the path to the repository containing the SNR traces files
+   * \param activateLoss set to 1 if you want ton activate losses 0 otherwise
    * \return WiMAX Phy object
    *
    * Creates a physical layer
@@ -226,7 +222,7 @@ public:
    * \param deviceType Device type to create.
    * \param phyType PHY type to create.
    * \param channel A channel to use.
-   * \param schedulerType The scheduling mechanism.
+   * \param schedulerType The scheduling mechanism to install on the device.
    *
    * For each of the input nodes, a new WiMAX net device (either
    * ns3::SubscriberStationNetDevice or ns3::BaseStationNetDevice
@@ -240,7 +236,7 @@ public:
 
   /**
    * \brief Creates a transport service flow.
-   * \param direction the Direction of the service flow: UP or DOWN.
+   * \param direction the direction of the service flow: UP or DOWN.
    * \param schedulinType The service scheduling type to be used: UGS, RTPS, NRTPS, BE
    * \param classifier The classifier to be used for this service flow
    *

@@ -45,8 +45,6 @@
 
 NS_LOG_COMPONENT_DEFINE ("TcpSocketImpl");
 
-using namespace std;
-
 namespace ns3 {
 
 NS_OBJECT_ENSURE_REGISTERED (TcpSocketImpl);
@@ -676,10 +674,6 @@ TcpSocketImpl::ForwardUp (Ptr<Packet> packet, Ipv4Address saddr, Ipv4Address dad
   Address fromAddress = InetSocketAddress (saddr, port);
   Address toAddress = InetSocketAddress (daddr, m_endPoint->GetLocalPort());
 
-  if (m_shutdownRecv)
-    {
-      return;
-    }
   TcpHeader tcpHeader;
   packet->RemoveHeader (tcpHeader);
 
@@ -700,6 +694,19 @@ TcpSocketImpl::ForwardUp (Ptr<Packet> packet, Ipv4Address saddr, Ipv4Address dad
   m_rxWindowSize = tcpHeader.GetWindowSize (); //update the flow control window
 
   Events_t event = SimulationSingleton<TcpStateMachine>::Get ()->FlagsEvent (tcpHeader.GetFlags () );
+  // Given an ACK_RX event and FIN_WAIT_1, CLOSING, or LAST_ACK state, 
+  // we have to check the sequence numbers to determine if the 
+  // ACK is for the FIN
+  if ((m_state == FIN_WAIT_1 || m_state == CLOSING 
+                             || m_state == LAST_ACK) && event == ACK_RX)
+    {
+      if (tcpHeader.GetSequenceNumber () == m_nextRxSequence)
+        {
+          // This ACK is for the fin, change event to 
+          // recognize this
+          event = FIN_ACKED;
+        }
+    }
   Actions_t action = ProcessEvent (event); //updates the state
   NS_LOG_DEBUG("Socket " << this << 
                " processing pkt action, " << action <<
@@ -737,7 +744,10 @@ Actions_t TcpSocketImpl::ProcessEvent (Events_t e)
   if (saveState < CLOSING && (m_state == CLOSING || m_state == TIMED_WAIT) )
     {
       NS_LOG_LOGIC ("TcpSocketImpl peer closing, send EOF to application");
-      NotifyDataRecv ();
+      if (!m_shutdownRecv)
+        {
+          NotifyDataRecv ();
+        }
     }
 
   if (needCloseNotify && !m_closeNotified)
@@ -1298,7 +1308,10 @@ void TcpSocketImpl::NewRx (Ptr<Packet> p,
       m_rxAvailable += p->GetSize ();
       RxBufFinishInsert (tcpHeader.GetSequenceNumber ());
       m_rxBufSize += p->GetSize ();
-      NotifyDataRecv ();
+      if (!m_shutdownRecv)
+        {
+          NotifyDataRecv ();
+        }
       if (m_closeNotified)
         {
           NS_LOG_LOGIC ("Tcp " << this << " HuH?  Got data after closeNotif");
@@ -1394,7 +1407,10 @@ void TcpSocketImpl::NewRx (Ptr<Packet> p,
       m_rxAvailable += p->GetSize ();
       m_rxBufSize += p->GetSize();
       RxBufFinishInsert(start);
-      NotifyDataRecv ();
+      if (!m_shutdownRecv)
+        {
+          NotifyDataRecv ();
+        }
     }
   else
     { // debug
@@ -1490,7 +1506,7 @@ void TcpSocketImpl::CommonNewAck (SequenceNumber ack, bool skipTimer)
     }
   NS_LOG_LOGIC ("TCP " << this << " NewAck " << ack 
            << " numberAck " << (ack - m_highestRxAck)); // Number bytes ack'ed
-  m_highestRxAck = ack;         // Note the highest recieved Ack
+  m_highestRxAck = ack;         // Note the highest received Ack
   if (GetTxAvailable () > 0)
     {
       NotifySend (GetTxAvailable ());
@@ -1512,6 +1528,11 @@ void TcpSocketImpl::CommonNewAck (SequenceNumber ack, bool skipTimer)
                     << (Simulator::Now () + 
                         Simulator::GetDelayLeft (m_retxEvent)).GetSeconds());
           m_retxEvent.Cancel ();
+        }
+      else if (m_pendingData->SizeFromSeq (m_firstPendingSequence, m_highestRxAck) > 0)
+        {
+          // Remove from front, if possible
+          m_firstPendingSequence += m_pendingData->RemoveToSeq (m_firstPendingSequence, m_highestRxAck);
         }
     }
   // Try to send more data
@@ -1640,7 +1661,7 @@ void TcpSocketImpl::PersistTimeout ()
 void TcpSocketImpl::Retransmit ()
 {
   NS_LOG_FUNCTION (this);
-  uint8_t flags = TcpHeader::NONE;
+  uint8_t flags = TcpHeader::ACK;
   if (m_state == SYN_SENT) 
     {
       if (m_cnCount > 0) 
