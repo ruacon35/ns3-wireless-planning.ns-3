@@ -662,7 +662,7 @@ UplinkSchedulerMBQoS::CheckDeadline (uint32_t &availableSymbols)
         {
           Ptr<UlJob> job = *iter;
 
-          // garantee delay bound for rtps connections
+          // guarantee delay bound for rtps connections
           if (job->GetSchedulingType () == ServiceFlow::SF_TYPE_RTPS)
             {
               Time deadline = job->GetDeadline ();
@@ -782,9 +782,9 @@ UplinkSchedulerMBQoS::CheckMinimumBandwidth (uint32_t &availableSymbols)
             }
           else
             {
-              u_int32_t allocationSize = serviceFlow->GetRecord ()->GetRequestedBandwidth ()
+              uint32_t allocationSize = serviceFlow->GetRecord ()->GetRequestedBandwidth ()
                 - serviceFlow->GetRecord ()->GetGrantedBandwidth ();
-              u_int32_t sduSize = serviceFlow->GetSduSize ();
+              uint32_t sduSize = serviceFlow->GetSduSize ();
 
               if (allocationSize > 0)
                 {

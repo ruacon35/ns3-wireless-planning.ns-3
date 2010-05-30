@@ -178,16 +178,28 @@ Ipv4RawSocketImpl::SendTo (Ptr<Packet> p, uint32_t flags,
       SocketErrno errno_ = ERROR_NOTERROR;//do not use errno as it is the standard C last error number 
       Ptr<Ipv4Route> route;
       Ptr<NetDevice> oif = m_boundnetdevice; //specify non-zero if bound to a source address
+      if (!oif && m_src != Ipv4Address::GetAny ())
+        {
+          int32_t index = ipv4->GetInterfaceForAddress (m_src);
+          NS_ASSERT (index >= 0);
+          oif = ipv4->GetNetDevice (index);
+          NS_LOG_LOGIC ("Set index " << oif << "from source " << m_src);
+        }
+
       // TBD-- we could cache the route and just check its validity
       route = ipv4->GetRoutingProtocol ()->RouteOutput (p, header, oif, errno_);
       if (route != 0)
         {
           NS_LOG_LOGIC ("Route exists");
           ipv4->Send (p, route->GetSource (), dst, m_protocol, route);
+          NotifyDataSent (p->GetSize ());
+          NotifySend (GetTxAvailable ());
+          return p->GetSize();
         }
       else
         {
           NS_LOG_DEBUG ("dropped because no outgoing route.");
+          return -1;
         }
     }
   return 0;
@@ -221,6 +233,8 @@ Ipv4RawSocketImpl::RecvFrom (uint32_t maxSize, uint32_t flags,
     }
   struct Data data = m_recv.front ();
   m_recv.pop_front ();
+  InetSocketAddress inet = InetSocketAddress (data.fromIp, data.fromProtocol);
+  fromAddress = inet;
   if (data.packet->GetSize () > maxSize)
     {
       Ptr<Packet> first = data.packet->CreateFragment (0, maxSize);
@@ -228,8 +242,6 @@ Ipv4RawSocketImpl::RecvFrom (uint32_t maxSize, uint32_t flags,
       m_recv.push_front (data);
       return first;
     }
-  InetSocketAddress inet = InetSocketAddress (data.fromIp, data.fromProtocol);
-  fromAddress = inet;
   return data.packet;
 }
 

@@ -75,6 +75,7 @@ def build(bld):
         'tcp-test.cc',
         'udp-test.cc',
         'ipv4-test.cc',
+        'ipv4-raw-test.cc',
         'ipv4-l4-protocol.cc',
         'udp-header.cc',
         'tcp-header.cc',
@@ -142,6 +143,7 @@ def build(bld):
         'arp-cache.h',
         'icmpv6-l4-protocol.h',
         'ipv6-l4-protocol.h',
+        'ipv6-interface.h',
         'ndisc-cache.h',
 	'loopback-net-device.h'
        ]

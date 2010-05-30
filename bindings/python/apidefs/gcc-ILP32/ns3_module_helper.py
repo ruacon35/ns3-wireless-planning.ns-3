@@ -373,10 +373,10 @@ def register_Ns3AsciiTraceHelper_methods(root_module, cls):
     cls.add_constructor([param('ns3::AsciiTraceHelper const &', 'arg0')])
     ## trace-helper.h: ns3::AsciiTraceHelper::AsciiTraceHelper() [constructor]
     cls.add_constructor([])
-    ## trace-helper.h: ns3::Ptr<ns3::OutputStreamWrapper> ns3::AsciiTraceHelper::CreateFileStream(std::string filename, std::string filemode="w") [member function]
+    ## trace-helper.h: ns3::Ptr<ns3::OutputStreamWrapper> ns3::AsciiTraceHelper::CreateFileStream(std::string filename, std::_Ios_Openmode filemode=std::ios_base::out) [member function]
     cls.add_method('CreateFileStream', 
                    'ns3::Ptr< ns3::OutputStreamWrapper >', 
-                   [param('std::string', 'filename'), param('std::string', 'filemode', default_value='"w"')])
+                   [param('std::string', 'filename'), param('std::_Ios_Openmode', 'filemode', default_value='std::ios_base::out')])
     ## trace-helper.h: static void ns3::AsciiTraceHelper::DefaultDequeueSinkWithContext(ns3::Ptr<ns3::OutputStreamWrapper> file, std::string context, ns3::Ptr<ns3::Packet const> p) [member function]
     cls.add_method('DefaultDequeueSinkWithContext', 
                    'void', 
@@ -1356,10 +1356,10 @@ def register_Ns3PcapHelper_methods(root_module, cls):
     cls.add_constructor([param('ns3::PcapHelper const &', 'arg0')])
     ## trace-helper.h: ns3::PcapHelper::PcapHelper() [constructor]
     cls.add_constructor([])
-    ## trace-helper.h: ns3::Ptr<ns3::PcapFileWrapper> ns3::PcapHelper::CreateFile(std::string filename, std::string filemode, uint32_t dataLinkType, uint32_t snapLen=65535, int32_t tzCorrection=0) [member function]
+    ## trace-helper.h: ns3::Ptr<ns3::PcapFileWrapper> ns3::PcapHelper::CreateFile(std::string filename, std::_Ios_Openmode filemode, uint32_t dataLinkType, uint32_t snapLen=65535, int32_t tzCorrection=0) [member function]
     cls.add_method('CreateFile', 
                    'ns3::Ptr< ns3::PcapFileWrapper >', 
-                   [param('std::string', 'filename'), param('std::string', 'filemode'), param('uint32_t', 'dataLinkType'), param('uint32_t', 'snapLen', default_value='65535'), param('int32_t', 'tzCorrection', default_value='0')])
+                   [param('std::string', 'filename'), param('std::_Ios_Openmode', 'filemode'), param('uint32_t', 'dataLinkType'), param('uint32_t', 'snapLen', default_value='65535'), param('int32_t', 'tzCorrection', default_value='0')])
     ## trace-helper.h: std::string ns3::PcapHelper::GetFilenameFromDevice(std::string prefix, ns3::Ptr<ns3::NetDevice> device, bool useObjectNames=true) [member function]
     cls.add_method('GetFilenameFromDevice', 
                    'std::string', 
@@ -2008,6 +2008,10 @@ def register_Ns3WimaxHelper_methods(root_module, cls):
     cls.add_method('Install', 
                    'ns3::Ptr< ns3::WimaxNetDevice >', 
                    [param('ns3::Ptr< ns3::Node >', 'node'), param('ns3::WimaxHelper::NetDeviceType', 'deviceType'), param('ns3::WimaxHelper::PhyType', 'phyType'), param('ns3::Ptr< ns3::WimaxChannel >', 'channel'), param('ns3::WimaxHelper::SchedulerType', 'schedulerType')])
+    ## wimax-helper.h: void ns3::WimaxHelper::SetPropagationLossModel(ns3::SimpleOfdmWimaxChannel::PropModel propagationModel) [member function]
+    cls.add_method('SetPropagationLossModel', 
+                   'void', 
+                   [param('ns3::SimpleOfdmWimaxChannel::PropModel', 'propagationModel')])
     ## wimax-helper.h: void ns3::WimaxHelper::EnableAsciiInternal(ns3::Ptr<ns3::OutputStreamWrapper> stream, std::string prefix, ns3::Ptr<ns3::NetDevice> nd, bool explicitFilename) [member function]
     cls.add_method('EnableAsciiInternal', 
                    'void', 

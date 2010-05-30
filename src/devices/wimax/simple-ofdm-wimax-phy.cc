@@ -311,12 +311,7 @@ SimpleOfdmWimaxPhy::EndSendFecBlock (WimaxPhy::ModulationType modulationType,
     }
   else
     {
-      Simulator::Schedule (Seconds (0),
-                           &SimpleOfdmWimaxPhy::StartSendFecBlock,
-                           this,
-                           false,
-                           modulationType,
-                           direction);
+      StartSendFecBlock(false,modulationType,direction);
     }
 }
 
@@ -338,7 +333,7 @@ SimpleOfdmWimaxPhy::StartReceive (const bvec &fecBlock,
 
   UniformVariable URNG;
   uint8_t drop = 0;
-  double Nwb = -114 + m_noiseFigure + 10 * log (GetBandwidth () / 1000000000) / 2.303;
+  double Nwb = -114 + m_noiseFigure + 10 * log (GetBandwidth () / 1000000000.0) / 2.303;
   double SNR = rxPower - Nwb;
 
   SNRToBlockErrorRateRecord * record = m_snrToBlockErrorRateManager->GetSNRToBlockErrorRateRecord (SNR, modulationType);
@@ -392,7 +387,7 @@ SimpleOfdmWimaxPhy::StartReceive (const bvec &fecBlock,
               SetBlockParameters (burstSize, modulationType);
               m_blockTime = GetBlockTransmissionTime (modulationType);
             }
-          Simulator::Schedule (Seconds (0),
+          Simulator::Schedule (m_blockTime,
                                &SimpleOfdmWimaxPhy::EndReceiveFecBlock,
                                this,
                                fecBlock,

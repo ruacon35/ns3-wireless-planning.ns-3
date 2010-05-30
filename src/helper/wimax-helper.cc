@@ -80,7 +80,7 @@ Ptr<WimaxPhy> WimaxHelper::CreatePhy (PhyType phyType)
       phy = CreateObject<SimpleOfdmWimaxPhy> ();
       if (!m_channel)
         {
-          m_channel = CreateObject<SimpleOfdmWimaxChannel> ();
+          m_channel = CreateObject<SimpleOfdmWimaxChannel> (SimpleOfdmWimaxChannel::COST231_PROPAGATION);
         }
       break;
     default:
@@ -89,6 +89,15 @@ Ptr<WimaxPhy> WimaxHelper::CreatePhy (PhyType phyType)
     }
 
   return phy;
+}
+
+void WimaxHelper::SetPropagationLossModel (SimpleOfdmWimaxChannel::PropModel propagationModel)
+{
+  if (!m_channel)
+    {
+      m_channel = CreateObject<SimpleOfdmWimaxChannel> ();
+    }
+  m_channel->GetObject<SimpleOfdmWimaxChannel> ()->SetPropagationModel (propagationModel);
 }
 
 Ptr<WimaxPhy> WimaxHelper::CreatePhy (PhyType phyType, char * SNRTraceFilePath, bool activateLoss)
@@ -104,7 +113,7 @@ Ptr<WimaxPhy> WimaxHelper::CreatePhy (PhyType phyType, char * SNRTraceFilePath, 
       sphy->ActivateLoss (activateLoss);
       if (!m_channel)
         {
-          m_channel = CreateObject<SimpleOfdmWimaxChannel> ();
+          m_channel = CreateObject<SimpleOfdmWimaxChannel> (SimpleOfdmWimaxChannel::COST231_PROPAGATION);
         }
       break;
     default:
@@ -315,44 +324,6 @@ NetDeviceContainer WimaxHelper::Install (NodeContainer c,
   return devices;
 }
 
-NetDeviceContainer WimaxHelper::Install (NodeContainer c,
-                                         NetDeviceType deviceType,
-                                         Ptr<WimaxPhy> phy,
-                                         Ptr<WimaxChannel> channel,
-                                         SchedulerType schedulerType)
-{
-  NetDeviceContainer devices;
-  for (NodeContainer::Iterator i = c.Begin (); i != c.End (); i++)
-    {
-      Ptr<Node> node = *i;
-
-      Ptr<WimaxNetDevice> device;
-      Ptr<UplinkScheduler> uplinkScheduler = CreateUplinkScheduler (schedulerType);
-      Ptr<BSScheduler> bsScheduler = CreateBSScheduler (schedulerType);
-
-      if (deviceType == DEVICE_TYPE_BASE_STATION)
-        {
-          Ptr<BaseStationNetDevice> deviceBS;
-          deviceBS = CreateObject<BaseStationNetDevice> (node, phy, uplinkScheduler, bsScheduler);
-          device = deviceBS;
-          uplinkScheduler->SetBs (deviceBS);
-          bsScheduler->SetBs (deviceBS);
-        }
-      else
-        {
-          device = CreateObject<SubscriberStationNetDevice> (node, phy);
-        }
-      device->SetAddress (Mac48Address::Allocate ());
-      phy->SetDevice (device);
-      device->Start ();
-      device->Attach (channel);
-
-      node->AddDevice (device);
-      devices.Add (device);
-    }
-  return devices;
-}
-
 Ptr<WimaxNetDevice> WimaxHelper::Install (Ptr<Node> node,
                                           NetDeviceType deviceType,
                                           PhyType phyType,
@@ -518,7 +489,7 @@ WimaxHelper::EnableAsciiInternal (Ptr<OutputStreamWrapper> stream,
         {
           filename = asciiTraceHelper.GetFilenameFromDevice (prefix, device);
         }
-      Ptr<OutputStreamWrapper> theStream = asciiTraceHelper.CreateFileStream (filename, "w");
+      Ptr<OutputStreamWrapper> theStream = asciiTraceHelper.CreateFileStream (filename);
 
       uint32_t nodeid = nd->GetNode ()->GetId ();
       uint32_t deviceid = nd->GetIfIndex ();
@@ -624,7 +595,7 @@ WimaxHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, bool exp
       filename = pcapHelper.GetFilenameFromDevice (prefix, device);
     }
 
-  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, "w", PcapHelper::DLT_EN10MB);
+  Ptr<PcapFileWrapper> file = pcapHelper.CreateFile (filename, std::ios::out, PcapHelper::DLT_EN10MB);
 
   phy->TraceConnectWithoutContext ("Tx", MakeBoundCallback (&PcapSniffTxEvent, file));
   phy->TraceConnectWithoutContext ("Rx", MakeBoundCallback (&PcapSniffRxEvent, file));

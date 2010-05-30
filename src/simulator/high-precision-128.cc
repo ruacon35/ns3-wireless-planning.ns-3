@@ -39,7 +39,7 @@ int HighPrecision::m_nslowgets = 0;
 int HighPrecision::m_ndivs = 0;
 int HighPrecision::m_nconversions = 0;
 
-void 
+void
 HighPrecision::PrintStats (void)
 {
   double nadds = m_nfastadds + m_nslowadds;
@@ -53,25 +53,25 @@ HighPrecision::PrintStats (void)
   double fast_mul_ratio = m_nfastmuls / nmuls;
   double fast_get_ratio = m_nfastgets / ngets;
 
-  std::cout <<
-    "add="<<fast_add_ratio<<std::endl<<
-    "sub="<<fast_sub_ratio<<std::endl<<
-    "cmp="<<fast_cmp_ratio<<std::endl<<
-    "mul="<<fast_mul_ratio<<std::endl<<
-    "get="<<fast_get_ratio<<std::endl<<
-    "nadds="<<nadds<<std::endl<<
-    "nsubs="<<nsubs<<std::endl<<
-    "ncmps="<<ncmps<<std::endl<<
-    "nmuls="<<nmuls<<std::endl<<
-    "ngets="<<ngets<<std::endl<<
-    "ndivs="<<m_ndivs<<std::endl<<
-    "nconversions="<<m_nconversions<<std::endl
-    ;
+  std::cout << "add=" << fast_add_ratio << std::endl
+            << "sub=" << fast_sub_ratio << std::endl
+            << "cmp=" << fast_cmp_ratio << std::endl
+            << "mul=" << fast_mul_ratio << std::endl
+            << "get=" << fast_get_ratio << std::endl
+            << "nadds=" << nadds << std::endl
+            << "nsubs=" << nsubs << std::endl
+            << "ncmps=" << ncmps << std::endl
+            << "nmuls=" << nmuls << std::endl
+            << "ngets=" << ngets << std::endl
+            << "ndivs=" << m_ndivs << std::endl
+            << "nconversions=" << m_nconversions << std::endl
+  ;
 }
 #else
-void 
+void
 HighPrecision::PrintStats (void)
-{}
+{
+}
 #endif /* GATHER_STATISTICS */
 
 
@@ -117,21 +117,21 @@ HighPrecision::SlowGetInteger (void) const
   return _cairo_int128_to_int64 (value);
 }
 
-double 
+double
 HighPrecision::SlowGetDouble (void) const
 {
   bool is_negative = _cairo_int128_negative (m_slowValue);
-  cairo_int128_t value = is_negative?_cairo_int128_negate (m_slowValue):m_slowValue;
+  cairo_int128_t value = is_negative ? _cairo_int128_negate (m_slowValue) : m_slowValue;
   cairo_int128_t hi = _cairo_int128_rsa (value, 64);
   cairo_uint128_t lo = _cairo_int128_sub (value, _cairo_uint128_lsl (hi, 64));
   double flo = _cairo_uint128_to_uint64 (lo);
   flo /= MAX_64;
   double retval = _cairo_uint128_to_uint64 (hi);
   retval += flo;
-  retval *= is_negative?-1.0:1.0;
+  retval *= is_negative ? -1.0 : 1.0;
   return retval;
 }
-bool 
+bool
 HighPrecision::SlowAdd (HighPrecision const &o)
 {
   EnsureSlow ();
@@ -139,7 +139,7 @@ HighPrecision::SlowAdd (HighPrecision const &o)
   m_slowValue = _cairo_int128_add (m_slowValue, o.m_slowValue);
   return false;
 }
-bool 
+bool
 HighPrecision::SlowSub (HighPrecision const &o)
 {
   EnsureSlow ();
@@ -147,13 +147,13 @@ HighPrecision::SlowSub (HighPrecision const &o)
   m_slowValue = _cairo_int128_sub (m_slowValue, o.m_slowValue);
   return false;
 }
-bool 
+bool
 HighPrecision::SlowMul (HighPrecision const &o)
 {
   EnsureSlow ();
   const_cast<HighPrecision &> (o).EnsureSlow ();
-  //use the 128 bits multiplication
-  m_slowValue = Mul128(m_slowValue,o.m_slowValue);
+  // use the 128 bits multiplication
+  m_slowValue = Mul128 (m_slowValue,o.m_slowValue);
   return false;
 }
 /**
@@ -163,85 +163,98 @@ HighPrecision::SlowMul (HighPrecision const &o)
  * of the operands to produce a signed 128 bits result.
  */
 cairo_int128_t
-HighPrecision::Mul128(cairo_int128_t a, cairo_int128_t b )
+HighPrecision::Mul128 (cairo_int128_t sa, cairo_int128_t sb )
 {
-  //Implement the 128 bits multiplication
-  cairo_int128_t result;
+  bool negResult, negA, negB;
+
+  negA = _cairo_int128_negative (sa);
+  negB = _cairo_int128_negative (sb);
+  // the result is negative only if one of the operand is negative
+  negResult = (negA && !negB) || (!negA && negB);
+  // now take the absolute part to make sure that the resulting operands are positive
+  cairo_uint128_t a, b;
+  a = _cairo_int128_to_uint128 (sa);
+  b = _cairo_int128_to_uint128 (sb);
+  a = negA ? _cairo_uint128_negate (a) : a;
+  b = negB ? _cairo_uint128_negate (b) : b;
+
+  cairo_uint128_t result;
   cairo_uint128_t hiPart,loPart,midPart;
-  bool resultNegative = false, signA = false,signB = false;
 
-  //take the sign of the operands
-  signA = _cairo_int128_negative (a);
-  signB = _cairo_int128_negative (b);
-  //the result is negative only if one of the operand is negative
-  if ((signA == true && signB == false) ||(signA == false && signB == true))
-    {
-  	 resultNegative = true;
-    }
-  //now take the absolute part to make sure that the resulting operands are positive
-  if (signA == true)
-  {
-	  a = _cairo_int128_negate (a);
-  }
-  if (signB == true)
-  {
-  	  b = _cairo_int128_negate (b);
-  }
-
-  //Multiplying (a.h 2^64 + a.l) x (b.h 2^64 + b.l) =
+  // Multiplying (a.h 2^64 + a.l) x (b.h 2^64 + b.l) =
   //			2^128 a.h b.h + 2^64*(a.h b.l+b.h a.l) + a.l b.l
-  //get the low part a.l b.l
-  //multiply the fractional part
+  // get the low part a.l b.l
+  // multiply the fractional part
   loPart = _cairo_uint64x64_128_mul (a.lo, b.lo);
-  //compute the middle part 2^64*(a.h b.l+b.h a.l)
-  midPart = _cairo_uint128_add(_cairo_uint64x64_128_mul(a.lo, b.hi),
-		  _cairo_uint64x64_128_mul(a.hi, b.lo)) ;
-  //truncate the low part
-  result.lo = _cairo_uint64_add(loPart.hi,midPart.lo);
-  //compute the high part 2^128 a.h b.h
+  // compute the middle part 2^64*(a.h b.l+b.h a.l)
+  midPart = _cairo_uint128_add (_cairo_uint64x64_128_mul (a.lo, b.hi),
+                                _cairo_uint64x64_128_mul (a.hi, b.lo));
+  // truncate the low part
+  result.lo = _cairo_uint64_add (loPart.hi,midPart.lo);
+  // compute the high part 2^128 a.h b.h
   hiPart = _cairo_uint64x64_128_mul (a.hi, b.hi);
-  //truncate the high part and only use the low part
-  result.hi = _cairo_uint64_add(hiPart.lo,midPart.hi);
-  //if the high part is not zero, put a warning
-  if (hiPart.hi !=0)
-  {
-	  NS_FATAL_ERROR("High precision 128 bits multiplication error: multiplication overflow.");
-  }
-  //add the sign to the result
-  if (resultNegative)
-  {
-	 result = _cairo_int128_negate (result);
-  }
-  return result;
+  // truncate the high part and only use the low part
+  result.hi = _cairo_uint64_add (hiPart.lo,midPart.hi);
+  // if the high part is not zero, put a warning
+  if (hiPart.hi != 0)
+    {
+      NS_FATAL_ERROR ("High precision 128 bits multiplication error: multiplication overflow.");
+    }
+  // add the sign to the result
+  result = negResult ? _cairo_uint128_negate (result) : result;
+  return _cairo_uint128_to_int128 (result);
 }
 
-bool 
+bool
 HighPrecision::Div (HighPrecision const &o)
 {
   HP128INC (m_ndivs++);
   EnsureSlow ();
   const_cast<HighPrecision &> (o).EnsureSlow ();
-  cairo_quorem128_t qr;
-  qr = _cairo_int128_divrem (m_slowValue, o.m_slowValue);
-  m_slowValue = _cairo_int128_lsl (qr.quo, 64);
+
+  cairo_int128_t result = Div128 (m_slowValue, o.m_slowValue);
+  m_slowValue = result;
+  return false;
+}
+
+cairo_int128_t
+HighPrecision::Div128 (cairo_int128_t sa, cairo_int128_t sb)
+{
+  bool negResult, negA, negB;
+  // take the sign of the operands
+  negA = _cairo_int128_negative (sa);
+  negB = _cairo_int128_negative (sb);
+  // the result is negative only if one of the operand is negative
+  negResult = (negA && !negB) || (!negA && negB);
+  // now take the absolute part to make sure that the resulting operands are positive
+  cairo_uint128_t a, b;
+  a = _cairo_int128_to_uint128 (sa);
+  b = _cairo_int128_to_uint128 (sb);
+  a = negA ? _cairo_uint128_negate (a) : a;
+  b = negB ? _cairo_uint128_negate (b) : b;
+
+  cairo_uquorem128_t qr = _cairo_uint128_divrem (a, b);
+  cairo_uint128_t result = _cairo_uint128_lsl (qr.quo, 64);
   // Now, manage the remainder
-  cairo_int128_t div = o.m_slowValue;
-  cairo_int128_t tmp;
-  tmp = _cairo_int128_rsa (qr.rem, 64);
-  cairo_int128_t zero = _cairo_int64_to_int128 (0);
-  if (_cairo_int128_eq (tmp, zero))
+  cairo_uint128_t tmp = _cairo_uint128_rsl (qr.rem, 64);
+  cairo_uint128_t zero = _cairo_uint64_to_uint128 (0);
+  cairo_uint128_t rem, div;
+  if (_cairo_uint128_eq (tmp, zero))
     {
-      qr.rem = _cairo_int128_lsl (qr.rem, 64);
+      rem = _cairo_uint128_lsl (qr.rem, 64);
+      div = b;
     }
   else
     {
-      div = _cairo_int128_rsa (div, 64);
+      rem = qr.rem;
+      div = _cairo_uint128_rsl (b, 64);
     }
-  qr = _cairo_int128_divrem (qr.rem, div);
-  m_slowValue = _cairo_int128_add (m_slowValue, qr.quo);
-  return false;
+  qr = _cairo_uint128_divrem (rem, div);
+  result = _cairo_uint128_add (result, qr.quo);
+  result = negResult ? _cairo_uint128_negate (result) : result;
+  return _cairo_uint128_to_int128 (result);
 }
-int 
+int
 HighPrecision::SlowCompare (HighPrecision const &o) const
 {
   const_cast<HighPrecision *> (this)->EnsureSlow ();
@@ -265,7 +278,7 @@ HighPrecision::SlowCompare (HighPrecision const &o) const
 #include "ns3/test.h"
 
 #define CHECK_EXPECTED(a,b) \
-  NS_TEST_ASSERT_MSG_EQ(a.GetInteger(),b,"Arithmetic failure: " << (a.GetInteger()) << "!=" << (b))
+  NS_TEST_ASSERT_MSG_EQ (a.GetInteger (),b,"Arithmetic failure: " << (a.GetInteger ()) << "!=" << (b))
 
 #define V(v) \
   HighPrecision (v, false)
@@ -281,8 +294,9 @@ public:
 
 Hp128ArithmeticTestCase::Hp128ArithmeticTestCase ()
   : TestCase ("Check basic arithmetic operations")
-{}
-bool 
+{
+}
+bool
 Hp128ArithmeticTestCase::DoRun (void)
 {
   HighPrecision a, b;
@@ -293,103 +307,103 @@ Hp128ArithmeticTestCase::DoRun (void)
   CHECK_EXPECTED (a, 0);
 
   a = V (1);
-  a.Sub (V(2));
+  a.Sub (V (2));
   CHECK_EXPECTED (a, -1);
 
   a = V (1);
-  a.Sub (V(3));
+  a.Sub (V (3));
   CHECK_EXPECTED (a, -2);
 
   a = V (1);
-  a.Sub (V(-1));
+  a.Sub (V (-1));
   CHECK_EXPECTED (a, 2);
 
   a = V (1);
-  a.Sub (V(-2));
+  a.Sub (V (-2));
   CHECK_EXPECTED (a, 3);
 
   a = V (-3);
-  a.Sub (V(-4));
+  a.Sub (V (-4));
   CHECK_EXPECTED (a, 1);
 
   a = V (-2);
-  a.Sub (V(3));
+  a.Sub (V (3));
   CHECK_EXPECTED (a, -5);
 
   a = V (1);
-  a.Add (V(2));
+  a.Add (V (2));
   CHECK_EXPECTED (a, 3);
 
   a = V (1);
-  a.Add (V(-3));
+  a.Add (V (-3));
   CHECK_EXPECTED (a, -2);
 
   a = V (0);
-  a.Add (V(0));
+  a.Add (V (0));
   CHECK_EXPECTED (a, 0);
 
   a = V (0);
-  a.Mul (V(0));
+  a.Mul (V (0));
   CHECK_EXPECTED (a, 0);
   a = V (0);
-  a.Mul (V(1));
+  a.Mul (V (1));
   CHECK_EXPECTED (a, 0);
   a = V (0);
-  a.Mul (V(-1));
+  a.Mul (V (-1));
   CHECK_EXPECTED (a, 0);
   a = V (1);
-  a.Mul (V(0));
+  a.Mul (V (0));
   CHECK_EXPECTED (a, 0);
   a = V (1);
-  a.Mul (V(1));
+  a.Mul (V (1));
   CHECK_EXPECTED (a, 1);
   a = V (1);
-  a.Mul (V(-1));
+  a.Mul (V (-1));
   CHECK_EXPECTED (a, -1);
   a = V (-1);
-  a.Mul (V(-1));
+  a.Mul (V (-1));
   CHECK_EXPECTED (a, 1);
 
   a = V (0);
-  a.Mul (V(1));
+  a.Mul (V (1));
   CHECK_EXPECTED (a, 0);
   a = V (0);
-  a.Mul (V(-1));
+  a.Mul (V (-1));
   CHECK_EXPECTED (a, 0);
   a = V (1);
-  a.Mul (V(1));
+  a.Mul (V (1));
   CHECK_EXPECTED (a, 1);
   a = V (1);
-  a.Mul (V(-1));
+  a.Mul (V (-1));
   CHECK_EXPECTED (a, -1);
   a = V (-1);
-  a.Mul (V(1));
+  a.Mul (V (1));
   CHECK_EXPECTED (a, -1);
   a = V (-1);
-  a.Mul (V(-1));
+  a.Mul (V (-1));
   CHECK_EXPECTED (a, 1);
 
 
 
   a = V (2);
-  a.Mul (V(3));
-  a.Div (V(3));
+  a.Mul (V (3));
+  a.Div (V (3));
   CHECK_EXPECTED (a, 2);
 
   // Below, the division loses precision because 2/3 is not
   // representable exactly in 64.64 integers. So, we got
   // something super close but the final rounding kills us.
   a = V (2);
-  a.Div (V(3));
-  a.Mul (V(3));
+  a.Div (V (3));
+  a.Mul (V (3));
   CHECK_EXPECTED (a, 1);
 
   // The example below shows that we really do not lose
   // much precision internally: it is almost always the
   // final conversion which loses precision.
   a = V (2000000000);
-  a.Div (V(3));
-  a.Mul (V(3));
+  a.Div (V (3));
+  a.Mul (V (3));
   CHECK_EXPECTED (a, 1999999999);
 
   return false;
@@ -398,45 +412,79 @@ Hp128ArithmeticTestCase::DoRun (void)
 class Hp128Bug455TestCase : public TestCase
 {
 public:
-  Hp128Bug455TestCase();
+  Hp128Bug455TestCase ();
   virtual bool DoRun (void);
 };
 
-Hp128Bug455TestCase::Hp128Bug455TestCase()
-  : TestCase("Test case for bug 455")
-{}
-bool 
+Hp128Bug455TestCase::Hp128Bug455TestCase ()
+  : TestCase ("Test case for bug 455")
+{
+}
+bool
 Hp128Bug455TestCase::DoRun (void)
 {
   HighPrecision a = HighPrecision (0.1);
   a.Div (HighPrecision (1.25));
   NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), 0.08, "The original testcase");
   a = HighPrecision (0.5);
-  a.Mul(HighPrecision (5));
+  a.Mul (HighPrecision (5));
   NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), 2.5, "Simple test for multiplication");
   a = HighPrecision (-0.5);
-  a.Mul(HighPrecision (5));
+  a.Mul (HighPrecision (5));
   NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), -2.5, "Test sign, first operation negative");
   a = HighPrecision (-0.5);
-  a.Mul(HighPrecision (-5));
+  a.Mul (HighPrecision (-5));
   NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), 2.5, "both operands negative");
   a = HighPrecision (0.5);
-  a.Mul(HighPrecision (-5));
+  a.Mul (HighPrecision (-5));
   NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), -2.5, "only second operand negative");
 
   return false;
 }
 
 
+class Hp128Bug863TestCase : public TestCase
+{
+public:
+  Hp128Bug863TestCase ();
+  virtual bool DoRun (void);
+};
+
+Hp128Bug863TestCase::Hp128Bug863TestCase ()
+  : TestCase ("Test case for bug 863")
+{
+}
+bool
+Hp128Bug863TestCase::DoRun (void)
+{
+  HighPrecision a = HighPrecision (0.9);
+  a.Div (HighPrecision (1));
+  NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), 0.9, "The original testcase");
+  a = HighPrecision (0.5);
+  a.Div (HighPrecision (0.5));
+  NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), 1.0, "Simple test for division");
+  a = HighPrecision (-0.5);
+  a.Div (HighPrecision (0.5));
+  NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), -1.0, "first argument negative");
+  a = HighPrecision (0.5);
+  a.Div (HighPrecision (-0.5));
+  NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), -1.0, "second argument negative");
+  a = HighPrecision (-0.5);
+  a.Div (HighPrecision (-0.5));
+  NS_TEST_ASSERT_MSG_EQ (a.GetDouble (), 1.0, "both arguments negative");
+
+  return false;
+}
 
 static class HighPrecision128TestSuite : public TestSuite
 {
 public:
-  HighPrecision128TestSuite()
+  HighPrecision128TestSuite ()
     : TestSuite ("high-precision-128", UNIT)
   {
-    AddTestCase (new Hp128ArithmeticTestCase());
-    AddTestCase (new Hp128Bug455TestCase());
+    AddTestCase (new Hp128ArithmeticTestCase ());
+    AddTestCase (new Hp128Bug455TestCase ());
+    AddTestCase (new Hp128Bug863TestCase ());
   }
 } g_highPrecision128TestSuite;
 
