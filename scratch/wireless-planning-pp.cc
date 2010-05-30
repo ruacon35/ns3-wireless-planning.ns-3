@@ -56,7 +56,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
 /*
   * Network Creation
   */
- string netInfoFile = "wifi-PtP.ni";
+ string netInfoFile = "wifi-PtP-10m-11Mbps.ni";
  NS_LOG_INFO ("Getting data in order to create and configure the network...");
  CommandLine cmd;
  cmd.AddValue ("NetInfoFile", "Network Information File", netInfoFile);
@@ -77,11 +77,11 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
   */
   NetTest netTest;
 // Point to Point scenario
- string rate = "4Mbps";
+ string rate = "10Mbps";
  AppState appState1 (AC_VO);
  netTest.ApplicationSetup ("A", "B", 1, 10, rate, 1452, &appState1);
- AppState appState2 (AC_VO);
- netTest.ApplicationSetup ("A", "B", 1, 10, rate, 1452, &appState2);
+// AppState appState2 (AC_VO);
+// netTest.ApplicationSetup ("A", "B", 1, 10, rate, 1452, &appState2);
 // AppState appState3 (AC_VI);
 // netTest.ApplicationSetup ("A", "B", 3, 10, rate, 1452, &appState3);
 // AppState appState4 (AC_BE);
@@ -89,7 +89,7 @@ Time eos = Seconds (15);// End Of Simulation in seconds, necessary to finish som
 
  vector < string > flowNames;
  flowNames.push_back ("A-B VO " + rate);
- flowNames.push_back ("A-B VO " + rate);
+// flowNames.push_back ("A-B VO " + rate);
 // flowNames.push_back ("A-B VI " + rate);
 // flowNames.push_back ("B-A BE " + rate);
 
